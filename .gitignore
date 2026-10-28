@@ -1,0 +1,22 @@
+.venv/
+.uv-cache/
+.pnpm-store/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+pytest-cache-files-*/
+.mypy_cache/
+.ruff_cache/
+build/
+dist/
+*.egg-info/
+docs/audit-remediation-2026-10-24/playwright-results/
+.pytest-tmp-empirical*/
+
+# Local scratch space and legacy test output (retained on disk).
+.tmp/
+.pytest-spec07-*/
+.pytest-tmp-*/
+
+# Inspected pytest fixture directories; retained locally, not historical reports.
+openspec/changes/boquitas-07-preparation-interruptions/review/pytest-*/
