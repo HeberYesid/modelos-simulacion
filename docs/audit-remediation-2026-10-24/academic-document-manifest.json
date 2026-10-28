@@ -1,0 +1,17 @@
+{
+  "verified_on": "2026-10-24",
+  "output_file": "Boquitas - Trabajo académico actualizado - 2026-10-24.docx",
+  "output_sha256": "af031ff02d46e87face2ce4e80b4babc728b95efb00b0568a623c8afd393daf7",
+  "original_sha256": "7629ae302af295bf02f3d9cf0f680343db93f0fd9bd4527322b3960decce3e21",
+  "page_count": 27,
+  "page_image_count": 27,
+  "minimum_page_text_characters": 313,
+  "source_geometry_preserved": true,
+  "original_image_parts": 2,
+  "original_images_byte_identical": true,
+  "protected_sources_byte_identical": 6,
+  "native_toc_refreshed": true,
+  "visual_qa": "Every final page inspected or byte-identical to an inspected clean page in this same revision",
+  "render_directory": "C:\\Users\\HeberYesid\\.codex\\visualizations\\2026\\10\\24\\01a16e0c-8e61-7b43-937b-f72aa096877a\\academic-update-qa-8",
+  "pending": "Cover identity/delivery fields and empirical work remain unfilled; Spec07 is under separate integration acceptance."
+}

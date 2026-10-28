@@ -1,0 +1,19 @@
+{
+  "scientific_V1": {
+    "Tuesday": {
+      "bytes": 895752,
+      "sha256": "8bbe6b117f59dde367816d8ed63bb013b0ad624d916a57159c084fcff4051dd7",
+      "byte_identical": true
+    },
+    "regular": {
+      "bytes": 976770,
+      "sha256": "d0093084b4e99e59000725ae99c8cab2603bb3f7a666c986f731b06b5c157e69",
+      "byte_identical": true
+    }
+  },
+  "original_test_files_changed": [
+    "tests/test_api.py",
+    "web/tests/json-precision.test.ts"
+  ],
+  "note": "Changed H01 tests must be compared against its coordinated post-H01 snapshot, rather than reverted."
+}

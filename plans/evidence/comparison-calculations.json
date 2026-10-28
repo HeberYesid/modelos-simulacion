@@ -1,0 +1,489 @@
+{
+  "analysis_version": 1,
+  "prepared_on": "2026-10-24",
+  "status": "descriptive_analysis_and_proposal_only",
+  "source_manifest": {
+    "tuesday": {
+      "path": "C:\\Users\\HeberYesid\\OneDrive - UNIVERSIDAD DE SANTANDER - UDES\\Universidad\\8\\MODELOS\\Datos Boquitas 2026-10-20 corregidos.txt",
+      "sha256": "480ade881fd14bc88d8c94f037cea9ef4c2869b7ba400cbffda772f6f470caea",
+      "row_count": 119
+    },
+    "normal_cashier": {
+      "path": "C:\\Users\\HeberYesid\\Desktop\\Universidad Trabajos\\Modelos-simulación\\plans\\evidence\\normal-2026-10-23-caja.txt",
+      "sha256": "253e1f5fea2a9a998414a3aa9accc7f4c69df68bd3c48910c9f149fdb0ca896d",
+      "row_count": 8
+    },
+    "normal_delivery": {
+      "path": "C:\\Users\\HeberYesid\\Desktop\\Universidad Trabajos\\Modelos-simulación\\plans\\evidence\\normal-2026-10-23-entrega.txt",
+      "sha256": "306894afd30abded545c5ffb6e62446cd1d7926264f162775f45bda03295f220",
+      "row_count": 8
+    }
+  },
+  "user_confirmations": {
+    "normal_preparation_start_means_preparation": true,
+    "normal_same_ids_are_same_orders": true,
+    "normal_same_worker_paused_preparation_for_cashier": true,
+    "confirmation_date": "2026-10-24",
+    "scope": "2026-10-23 only; no Tuesday join is established",
+    "exact_pause_boundaries_observed": false,
+    "clock_basis_confirmed": false,
+    "actual_observation_window_confirmed": false
+  },
+  "station_summaries": {
+    "tuesday": {
+      "caja": {
+        "n_rows": 61,
+        "n_complete": 58,
+        "n_withdrawn": 3,
+        "staff_values": [
+          1
+        ],
+        "first_arrival": "16:45:35",
+        "last_arrival": "18:32:51",
+        "first_recorded_event": "2026-10-20T16:45:35",
+        "last_recorded_event": "2026-10-20T18:33:46",
+        "wait_s": {
+          "n": 58,
+          "sum": 6353.0,
+          "mean": 109.53448275862068,
+          "median": 76.5,
+          "min": 1.0,
+          "max": 474.0
+        },
+        "interval_s": {
+          "n": 58,
+          "sum": 4816.0,
+          "mean": 83.03448275862068,
+          "median": 60.0,
+          "min": 1.0,
+          "max": 271.0
+        }
+      },
+      "entrega": {
+        "n_rows": 58,
+        "n_complete": 58,
+        "n_withdrawn": 0,
+        "staff_values": [
+          4
+        ],
+        "first_arrival": "16:47:05",
+        "last_arrival": "18:33:01",
+        "first_recorded_event": "2026-10-20T16:47:05",
+        "last_recorded_event": "2026-10-20T18:41:30",
+        "wait_s": {
+          "n": 58,
+          "sum": 1331.0,
+          "mean": 22.948275862068964,
+          "median": 8.5,
+          "min": 0.0,
+          "max": 238.0
+        },
+        "interval_s": {
+          "n": 58,
+          "sum": 16532.0,
+          "mean": 285.0344827586207,
+          "median": 253.0,
+          "min": 8.0,
+          "max": 538.0
+        }
+      }
+    },
+    "normal": {
+      "caja": {
+        "n_rows": 8,
+        "n_complete": 8,
+        "n_withdrawn": 0,
+        "staff_values": [
+          1
+        ],
+        "first_arrival": "17:20:23",
+        "last_arrival": "18:18:46",
+        "first_recorded_event": "2026-10-23T17:20:23",
+        "last_recorded_event": "2026-10-23T18:19:32",
+        "wait_s": {
+          "n": 8,
+          "sum": 328.0,
+          "mean": 41.0,
+          "median": 37.5,
+          "min": 1.0,
+          "max": 96.0
+        },
+        "interval_s": {
+          "n": 8,
+          "sum": 180.0,
+          "mean": 22.5,
+          "median": 21.0,
+          "min": 10.0,
+          "max": 39.0
+        }
+      },
+      "entrega": {
+        "n_rows": 8,
+        "n_complete": 8,
+        "n_withdrawn": 0,
+        "staff_values": [
+          1
+        ],
+        "first_arrival": "17:21:03",
+        "last_arrival": "18:19:33",
+        "first_recorded_event": "2026-10-23T17:21:03",
+        "last_recorded_event": "2026-10-23T18:21:09",
+        "wait_s": {
+          "n": 8,
+          "sum": 124.0,
+          "mean": 15.5,
+          "median": 1.5,
+          "min": 0.0,
+          "max": 106.0
+        },
+        "interval_s": {
+          "n": 8,
+          "sum": 1168.0,
+          "mean": 146.0,
+          "median": 138.0,
+          "min": 95.0,
+          "max": 232.0
+        }
+      }
+    }
+  },
+  "importer_checks": {
+    "tuesday": {
+      "policy_status": "already_reflected",
+      "row_count": 119,
+      "issues": [
+        {
+          "code": "cashier_window_overlap",
+          "severity": "information",
+          "row_keys": [
+            "2026-10-20|caja|3",
+            "2026-10-20|caja|4",
+            "2026-10-20|caja|5",
+            "2026-10-20|caja|6",
+            "2026-10-20|caja|18",
+            "2026-10-20|caja|20",
+            "2026-10-20|caja|21",
+            "2026-10-20|caja|22",
+            "2026-10-20|caja|23",
+            "2026-10-20|caja|24",
+            "2026-10-20|caja|25",
+            "2026-10-20|caja|26",
+            "2026-10-20|caja|27",
+            "2026-10-20|caja|31",
+            "2026-10-20|caja|32",
+            "2026-10-20|caja|35",
+            "2026-10-20|caja|36",
+            "2026-10-20|caja|37",
+            "2026-10-20|caja|40",
+            "2026-10-20|caja|41",
+            "2026-10-20|caja|42",
+            "2026-10-20|caja|43",
+            "2026-10-20|caja|44",
+            "2026-10-20|caja|45",
+            "2026-10-20|caja|47",
+            "2026-10-20|caja|48"
+          ],
+          "line_numbers": [
+            62,
+            63,
+            64,
+            65,
+            77,
+            79,
+            80,
+            81,
+            82,
+            83,
+            84,
+            85,
+            86,
+            90,
+            91,
+            94,
+            95,
+            96,
+            99,
+            100,
+            101,
+            102,
+            103,
+            104,
+            106,
+            107
+          ],
+          "fields": [
+            "hora_inicio",
+            "hora_fin"
+          ],
+          "affected_view": "normalized",
+          "message": "Cashier transaction windows overlap; this observation does not measure active cashier occupation or utilization."
+        },
+        {
+          "code": "capacity_exceeded",
+          "severity": "warning",
+          "row_keys": [
+            "2026-10-20|entrega|5",
+            "2026-10-20|entrega|6",
+            "2026-10-20|entrega|7",
+            "2026-10-20|entrega|8",
+            "2026-10-20|entrega|9"
+          ],
+          "line_numbers": [
+            6,
+            7,
+            8,
+            9,
+            10
+          ],
+          "fields": [
+            "personal",
+            "hora_inicio",
+            "hora_fin"
+          ],
+          "affected_view": "normalized",
+          "message": "5 delivery intervals overlap at 16:57:32 while reported preparation staff is 4; this is a consistency conflict, not an inferred assignment."
+        },
+        {
+          "code": "capacity_exceeded",
+          "severity": "warning",
+          "row_keys": [
+            "2026-10-20|entrega|6",
+            "2026-10-20|entrega|7",
+            "2026-10-20|entrega|8",
+            "2026-10-20|entrega|9",
+            "2026-10-20|entrega|10"
+          ],
+          "line_numbers": [
+            7,
+            8,
+            9,
+            10,
+            11
+          ],
+          "fields": [
+            "personal",
+            "hora_inicio",
+            "hora_fin"
+          ],
+          "affected_view": "normalized",
+          "message": "5 delivery intervals overlap at 16:58:55 while reported preparation staff is 4; this is a consistency conflict, not an inferred assignment."
+        },
+        {
+          "code": "capacity_exceeded",
+          "severity": "warning",
+          "row_keys": [
+            "2026-10-20|entrega|6",
+            "2026-10-20|entrega|7",
+            "2026-10-20|entrega|8",
+            "2026-10-20|entrega|9",
+            "2026-10-20|entrega|10",
+            "2026-10-20|entrega|11"
+          ],
+          "line_numbers": [
+            7,
+            8,
+            9,
+            10,
+            11,
+            12
+          ],
+          "fields": [
+            "personal",
+            "hora_inicio",
+            "hora_fin"
+          ],
+          "affected_view": "normalized",
+          "message": "6 delivery intervals overlap at 17:00:10 while reported preparation staff is 4; this is a consistency conflict, not an inferred assignment."
+        },
+        {
+          "code": "capacity_exceeded",
+          "severity": "warning",
+          "row_keys": [
+            "2026-10-20|entrega|7",
+            "2026-10-20|entrega|8",
+            "2026-10-20|entrega|9",
+            "2026-10-20|entrega|10",
+            "2026-10-20|entrega|11"
+          ],
+          "line_numbers": [
+            8,
+            9,
+            10,
+            11,
+            12
+          ],
+          "fields": [
+            "personal",
+            "hora_inicio",
+            "hora_fin"
+          ],
+          "affected_view": "normalized",
+          "message": "5 delivery intervals overlap at 17:00:12 while reported preparation staff is 4; this is a consistency conflict, not an inferred assignment."
+        },
+        {
+          "code": "capacity_exceeded",
+          "severity": "warning",
+          "row_keys": [
+            "2026-10-20|entrega|8",
+            "2026-10-20|entrega|9",
+            "2026-10-20|entrega|10",
+            "2026-10-20|entrega|11",
+            "2026-10-20|entrega|12"
+          ],
+          "line_numbers": [
+            9,
+            10,
+            11,
+            12,
+            13
+          ],
+          "fields": [
+            "personal",
+            "hora_inicio",
+            "hora_fin"
+          ],
+          "affected_view": "normalized",
+          "message": "5 delivery intervals overlap at 17:03:13 while reported preparation staff is 4; this is a consistency conflict, not an inferred assignment."
+        }
+      ],
+      "concurrency": [
+        {
+          "station": "caja",
+          "peak": 3,
+          "peak_at": "16:51:10"
+        },
+        {
+          "station": "entrega",
+          "peak": 6,
+          "peak_at": "17:00:10"
+        }
+      ]
+    },
+    "normal": {
+      "policy_status": "none",
+      "row_count": 16,
+      "issues": [],
+      "concurrency": [
+        {
+          "station": "caja",
+          "peak": 1,
+          "peak_at": "17:20:44"
+        },
+        {
+          "station": "entrega",
+          "peak": 1,
+          "peak_at": "17:21:12"
+        }
+      ]
+    }
+  },
+  "normal_linked_orders": [
+    {
+      "order_id": "1",
+      "cash_wait_s": 21.0,
+      "cash_window_s": 17.0,
+      "between_stations_recorded_gap_s": 2.0,
+      "prep_wait_s": 9.0,
+      "prep_elapsed_s": 232.0,
+      "total_s": 281.0
+    },
+    {
+      "order_id": "2",
+      "cash_wait_s": 1.0,
+      "cash_window_s": 30.0,
+      "between_stations_recorded_gap_s": 1.0,
+      "prep_wait_s": 1.0,
+      "prep_elapsed_s": 131.0,
+      "total_s": 164.0
+    },
+    {
+      "order_id": "3",
+      "cash_wait_s": 72.0,
+      "cash_window_s": 24.0,
+      "between_stations_recorded_gap_s": 2.0,
+      "prep_wait_s": 4.0,
+      "prep_elapsed_s": 135.0,
+      "total_s": 237.0
+    },
+    {
+      "order_id": "4",
+      "cash_wait_s": 96.0,
+      "cash_window_s": 39.0,
+      "between_stations_recorded_gap_s": 2.0,
+      "prep_wait_s": 2.0,
+      "prep_elapsed_s": 154.0,
+      "total_s": 293.0
+    },
+    {
+      "order_id": "5",
+      "cash_wait_s": 43.0,
+      "cash_window_s": 18.0,
+      "between_stations_recorded_gap_s": 1.0,
+      "prep_wait_s": 0.0,
+      "prep_elapsed_s": 97.0,
+      "total_s": 159.0
+    },
+    {
+      "order_id": "6",
+      "cash_wait_s": 39.0,
+      "cash_window_s": 32.0,
+      "between_stations_recorded_gap_s": 2.0,
+      "prep_wait_s": 1.0,
+      "prep_elapsed_s": 183.0,
+      "total_s": 257.0
+    },
+    {
+      "order_id": "7",
+      "cash_wait_s": 20.0,
+      "cash_window_s": 10.0,
+      "between_stations_recorded_gap_s": 2.0,
+      "prep_wait_s": 106.0,
+      "prep_elapsed_s": 141.0,
+      "total_s": 279.0
+    },
+    {
+      "order_id": "8",
+      "cash_wait_s": 36.0,
+      "cash_window_s": 10.0,
+      "between_stations_recorded_gap_s": 1.0,
+      "prep_wait_s": 1.0,
+      "prep_elapsed_s": 95.0,
+      "total_s": 143.0
+    }
+  ],
+  "normal_linked_summary": {
+    "cash_wait_s": 41.0,
+    "cash_window_s": 22.5,
+    "between_stations_recorded_gap_s": 1.625,
+    "prep_wait_s": 15.5,
+    "prep_elapsed_s": 146.0,
+    "total_s": 226.625,
+    "n_orders": 8,
+    "total_sum_s": 1813.0,
+    "total_median_s": 247.0,
+    "total_min_s": 143.0,
+    "total_max_s": 293.0
+  },
+  "normal_cross_station_overlaps": [
+    {
+      "cashier_id": "7",
+      "preparation_id": "6",
+      "start_at": "2026-10-23T18:14:19",
+      "end_at": "2026-10-23T18:14:29",
+      "overlap_s": 10.0
+    }
+  ],
+  "differences_normal_minus_tuesday_s": {
+    "caja": {
+      "wait_s": -68.53448275862068,
+      "interval_s": -60.53448275862068
+    },
+    "entrega": {
+      "wait_s": -7.448275862068964,
+      "interval_s": -139.0344827586207
+    }
+  },
+  "tuesday_end_to_end": null,
+  "tuesday_end_to_end_unavailable_reason": "No verified order-level join between Tuesday cashier and delivery observations",
+  "verification": "Independent csv/datetime arithmetic matched the existing importer totals and counts; every normal order total equals its five recorded stage intervals."
+}

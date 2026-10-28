@@ -1,0 +1,18 @@
+{
+  "test": "commits a preparer increase on the first run click and exposes the new worker",
+  "status": "passed",
+  "expectedStatus": "passed",
+  "localOrigin": "http://127.0.0.1:8000",
+  "serviceWorkers": "blocked",
+  "guardActive": true,
+  "localHttpRequestCount": 6,
+  "localRequestPaths": [
+    "GET /",
+    "GET /assets/index-CcuhCTBa.js",
+    "GET /assets/index-DuO-lDds.css",
+    "GET /api/v1/health",
+    "GET /api/v1/demo",
+    "POST /api/v1/runs"
+  ],
+  "externalHttpAttempts": []
+}

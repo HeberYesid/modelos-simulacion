@@ -1,0 +1,37 @@
+{
+  "checks": [
+    "incompatible mode/capacity and incomplete rows retain scripts; explicit resolution and numeric V2 scenario download",
+    "core A/B 14/17, active/paused/count/elapsed 10/2/1/12, real graphics, repeated 6/8 seeks, speed controls, exact server-byte download",
+    "edited scenario keeps script and immutable completed bytes; actual CSV download",
+    "reopen without simulation POST, exact bytes and retained result after mismatched-version rejection",
+    "real WebGL loss keeps V2 inspector, timeline, metrics and exact export usable",
+    "external confirmation at t8 reserves one inactive worker; A/B deliveries 17/20",
+    "mobile V2 script editor has no document horizontal overflow"
+  ],
+  "requests": [
+    "GET /",
+    "GET /assets/index-U8QDHLar.js",
+    "GET /assets/index-DuO-lDds.css",
+    "GET /api/v1/health",
+    "GET /api/v1/demo",
+    "POST /api/v1/files/validate",
+    "POST /api/v1/files/validate",
+    "POST /api/v1/runs",
+    "POST /api/v1/files/validate",
+    "POST /api/v1/exports/csv",
+    "GET /",
+    "GET /assets/index-U8QDHLar.js",
+    "GET /assets/index-DuO-lDds.css",
+    "GET /api/v1/health",
+    "GET /api/v1/demo",
+    "POST /api/v1/files/validate",
+    "POST /api/v1/files/validate",
+    "POST /api/v1/files/validate",
+    "POST /api/v1/runs",
+    "POST /api/v1/files/validate"
+  ],
+  "external": [],
+  "errors": [],
+  "passed": false,
+  "failure": "locator.selectOption: Timeout 30000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('#selected-scenario')\u001b[22m\n\u001b[2m    - locator resolved to <select id=\"selected-scenario\" data-selected-scenario=\"\">…</select>\u001b[22m\n\u001b[2m  - attempting select option action\u001b[22m\n\u001b[2m    2 × waiting for element to be visible and enabled\u001b[22m\n\u001b[2m      - did not find some options\u001b[22m\n\u001b[2m    - retrying select option action\u001b[22m\n\u001b[2m    - waiting 20ms\u001b[22m\n\u001b[2m    2 × waiting for element to be visible and enabled\u001b[22m\n\u001b[2m      - did not find some options\u001b[22m\n\u001b[2m    - retrying select option action\u001b[22m\n\u001b[2m      - waiting 100ms\u001b[22m\n\u001b[2m    59 × waiting for element to be visible and enabled\u001b[22m\n\u001b[2m       - did not find some options\u001b[22m\n\u001b[2m     - retrying select option action\u001b[22m\n\u001b[2m       - waiting 500ms\u001b[22m\n\n    at C:\\Users\\HeberYesid\\Desktop\\Universidad Trabajos\\Modelos-simulación\\openspec\\changes\\boquitas-07-preparation-interruptions\\review\\browser-acceptance.mjs:186:46"
+}

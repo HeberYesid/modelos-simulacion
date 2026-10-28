@@ -1,0 +1,13 @@
+{
+  "src/boquitas/api.py": "1c3bf93014e4ce02e502a2639e3aa6db4f1a3a332b6ba3264cc92ea49671444d",
+  "src/boquitas/file_limits.py": "a54a3ef92119fb02b93122156f5c644ae8c164686d83890bacd0352dd5a45b3a",
+  "tests/test_api.py": "a58758d58f0883ef48f59945950cae4c4f29be7efdbc21f33e15deae3162af83",
+  "tests/test_large_result_reopen.py": "69033c595649447eb144facbb4ca9aff2afe510e8bcc3a973b7e1fd1a67eba23",
+  "web/src/services/api.ts": "e8777fdf7b8447eb4de34feb07ed195adc15f7bd7793982e39d27933e1b43007",
+  "web/src/domain/format.ts": "0771b4b43b876ac578f76d0ee79ff5588eca76d51dd8446d6543dd54e9088e0e",
+  "web/src/domain/file-limits.ts": "669505a526b1dedfb0c87923f8d74feef3d04476d3fd958e4e6b3586dd8cee4c",
+  "web/src/main.ts": "da74068442f735d42222818762d1ee8bfdea82419666b81c5a90b5a10d517084",
+  "web/tests/json-precision.test.ts": "f875579e0e1d864c51465c7722238498015f132468b1dfdcfd38ef5a5b6470ef",
+  "web/tests/file-size-policy.test.ts": "c5fd74526ee087304baaebaba284555737bbf78bcfcdabe409b1d63376c1c45c",
+  "web/tests/server-response-json.test.ts": "5f212c9ee739dae46bfec8c37b2d261634152dc3c8521b231fb8a6325222f533"
+}

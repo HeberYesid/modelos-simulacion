@@ -1,0 +1,3048 @@
+{
+  "reference_version": 1,
+  "source": "Downloaded RunResult from the installed local release workflow.",
+  "canonicalization": "Recursively sorted JSON object keys; no wall-clock metadata is present in RunResult.",
+  "excluded_wall_clock_metadata": [],
+  "simulation_time_fields_retained": [
+    "trace.events[].time_s",
+    "trace.window_end_s",
+    "trace.drain_end_s"
+  ],
+  "sha256": "62a4384e6e889698a5a62e6b63869a75efcf43bf125bc943c22cd3082a746c47",
+  "scientific_result": {
+    "assumptions": [
+      "Los valores de enseñanza son sintéticos y no son estimaciones de datos de Boquitas.",
+      "Cada orden compartida tiene un pago y una preparación, sin importar el tamaño del grupo.",
+      "El estado inicial está vacío; no se supone trabajo previo que no haya sido observado.",
+      "No se aplica un periodo de calentamiento; las medidas de ventana empiezan en la apertura.",
+      "Los parámetros editados en la interfaz son supuestos del usuario y no provienen de una calibración de las observaciones."
+    ],
+    "contract_version": 1,
+    "demand_tape": [
+      {
+        "arrival_s": 489.62731694950725,
+        "order_id": "r000000-o00000",
+        "patience_s": null,
+        "payment_active_s": 24.228323947979987,
+        "person_ids": [
+          "r000000-o00000-p01"
+        ],
+        "preparation_s": 118.29425085932077,
+        "transfer_wait_s": 0
+      },
+      {
+        "arrival_s": 506.6467870936526,
+        "order_id": "r000000-o00001",
+        "patience_s": null,
+        "payment_active_s": 26.77096277698255,
+        "person_ids": [
+          "r000000-o00001-p01",
+          "r000000-o00001-p02"
+        ],
+        "preparation_s": 95.63428004918732,
+        "transfer_wait_s": 0
+      },
+      {
+        "arrival_s": 808.1855232901876,
+        "order_id": "r000000-o00002",
+        "patience_s": null,
+        "payment_active_s": 25.111732293096857,
+        "person_ids": [
+          "r000000-o00002-p01"
+        ],
+        "preparation_s": 101.1143276099075,
+        "transfer_wait_s": 0
+      },
+      {
+        "arrival_s": 1066.904026805378,
+        "order_id": "r000000-o00003",
+        "patience_s": null,
+        "payment_active_s": 30.59124886806029,
+        "person_ids": [
+          "r000000-o00003-p01"
+        ],
+        "preparation_s": 125.35679612822796,
+        "transfer_wait_s": 0
+      },
+      {
+        "arrival_s": 1093.5226152934404,
+        "order_id": "r000000-o00004",
+        "patience_s": null,
+        "payment_active_s": 35.1015837156924,
+        "person_ids": [
+          "r000000-o00004-p01"
+        ],
+        "preparation_s": 120.85481194142429,
+        "transfer_wait_s": 0
+      },
+      {
+        "arrival_s": 1146.0033548973674,
+        "order_id": "r000000-o00005",
+        "patience_s": null,
+        "payment_active_s": 41.712481990436885,
+        "person_ids": [
+          "r000000-o00005-p01"
+        ],
+        "preparation_s": 90.56634836503201,
+        "transfer_wait_s": 0
+      }
+    ],
+    "initial_state": [],
+    "metrics": {
+      "contract_version": 1,
+      "drain_end_s": 1278.2821852528364,
+      "horizon_s": 1200,
+      "metric_summaries": [
+        {
+          "cohort": "new",
+          "count": 6,
+          "denominator": null,
+          "maximum": null,
+          "mean": null,
+          "median": null,
+          "metric_id": "count.admitted.orders.new",
+          "n_valid": 6,
+          "p95": null,
+          "population": "orders",
+          "unavailable_reason": null,
+          "unit": "orders",
+          "value": 6
+        },
+        {
+          "cohort": "new",
+          "count": 7,
+          "denominator": null,
+          "maximum": null,
+          "mean": null,
+          "median": null,
+          "metric_id": "count.admitted.people.new",
+          "n_valid": 7,
+          "p95": null,
+          "population": "people",
+          "unavailable_reason": null,
+          "unit": "people",
+          "value": 7
+        },
+        {
+          "cohort": "new",
+          "count": 6,
+          "denominator": null,
+          "maximum": null,
+          "mean": null,
+          "median": null,
+          "metric_id": "count.delivered.orders.new",
+          "n_valid": 6,
+          "p95": null,
+          "population": "orders",
+          "unavailable_reason": null,
+          "unit": "orders",
+          "value": 6
+        },
+        {
+          "cohort": "new",
+          "count": 7,
+          "denominator": null,
+          "maximum": null,
+          "mean": null,
+          "median": null,
+          "metric_id": "count.delivered.people.new",
+          "n_valid": 7,
+          "p95": null,
+          "population": "people",
+          "unavailable_reason": null,
+          "unit": "people",
+          "value": 7
+        },
+        {
+          "cohort": "new",
+          "count": 6,
+          "denominator": null,
+          "maximum": null,
+          "mean": null,
+          "median": null,
+          "metric_id": "count.withdrawn.orders.new",
+          "n_valid": 6,
+          "p95": null,
+          "population": "orders",
+          "unavailable_reason": null,
+          "unit": "orders",
+          "value": 0
+        },
+        {
+          "cohort": "new",
+          "count": 7,
+          "denominator": null,
+          "maximum": null,
+          "mean": null,
+          "median": null,
+          "metric_id": "count.withdrawn.people.new",
+          "n_valid": 7,
+          "p95": null,
+          "population": "people",
+          "unavailable_reason": null,
+          "unit": "people",
+          "value": 0
+        },
+        {
+          "cohort": "initialized",
+          "count": 0,
+          "denominator": null,
+          "maximum": null,
+          "mean": null,
+          "median": null,
+          "metric_id": "count.initialized.orders",
+          "n_valid": 0,
+          "p95": null,
+          "population": "orders",
+          "unavailable_reason": null,
+          "unit": "orders",
+          "value": 0
+        },
+        {
+          "cohort": "initialized",
+          "count": 0,
+          "denominator": null,
+          "maximum": null,
+          "mean": null,
+          "median": null,
+          "metric_id": "count.initialized.people",
+          "n_valid": 0,
+          "p95": null,
+          "population": "people",
+          "unavailable_reason": null,
+          "unit": "people",
+          "value": 0
+        },
+        {
+          "cohort": "initialized",
+          "count": 0,
+          "denominator": null,
+          "maximum": null,
+          "mean": null,
+          "median": null,
+          "metric_id": "count.delivered.orders.initialized",
+          "n_valid": 0,
+          "p95": null,
+          "population": "orders",
+          "unavailable_reason": null,
+          "unit": "orders",
+          "value": 0
+        },
+        {
+          "cohort": "initialized",
+          "count": 0,
+          "denominator": null,
+          "maximum": null,
+          "mean": null,
+          "median": null,
+          "metric_id": "count.delivered.people.initialized",
+          "n_valid": 0,
+          "p95": null,
+          "population": "people",
+          "unavailable_reason": null,
+          "unit": "people",
+          "value": 0
+        },
+        {
+          "cohort": "initialized",
+          "count": 0,
+          "denominator": null,
+          "maximum": null,
+          "mean": null,
+          "median": null,
+          "metric_id": "count.withdrawn.orders.initialized",
+          "n_valid": 0,
+          "p95": null,
+          "population": "orders",
+          "unavailable_reason": null,
+          "unit": "orders",
+          "value": 0
+        },
+        {
+          "cohort": "initialized",
+          "count": 0,
+          "denominator": null,
+          "maximum": null,
+          "mean": null,
+          "median": null,
+          "metric_id": "count.withdrawn.people.initialized",
+          "n_valid": 0,
+          "p95": null,
+          "population": "people",
+          "unavailable_reason": null,
+          "unit": "people",
+          "value": 0
+        },
+        {
+          "cohort": "all",
+          "count": 6,
+          "denominator": null,
+          "maximum": null,
+          "mean": null,
+          "median": null,
+          "metric_id": "count.delivered.orders.all",
+          "n_valid": 6,
+          "p95": null,
+          "population": "orders",
+          "unavailable_reason": null,
+          "unit": "orders",
+          "value": 6
+        },
+        {
+          "cohort": "all",
+          "count": 7,
+          "denominator": null,
+          "maximum": null,
+          "mean": null,
+          "median": null,
+          "metric_id": "count.delivered.people.all",
+          "n_valid": 7,
+          "p95": null,
+          "population": "people",
+          "unavailable_reason": null,
+          "unit": "people",
+          "value": 7
+        },
+        {
+          "cohort": "all",
+          "count": 6,
+          "denominator": null,
+          "maximum": null,
+          "mean": null,
+          "median": null,
+          "metric_id": "count.withdrawn.orders.all",
+          "n_valid": 6,
+          "p95": null,
+          "population": "orders",
+          "unavailable_reason": null,
+          "unit": "orders",
+          "value": 0
+        },
+        {
+          "cohort": "all",
+          "count": 7,
+          "denominator": null,
+          "maximum": null,
+          "mean": null,
+          "median": null,
+          "metric_id": "count.withdrawn.people.all",
+          "n_valid": 7,
+          "p95": null,
+          "population": "people",
+          "unavailable_reason": null,
+          "unit": "people",
+          "value": 0
+        },
+        {
+          "cohort": "new",
+          "count": 6,
+          "denominator": null,
+          "maximum": 7.208853803834586,
+          "mean": 1.86358569730542,
+          "median": 0,
+          "metric_id": "duration.payment_wait.served.order.new",
+          "n_valid": 6,
+          "p95": 6.399805447875423,
+          "population": "orders",
+          "unavailable_reason": null,
+          "unit": "s",
+          "value": 1.86358569730542
+        },
+        {
+          "cohort": "new",
+          "count": 7,
+          "denominator": null,
+          "maximum": 7.208853803834586,
+          "mean": 2.6271954268095863,
+          "median": 0,
+          "metric_id": "duration.payment_wait.served.person.new",
+          "n_valid": 7,
+          "p95": 7.208853803834586,
+          "population": "people",
+          "unavailable_reason": null,
+          "unit": "s",
+          "value": 2.6271954268095863
+        },
+        {
+          "cohort": "initialized",
+          "count": 0,
+          "denominator": null,
+          "maximum": null,
+          "mean": null,
+          "median": null,
+          "metric_id": "duration.payment_wait.served.order.initialized",
+          "n_valid": 0,
+          "p95": null,
+          "population": "orders",
+          "unavailable_reason": "no_eligible_samples",
+          "unit": "s",
+          "value": null
+        },
+        {
+          "cohort": "initialized",
+          "count": 0,
+          "denominator": null,
+          "maximum": null,
+          "mean": null,
+          "median": null,
+          "metric_id": "duration.payment_wait.served.person.initialized",
+          "n_valid": 0,
+          "p95": null,
+          "population": "people",
+          "unavailable_reason": "no_eligible_samples",
+          "unit": "s",
+          "value": null
+        },
+        {
+          "cohort": "all",
+          "count": 6,
+          "denominator": null,
+          "maximum": 7.208853803834586,
+          "mean": 1.86358569730542,
+          "median": 0,
+          "metric_id": "duration.payment_wait.served.order.all",
+          "n_valid": 6,
+          "p95": 6.399805447875423,
+          "population": "orders",
+          "unavailable_reason": null,
+          "unit": "s",
+          "value": 1.86358569730542
+        },
+        {
+          "cohort": "all",
+          "count": 7,
+          "denominator": null,
+          "maximum": 7.208853803834586,
+          "mean": 2.6271954268095863,
+          "median": 0,
+          "metric_id": "duration.payment_wait.served.person.all",
+          "n_valid": 7,
+          "p95": 7.208853803834586,
+          "population": "people",
+          "unavailable_reason": null,
+          "unit": "s",
+          "value": 2.6271954268095863
+        },
+        {
+          "cohort": "new",
+          "count": 6,
+          "denominator": null,
+          "maximum": null,
+          "mean": null,
+          "median": null,
+          "metric_id": "duration.payment_wait.withdrawn.order.new",
+          "n_valid": 0,
+          "p95": null,
+          "population": "orders",
+          "unavailable_reason": "no_eligible_samples",
+          "unit": "s",
+          "value": null
+        },
+        {
+          "cohort": "new",
+          "count": 7,
+          "denominator": null,
+          "maximum": null,
+          "mean": null,
+          "median": null,
+          "metric_id": "duration.payment_wait.withdrawn.person.new",
+          "n_valid": 0,
+          "p95": null,
+          "population": "people",
+          "unavailable_reason": "no_eligible_samples",
+          "unit": "s",
+          "value": null
+        },
+        {
+          "cohort": "initialized",
+          "count": 0,
+          "denominator": null,
+          "maximum": null,
+          "mean": null,
+          "median": null,
+          "metric_id": "duration.payment_wait.withdrawn.order.initialized",
+          "n_valid": 0,
+          "p95": null,
+          "population": "orders",
+          "unavailable_reason": "no_eligible_samples",
+          "unit": "s",
+          "value": null
+        },
+        {
+          "cohort": "initialized",
+          "count": 0,
+          "denominator": null,
+          "maximum": null,
+          "mean": null,
+          "median": null,
+          "metric_id": "duration.payment_wait.withdrawn.person.initialized",
+          "n_valid": 0,
+          "p95": null,
+          "population": "people",
+          "unavailable_reason": "no_eligible_samples",
+          "unit": "s",
+          "value": null
+        },
+        {
+          "cohort": "all",
+          "count": 6,
+          "denominator": null,
+          "maximum": null,
+          "mean": null,
+          "median": null,
+          "metric_id": "duration.payment_wait.withdrawn.order.all",
+          "n_valid": 0,
+          "p95": null,
+          "population": "orders",
+          "unavailable_reason": "no_eligible_samples",
+          "unit": "s",
+          "value": null
+        },
+        {
+          "cohort": "all",
+          "count": 7,
+          "denominator": null,
+          "maximum": null,
+          "mean": null,
+          "median": null,
+          "metric_id": "duration.payment_wait.withdrawn.person.all",
+          "n_valid": 0,
+          "p95": null,
+          "population": "people",
+          "unavailable_reason": "no_eligible_samples",
+          "unit": "s",
+          "value": null
+        },
+        {
+          "cohort": "new",
+          "count": 6,
+          "denominator": null,
+          "maximum": 41.7124819904368,
+          "mean": 30.586055598708157,
+          "median": 28.68110582252143,
+          "metric_id": "duration.transaction_elapsed.order.new",
+          "n_valid": 6,
+          "p95": 40.0597574217507,
+          "population": "orders",
+          "unavailable_reason": null,
+          "unit": "s",
+          "value": 30.586055598708157
+        },
+        {
+          "cohort": "new",
+          "count": 7,
+          "denominator": null,
+          "maximum": 41.7124819904368,
+          "mean": 30.041042338461637,
+          "median": 26.770962776982515,
+          "metric_id": "duration.transaction_elapsed.person.new",
+          "n_valid": 7,
+          "p95": 39.729212508013475,
+          "population": "people",
+          "unavailable_reason": null,
+          "unit": "s",
+          "value": 30.041042338461637
+        },
+        {
+          "cohort": "initialized",
+          "count": 0,
+          "denominator": null,
+          "maximum": null,
+          "mean": null,
+          "median": null,
+          "metric_id": "duration.transaction_elapsed.order.initialized",
+          "n_valid": 0,
+          "p95": null,
+          "population": "orders",
+          "unavailable_reason": "no_completed_transaction",
+          "unit": "s",
+          "value": null
+        },
+        {
+          "cohort": "initialized",
+          "count": 0,
+          "denominator": null,
+          "maximum": null,
+          "mean": null,
+          "median": null,
+          "metric_id": "duration.transaction_elapsed.person.initialized",
+          "n_valid": 0,
+          "p95": null,
+          "population": "people",
+          "unavailable_reason": "no_completed_transaction",
+          "unit": "s",
+          "value": null
+        },
+        {
+          "cohort": "all",
+          "count": 6,
+          "denominator": null,
+          "maximum": 41.7124819904368,
+          "mean": 30.586055598708157,
+          "median": 28.68110582252143,
+          "metric_id": "duration.transaction_elapsed.order.all",
+          "n_valid": 6,
+          "p95": 40.0597574217507,
+          "population": "orders",
+          "unavailable_reason": null,
+          "unit": "s",
+          "value": 30.586055598708157
+        },
+        {
+          "cohort": "all",
+          "count": 7,
+          "denominator": null,
+          "maximum": 41.7124819904368,
+          "mean": 30.041042338461637,
+          "median": 26.770962776982515,
+          "metric_id": "duration.transaction_elapsed.person.all",
+          "n_valid": 7,
+          "p95": 39.729212508013475,
+          "population": "people",
+          "unavailable_reason": null,
+          "unit": "s",
+          "value": 30.041042338461637
+        },
+        {
+          "cohort": "new",
+          "count": 6,
+          "denominator": null,
+          "maximum": 0,
+          "mean": 0,
+          "median": 0,
+          "metric_id": "duration.preparation_queue_wait.order.new",
+          "n_valid": 6,
+          "p95": 0,
+          "population": "orders",
+          "unavailable_reason": null,
+          "unit": "s",
+          "value": 0
+        },
+        {
+          "cohort": "new",
+          "count": 7,
+          "denominator": null,
+          "maximum": 0,
+          "mean": 0,
+          "median": 0,
+          "metric_id": "duration.preparation_queue_wait.person.new",
+          "n_valid": 7,
+          "p95": 0,
+          "population": "people",
+          "unavailable_reason": null,
+          "unit": "s",
+          "value": 0
+        },
+        {
+          "cohort": "initialized",
+          "count": 0,
+          "denominator": null,
+          "maximum": null,
+          "mean": null,
+          "median": null,
+          "metric_id": "duration.preparation_queue_wait.order.initialized",
+          "n_valid": 0,
+          "p95": null,
+          "population": "orders",
+          "unavailable_reason": "no_preparation_queue_wait",
+          "unit": "s",
+          "value": null
+        },
+        {
+          "cohort": "initialized",
+          "count": 0,
+          "denominator": null,
+          "maximum": null,
+          "mean": null,
+          "median": null,
+          "metric_id": "duration.preparation_queue_wait.person.initialized",
+          "n_valid": 0,
+          "p95": null,
+          "population": "people",
+          "unavailable_reason": "no_preparation_queue_wait",
+          "unit": "s",
+          "value": null
+        },
+        {
+          "cohort": "all",
+          "count": 6,
+          "denominator": null,
+          "maximum": 0,
+          "mean": 0,
+          "median": 0,
+          "metric_id": "duration.preparation_queue_wait.order.all",
+          "n_valid": 6,
+          "p95": 0,
+          "population": "orders",
+          "unavailable_reason": null,
+          "unit": "s",
+          "value": 0
+        },
+        {
+          "cohort": "all",
+          "count": 7,
+          "denominator": null,
+          "maximum": 0,
+          "mean": 0,
+          "median": 0,
+          "metric_id": "duration.preparation_queue_wait.person.all",
+          "n_valid": 7,
+          "p95": 0,
+          "population": "people",
+          "unavailable_reason": null,
+          "unit": "s",
+          "value": 0
+        },
+        {
+          "cohort": "new",
+          "count": 6,
+          "denominator": null,
+          "maximum": 125.35679612822787,
+          "mean": 108.63680249218329,
+          "median": 109.70428923461412,
+          "metric_id": "duration.preparation_elapsed.order.new",
+          "n_valid": 6,
+          "p95": 124.23130008152697,
+          "population": "orders",
+          "unavailable_reason": null,
+          "unit": "s",
+          "value": 108.63680249218329
+        },
+        {
+          "cohort": "new",
+          "count": 7,
+          "denominator": null,
+          "maximum": 125.35679612822787,
+          "mean": 106.77929928604101,
+          "median": 101.11432760990749,
+          "metric_id": "duration.preparation_elapsed.person.new",
+          "n_valid": 7,
+          "p95": 124.00620087218678,
+          "population": "people",
+          "unavailable_reason": null,
+          "unit": "s",
+          "value": 106.77929928604101
+        },
+        {
+          "cohort": "initialized",
+          "count": 0,
+          "denominator": null,
+          "maximum": null,
+          "mean": null,
+          "median": null,
+          "metric_id": "duration.preparation_elapsed.order.initialized",
+          "n_valid": 0,
+          "p95": null,
+          "population": "orders",
+          "unavailable_reason": "no_completed_preparation",
+          "unit": "s",
+          "value": null
+        },
+        {
+          "cohort": "initialized",
+          "count": 0,
+          "denominator": null,
+          "maximum": null,
+          "mean": null,
+          "median": null,
+          "metric_id": "duration.preparation_elapsed.person.initialized",
+          "n_valid": 0,
+          "p95": null,
+          "population": "people",
+          "unavailable_reason": "no_completed_preparation",
+          "unit": "s",
+          "value": null
+        },
+        {
+          "cohort": "all",
+          "count": 6,
+          "denominator": null,
+          "maximum": 125.35679612822787,
+          "mean": 108.63680249218329,
+          "median": 109.70428923461412,
+          "metric_id": "duration.preparation_elapsed.order.all",
+          "n_valid": 6,
+          "p95": 124.23130008152697,
+          "population": "orders",
+          "unavailable_reason": null,
+          "unit": "s",
+          "value": 108.63680249218329
+        },
+        {
+          "cohort": "all",
+          "count": 7,
+          "denominator": null,
+          "maximum": 125.35679612822787,
+          "mean": 106.77929928604101,
+          "median": 101.11432760990749,
+          "metric_id": "duration.preparation_elapsed.person.all",
+          "n_valid": 7,
+          "p95": 124.00620087218678,
+          "population": "people",
+          "unavailable_reason": null,
+          "unit": "s",
+          "value": 106.77929928604101
+        },
+        {
+          "cohort": "new",
+          "count": 6,
+          "denominator": null,
+          "maximum": 159.9290560371146,
+          "mean": 141.08644378819687,
+          "median": 137.40070258138482,
+          "metric_id": "duration.permanence.completed.order.new",
+          "n_valid": 6,
+          "p95": 158.933803276908,
+          "population": "orders",
+          "unavailable_reason": null,
+          "unit": "s",
+          "value": 141.08644378819687
+        },
+        {
+          "cohort": "new",
+          "count": 7,
+          "denominator": null,
+          "maximum": 159.9290560371146,
+          "mean": 139.44753705131225,
+          "median": 132.27883035546893,
+          "metric_id": "duration.permanence.completed.person.new",
+          "n_valid": 7,
+          "p95": 158.7347527248667,
+          "population": "people",
+          "unavailable_reason": null,
+          "unit": "s",
+          "value": 139.44753705131225
+        },
+        {
+          "cohort": "initialized",
+          "count": 0,
+          "denominator": null,
+          "maximum": null,
+          "mean": null,
+          "median": null,
+          "metric_id": "duration.permanence.completed.order.initialized",
+          "n_valid": 0,
+          "p95": null,
+          "population": "orders",
+          "unavailable_reason": "no_completed_orders",
+          "unit": "s",
+          "value": null
+        },
+        {
+          "cohort": "initialized",
+          "count": 0,
+          "denominator": null,
+          "maximum": null,
+          "mean": null,
+          "median": null,
+          "metric_id": "duration.permanence.completed.person.initialized",
+          "n_valid": 0,
+          "p95": null,
+          "population": "people",
+          "unavailable_reason": "no_completed_orders",
+          "unit": "s",
+          "value": null
+        },
+        {
+          "cohort": "all",
+          "count": 6,
+          "denominator": null,
+          "maximum": 159.9290560371146,
+          "mean": 141.08644378819687,
+          "median": 137.40070258138482,
+          "metric_id": "duration.permanence.completed.order.all",
+          "n_valid": 6,
+          "p95": 158.933803276908,
+          "population": "orders",
+          "unavailable_reason": null,
+          "unit": "s",
+          "value": 141.08644378819687
+        },
+        {
+          "cohort": "all",
+          "count": 7,
+          "denominator": null,
+          "maximum": 159.9290560371146,
+          "mean": 139.44753705131225,
+          "median": 132.27883035546893,
+          "metric_id": "duration.permanence.completed.person.all",
+          "n_valid": 7,
+          "p95": 158.7347527248667,
+          "population": "people",
+          "unavailable_reason": null,
+          "unit": "s",
+          "value": 139.44753705131225
+        },
+        {
+          "cohort": "new",
+          "count": 6,
+          "denominator": null,
+          "maximum": null,
+          "mean": null,
+          "median": null,
+          "metric_id": "duration.withdrawal_wait.order.new",
+          "n_valid": 0,
+          "p95": null,
+          "population": "orders",
+          "unavailable_reason": "no_withdrawals",
+          "unit": "s",
+          "value": null
+        },
+        {
+          "cohort": "new",
+          "count": 7,
+          "denominator": null,
+          "maximum": null,
+          "mean": null,
+          "median": null,
+          "metric_id": "duration.withdrawal_wait.person.new",
+          "n_valid": 0,
+          "p95": null,
+          "population": "people",
+          "unavailable_reason": "no_withdrawals",
+          "unit": "s",
+          "value": null
+        },
+        {
+          "cohort": "initialized",
+          "count": 0,
+          "denominator": null,
+          "maximum": null,
+          "mean": null,
+          "median": null,
+          "metric_id": "duration.withdrawal_wait.order.initialized",
+          "n_valid": 0,
+          "p95": null,
+          "population": "orders",
+          "unavailable_reason": "no_withdrawals",
+          "unit": "s",
+          "value": null
+        },
+        {
+          "cohort": "initialized",
+          "count": 0,
+          "denominator": null,
+          "maximum": null,
+          "mean": null,
+          "median": null,
+          "metric_id": "duration.withdrawal_wait.person.initialized",
+          "n_valid": 0,
+          "p95": null,
+          "population": "people",
+          "unavailable_reason": "no_withdrawals",
+          "unit": "s",
+          "value": null
+        },
+        {
+          "cohort": "all",
+          "count": 6,
+          "denominator": null,
+          "maximum": null,
+          "mean": null,
+          "median": null,
+          "metric_id": "duration.withdrawal_wait.order.all",
+          "n_valid": 0,
+          "p95": null,
+          "population": "orders",
+          "unavailable_reason": "no_withdrawals",
+          "unit": "s",
+          "value": null
+        },
+        {
+          "cohort": "all",
+          "count": 7,
+          "denominator": null,
+          "maximum": null,
+          "mean": null,
+          "median": null,
+          "metric_id": "duration.withdrawal_wait.person.all",
+          "n_valid": 0,
+          "p95": null,
+          "population": "people",
+          "unavailable_reason": "no_withdrawals",
+          "unit": "s",
+          "value": null
+        },
+        {
+          "cohort": "all",
+          "count": 6,
+          "denominator": 1200,
+          "maximum": null,
+          "mean": null,
+          "median": null,
+          "metric_id": "queue.payment.mean.orders",
+          "n_valid": 1,
+          "p95": null,
+          "population": "waiting_orders",
+          "unavailable_reason": null,
+          "unit": "orders",
+          "value": 0.0093179284865271
+        },
+        {
+          "cohort": "all",
+          "count": 6,
+          "denominator": null,
+          "maximum": null,
+          "mean": null,
+          "median": null,
+          "metric_id": "queue.payment.max.orders",
+          "n_valid": 1,
+          "p95": null,
+          "population": "waiting_orders",
+          "unavailable_reason": null,
+          "unit": "orders",
+          "value": 1
+        },
+        {
+          "cohort": "all",
+          "count": 7,
+          "denominator": 1200,
+          "maximum": null,
+          "mean": null,
+          "median": null,
+          "metric_id": "queue.payment.mean.people",
+          "n_valid": 1,
+          "p95": null,
+          "population": "waiting_people",
+          "unavailable_reason": null,
+          "unit": "people",
+          "value": 0.015325306656389254
+        },
+        {
+          "cohort": "all",
+          "count": 7,
+          "denominator": null,
+          "maximum": null,
+          "mean": null,
+          "median": null,
+          "metric_id": "queue.payment.max.people",
+          "n_valid": 1,
+          "p95": null,
+          "population": "waiting_people",
+          "unavailable_reason": null,
+          "unit": "people",
+          "value": 2
+        },
+        {
+          "cohort": "all",
+          "count": 6,
+          "denominator": 1200,
+          "maximum": null,
+          "mean": null,
+          "median": null,
+          "metric_id": "queue.preparation.mean.orders",
+          "n_valid": 1,
+          "p95": null,
+          "population": "waiting_orders",
+          "unavailable_reason": null,
+          "unit": "orders",
+          "value": 0
+        },
+        {
+          "cohort": "all",
+          "count": 6,
+          "denominator": null,
+          "maximum": null,
+          "mean": null,
+          "median": null,
+          "metric_id": "queue.preparation.max.orders",
+          "n_valid": 1,
+          "p95": null,
+          "population": "waiting_orders",
+          "unavailable_reason": null,
+          "unit": "orders",
+          "value": 0
+        },
+        {
+          "cohort": "all",
+          "count": 7,
+          "denominator": 1200,
+          "maximum": null,
+          "mean": null,
+          "median": null,
+          "metric_id": "queue.preparation.mean.people",
+          "n_valid": 1,
+          "p95": null,
+          "population": "waiting_people",
+          "unavailable_reason": null,
+          "unit": "people",
+          "value": 0
+        },
+        {
+          "cohort": "all",
+          "count": 7,
+          "denominator": null,
+          "maximum": null,
+          "mean": null,
+          "median": null,
+          "metric_id": "queue.preparation.max.people",
+          "n_valid": 1,
+          "p95": null,
+          "population": "waiting_people",
+          "unavailable_reason": null,
+          "unit": "people",
+          "value": 0
+        },
+        {
+          "cohort": "all",
+          "count": 1,
+          "denominator": 1200,
+          "maximum": null,
+          "mean": null,
+          "median": null,
+          "metric_id": "resource.cashier.payment.active_fraction",
+          "n_valid": 1,
+          "p95": null,
+          "population": "workers",
+          "unavailable_reason": null,
+          "unit": "fraction",
+          "value": 0.15293027799354078
+        },
+        {
+          "cohort": "all",
+          "count": 1,
+          "denominator": 1200,
+          "maximum": null,
+          "mean": null,
+          "median": null,
+          "metric_id": "resource.cashier.payment.reserved_fraction",
+          "n_valid": 1,
+          "p95": null,
+          "population": "workers",
+          "unavailable_reason": null,
+          "unit": "fraction",
+          "value": 0.15293027799354078
+        },
+        {
+          "cohort": "all",
+          "count": 1,
+          "denominator": 1200,
+          "maximum": null,
+          "mean": null,
+          "median": null,
+          "metric_id": "resource.cashier.preparation.active_fraction",
+          "n_valid": 1,
+          "p95": null,
+          "population": "workers",
+          "unavailable_reason": null,
+          "unit": "fraction",
+          "value": 0
+        },
+        {
+          "cohort": "all",
+          "count": 1,
+          "denominator": 1200,
+          "maximum": null,
+          "mean": null,
+          "median": null,
+          "metric_id": "resource.cashier.preparation.reserved_fraction",
+          "n_valid": 1,
+          "p95": null,
+          "population": "workers",
+          "unavailable_reason": null,
+          "unit": "fraction",
+          "value": 0
+        },
+        {
+          "cohort": "all",
+          "count": 1,
+          "denominator": 1200,
+          "maximum": null,
+          "mean": null,
+          "median": null,
+          "metric_id": "resource.cashier.external_confirmation.active_fraction",
+          "n_valid": 1,
+          "p95": null,
+          "population": "workers",
+          "unavailable_reason": null,
+          "unit": "fraction",
+          "value": 0
+        },
+        {
+          "cohort": "all",
+          "count": 1,
+          "denominator": 1200,
+          "maximum": null,
+          "mean": null,
+          "median": null,
+          "metric_id": "resource.cashier.external_confirmation.reserved_fraction",
+          "n_valid": 1,
+          "p95": null,
+          "population": "workers",
+          "unavailable_reason": null,
+          "unit": "fraction",
+          "value": 0
+        },
+        {
+          "cohort": "all",
+          "count": 1,
+          "denominator": 1200,
+          "maximum": null,
+          "mean": null,
+          "median": null,
+          "metric_id": "resource.cashier.total.active_fraction",
+          "n_valid": 1,
+          "p95": null,
+          "population": "workers",
+          "unavailable_reason": null,
+          "unit": "fraction",
+          "value": 0.41436240547336856
+        },
+        {
+          "cohort": "all",
+          "count": 1,
+          "denominator": 1200,
+          "maximum": null,
+          "mean": null,
+          "median": null,
+          "metric_id": "resource.cashier.total.reserved_fraction",
+          "n_valid": 1,
+          "p95": null,
+          "population": "workers",
+          "unavailable_reason": null,
+          "unit": "fraction",
+          "value": 0.41436240547336856
+        },
+        {
+          "cohort": "all",
+          "count": 4,
+          "denominator": 4800,
+          "maximum": null,
+          "mean": null,
+          "median": null,
+          "metric_id": "resource.preparer.payment.active_fraction",
+          "n_valid": 4,
+          "p95": null,
+          "population": "workers",
+          "unavailable_reason": null,
+          "unit": "fraction",
+          "value": 0
+        },
+        {
+          "cohort": "all",
+          "count": 4,
+          "denominator": 4800,
+          "maximum": null,
+          "mean": null,
+          "median": null,
+          "metric_id": "resource.preparer.payment.reserved_fraction",
+          "n_valid": 4,
+          "p95": null,
+          "population": "workers",
+          "unavailable_reason": null,
+          "unit": "fraction",
+          "value": 0
+        },
+        {
+          "cohort": "all",
+          "count": 4,
+          "denominator": 4800,
+          "maximum": null,
+          "mean": null,
+          "median": null,
+          "metric_id": "resource.preparer.preparation.active_fraction",
+          "n_valid": 4,
+          "p95": null,
+          "population": "workers",
+          "unavailable_reason": null,
+          "unit": "fraction",
+          "value": 0.10359060136834214
+        },
+        {
+          "cohort": "all",
+          "count": 4,
+          "denominator": 4800,
+          "maximum": null,
+          "mean": null,
+          "median": null,
+          "metric_id": "resource.preparer.preparation.reserved_fraction",
+          "n_valid": 4,
+          "p95": null,
+          "population": "workers",
+          "unavailable_reason": null,
+          "unit": "fraction",
+          "value": 0.10359060136834214
+        },
+        {
+          "cohort": "all",
+          "count": 4,
+          "denominator": 4800,
+          "maximum": null,
+          "mean": null,
+          "median": null,
+          "metric_id": "resource.preparer.external_confirmation.active_fraction",
+          "n_valid": 4,
+          "p95": null,
+          "population": "workers",
+          "unavailable_reason": null,
+          "unit": "fraction",
+          "value": 0
+        },
+        {
+          "cohort": "all",
+          "count": 4,
+          "denominator": 4800,
+          "maximum": null,
+          "mean": null,
+          "median": null,
+          "metric_id": "resource.preparer.external_confirmation.reserved_fraction",
+          "n_valid": 4,
+          "p95": null,
+          "population": "workers",
+          "unavailable_reason": null,
+          "unit": "fraction",
+          "value": 0
+        },
+        {
+          "cohort": "all",
+          "count": 4,
+          "denominator": 4800,
+          "maximum": null,
+          "mean": null,
+          "median": null,
+          "metric_id": "resource.preparer.total.active_fraction",
+          "n_valid": 4,
+          "p95": null,
+          "population": "workers",
+          "unavailable_reason": null,
+          "unit": "fraction",
+          "value": 0.10359060136834214
+        },
+        {
+          "cohort": "all",
+          "count": 4,
+          "denominator": 4800,
+          "maximum": null,
+          "mean": null,
+          "median": null,
+          "metric_id": "resource.preparer.total.reserved_fraction",
+          "n_valid": 4,
+          "p95": null,
+          "population": "workers",
+          "unavailable_reason": null,
+          "unit": "fraction",
+          "value": 0.10359060136834214
+        },
+        {
+          "cohort": "all",
+          "count": 0,
+          "denominator": null,
+          "maximum": null,
+          "mean": null,
+          "median": null,
+          "metric_id": "resource.integrated.payment.active_fraction",
+          "n_valid": 0,
+          "p95": null,
+          "population": "workers",
+          "unavailable_reason": "pool_unavailable",
+          "unit": "fraction",
+          "value": null
+        },
+        {
+          "cohort": "all",
+          "count": 0,
+          "denominator": null,
+          "maximum": null,
+          "mean": null,
+          "median": null,
+          "metric_id": "resource.integrated.payment.reserved_fraction",
+          "n_valid": 0,
+          "p95": null,
+          "population": "workers",
+          "unavailable_reason": "pool_unavailable",
+          "unit": "fraction",
+          "value": null
+        },
+        {
+          "cohort": "all",
+          "count": 0,
+          "denominator": null,
+          "maximum": null,
+          "mean": null,
+          "median": null,
+          "metric_id": "resource.integrated.preparation.active_fraction",
+          "n_valid": 0,
+          "p95": null,
+          "population": "workers",
+          "unavailable_reason": "pool_unavailable",
+          "unit": "fraction",
+          "value": null
+        },
+        {
+          "cohort": "all",
+          "count": 0,
+          "denominator": null,
+          "maximum": null,
+          "mean": null,
+          "median": null,
+          "metric_id": "resource.integrated.preparation.reserved_fraction",
+          "n_valid": 0,
+          "p95": null,
+          "population": "workers",
+          "unavailable_reason": "pool_unavailable",
+          "unit": "fraction",
+          "value": null
+        },
+        {
+          "cohort": "all",
+          "count": 0,
+          "denominator": null,
+          "maximum": null,
+          "mean": null,
+          "median": null,
+          "metric_id": "resource.integrated.external_confirmation.active_fraction",
+          "n_valid": 0,
+          "p95": null,
+          "population": "workers",
+          "unavailable_reason": "pool_unavailable",
+          "unit": "fraction",
+          "value": null
+        },
+        {
+          "cohort": "all",
+          "count": 0,
+          "denominator": null,
+          "maximum": null,
+          "mean": null,
+          "median": null,
+          "metric_id": "resource.integrated.external_confirmation.reserved_fraction",
+          "n_valid": 0,
+          "p95": null,
+          "population": "workers",
+          "unavailable_reason": "pool_unavailable",
+          "unit": "fraction",
+          "value": null
+        },
+        {
+          "cohort": "all",
+          "count": 0,
+          "denominator": null,
+          "maximum": null,
+          "mean": null,
+          "median": null,
+          "metric_id": "resource.integrated.total.active_fraction",
+          "n_valid": 0,
+          "p95": null,
+          "population": "workers",
+          "unavailable_reason": "pool_unavailable",
+          "unit": "fraction",
+          "value": null
+        },
+        {
+          "cohort": "all",
+          "count": 0,
+          "denominator": null,
+          "maximum": null,
+          "mean": null,
+          "median": null,
+          "metric_id": "resource.integrated.total.reserved_fraction",
+          "n_valid": 0,
+          "p95": null,
+          "population": "workers",
+          "unavailable_reason": "pool_unavailable",
+          "unit": "fraction",
+          "value": null
+        },
+        {
+          "cohort": "all",
+          "count": 5,
+          "denominator": 6000,
+          "maximum": null,
+          "mean": null,
+          "median": null,
+          "metric_id": "resource.all.total.active_fraction",
+          "n_valid": 5,
+          "p95": null,
+          "population": "workers",
+          "unavailable_reason": null,
+          "unit": "fraction",
+          "value": 0.11345853669338188
+        },
+        {
+          "cohort": "all",
+          "count": 5,
+          "denominator": 6000,
+          "maximum": null,
+          "mean": null,
+          "median": null,
+          "metric_id": "resource.all.total.reserved_fraction",
+          "n_valid": 5,
+          "p95": null,
+          "population": "workers",
+          "unavailable_reason": null,
+          "unit": "fraction",
+          "value": 0.11345853669338188
+        },
+        {
+          "cohort": "all",
+          "count": 3,
+          "denominator": 1200,
+          "maximum": null,
+          "mean": null,
+          "median": null,
+          "metric_id": "throughput.window.delivery.orders_per_s",
+          "n_valid": 1,
+          "p95": null,
+          "population": "delivered_orders",
+          "unavailable_reason": null,
+          "unit": "orders/s",
+          "value": 0.0025
+        },
+        {
+          "cohort": "all",
+          "count": 4,
+          "denominator": 1200,
+          "maximum": null,
+          "mean": null,
+          "median": null,
+          "metric_id": "throughput.window.delivery.people_per_s",
+          "n_valid": 1,
+          "p95": null,
+          "population": "delivered_people",
+          "unavailable_reason": null,
+          "unit": "people/s",
+          "value": 0.0033333333333333335
+        },
+        {
+          "cohort": "all",
+          "count": 1,
+          "denominator": null,
+          "maximum": null,
+          "mean": null,
+          "median": null,
+          "metric_id": "drain.end_s",
+          "n_valid": 1,
+          "p95": null,
+          "population": "run",
+          "unavailable_reason": null,
+          "unit": "s",
+          "value": 1278.2821852528364
+        },
+        {
+          "cohort": "all",
+          "count": 1,
+          "denominator": null,
+          "maximum": null,
+          "mean": null,
+          "median": null,
+          "metric_id": "drain.overtime_s",
+          "n_valid": 1,
+          "p95": null,
+          "population": "run",
+          "unavailable_reason": null,
+          "unit": "s",
+          "value": 78.28218525283637
+        }
+      ],
+      "orders": [
+        {
+          "abandonment_s": null,
+          "arrival_s": 489.62731694950725,
+          "cohort": "new",
+          "delivery_s": 632.149891756808,
+          "order_id": "r000000-o00000",
+          "payment_active_ended_s": 513.8556408974872,
+          "payment_completed_s": 513.8556408974872,
+          "payment_started_s": 489.62731694950725,
+          "payment_wait_s": 0,
+          "permanence_s": 142.5225748073007,
+          "person_ids": [
+            "r000000-o00000-p01"
+          ],
+          "preparation_elapsed_s": 118.29425085932075,
+          "preparation_queue_wait_s": 0,
+          "preparation_started_s": 513.8556408974872,
+          "state": "completed",
+          "transaction_elapsed_s": 24.22832394797996,
+          "unavailable_fields": [
+            {
+              "field": "withdrawal_wait_s",
+              "reason": "not_withdrawn"
+            }
+          ],
+          "withdrawal_wait_s": null
+        },
+        {
+          "abandonment_s": null,
+          "arrival_s": 506.6467870936526,
+          "cohort": "new",
+          "delivery_s": 636.260883723657,
+          "order_id": "r000000-o00001",
+          "payment_active_ended_s": 540.6266036744697,
+          "payment_completed_s": 540.6266036744697,
+          "payment_started_s": 513.8556408974872,
+          "payment_wait_s": 7.208853803834586,
+          "permanence_s": 129.61409663000438,
+          "person_ids": [
+            "r000000-o00001-p01",
+            "r000000-o00001-p02"
+          ],
+          "preparation_elapsed_s": 95.63428004918728,
+          "preparation_queue_wait_s": 0,
+          "preparation_started_s": 540.6266036744697,
+          "state": "completed",
+          "transaction_elapsed_s": 26.770962776982515,
+          "unavailable_fields": [
+            {
+              "field": "withdrawal_wait_s",
+              "reason": "not_withdrawn"
+            }
+          ],
+          "withdrawal_wait_s": null
+        },
+        {
+          "abandonment_s": null,
+          "arrival_s": 808.1855232901876,
+          "cohort": "new",
+          "delivery_s": 934.411583193192,
+          "order_id": "r000000-o00002",
+          "payment_active_ended_s": 833.2972555832845,
+          "payment_completed_s": 833.2972555832845,
+          "payment_started_s": 808.1855232901876,
+          "payment_wait_s": 0,
+          "permanence_s": 126.2260599030044,
+          "person_ids": [
+            "r000000-o00002-p01"
+          ],
+          "preparation_elapsed_s": 101.11432760990749,
+          "preparation_queue_wait_s": 0,
+          "preparation_started_s": 833.2972555832845,
+          "state": "completed",
+          "transaction_elapsed_s": 25.111732293096907,
+          "unavailable_fields": [
+            {
+              "field": "withdrawal_wait_s",
+              "reason": "not_withdrawn"
+            }
+          ],
+          "withdrawal_wait_s": null
+        },
+        {
+          "abandonment_s": null,
+          "arrival_s": 1066.904026805378,
+          "cohort": "new",
+          "delivery_s": 1222.8520718016662,
+          "order_id": "r000000-o00003",
+          "payment_active_ended_s": 1097.4952756734383,
+          "payment_completed_s": 1097.4952756734383,
+          "payment_started_s": 1066.904026805378,
+          "payment_wait_s": 0,
+          "permanence_s": 155.94804499628822,
+          "person_ids": [
+            "r000000-o00003-p01"
+          ],
+          "preparation_elapsed_s": 125.35679612822787,
+          "preparation_queue_wait_s": 0,
+          "preparation_started_s": 1097.4952756734383,
+          "state": "completed",
+          "transaction_elapsed_s": 30.591248868060347,
+          "unavailable_fields": [
+            {
+              "field": "withdrawal_wait_s",
+              "reason": "not_withdrawn"
+            }
+          ],
+          "withdrawal_wait_s": null
+        },
+        {
+          "abandonment_s": null,
+          "arrival_s": 1093.5226152934404,
+          "cohort": "new",
+          "delivery_s": 1253.451671330555,
+          "order_id": "r000000-o00004",
+          "payment_active_ended_s": 1132.5968593891307,
+          "payment_completed_s": 1132.5968593891307,
+          "payment_started_s": 1097.4952756734383,
+          "payment_wait_s": 3.972660379997933,
+          "permanence_s": 159.9290560371146,
+          "person_ids": [
+            "r000000-o00004-p01"
+          ],
+          "preparation_elapsed_s": 120.85481194142426,
+          "preparation_queue_wait_s": 0,
+          "preparation_started_s": 1132.5968593891307,
+          "state": "completed",
+          "transaction_elapsed_s": 35.10158371569241,
+          "unavailable_fields": [
+            {
+              "field": "withdrawal_wait_s",
+              "reason": "not_withdrawn"
+            }
+          ],
+          "withdrawal_wait_s": null
+        },
+        {
+          "abandonment_s": null,
+          "arrival_s": 1146.0033548973674,
+          "cohort": "new",
+          "delivery_s": 1278.2821852528364,
+          "order_id": "r000000-o00005",
+          "payment_active_ended_s": 1187.7158368878042,
+          "payment_completed_s": 1187.7158368878042,
+          "payment_started_s": 1146.0033548973674,
+          "payment_wait_s": 0,
+          "permanence_s": 132.27883035546893,
+          "person_ids": [
+            "r000000-o00005-p01"
+          ],
+          "preparation_elapsed_s": 90.56634836503213,
+          "preparation_queue_wait_s": 0,
+          "preparation_started_s": 1187.7158368878042,
+          "state": "completed",
+          "transaction_elapsed_s": 41.7124819904368,
+          "unavailable_fields": [
+            {
+              "field": "withdrawal_wait_s",
+              "reason": "not_withdrawn"
+            }
+          ],
+          "withdrawal_wait_s": null
+        }
+      ],
+      "overtime_s": 78.28218525283637,
+      "people": [
+        {
+          "abandonment_s": null,
+          "arrival_s": 489.62731694950725,
+          "cohort": "new",
+          "delivery_s": 632.149891756808,
+          "order_id": "r000000-o00000",
+          "payment_active_ended_s": 513.8556408974872,
+          "payment_completed_s": 513.8556408974872,
+          "payment_started_s": 489.62731694950725,
+          "payment_wait_s": 0,
+          "permanence_s": 142.5225748073007,
+          "person_id": "r000000-o00000-p01",
+          "preparation_elapsed_s": 118.29425085932075,
+          "preparation_queue_wait_s": 0,
+          "preparation_started_s": 513.8556408974872,
+          "state": "completed",
+          "transaction_elapsed_s": 24.22832394797996,
+          "unavailable_fields": [
+            {
+              "field": "withdrawal_wait_s",
+              "reason": "not_withdrawn"
+            }
+          ],
+          "withdrawal_wait_s": null
+        },
+        {
+          "abandonment_s": null,
+          "arrival_s": 506.6467870936526,
+          "cohort": "new",
+          "delivery_s": 636.260883723657,
+          "order_id": "r000000-o00001",
+          "payment_active_ended_s": 540.6266036744697,
+          "payment_completed_s": 540.6266036744697,
+          "payment_started_s": 513.8556408974872,
+          "payment_wait_s": 7.208853803834586,
+          "permanence_s": 129.61409663000438,
+          "person_id": "r000000-o00001-p01",
+          "preparation_elapsed_s": 95.63428004918728,
+          "preparation_queue_wait_s": 0,
+          "preparation_started_s": 540.6266036744697,
+          "state": "completed",
+          "transaction_elapsed_s": 26.770962776982515,
+          "unavailable_fields": [
+            {
+              "field": "withdrawal_wait_s",
+              "reason": "not_withdrawn"
+            }
+          ],
+          "withdrawal_wait_s": null
+        },
+        {
+          "abandonment_s": null,
+          "arrival_s": 506.6467870936526,
+          "cohort": "new",
+          "delivery_s": 636.260883723657,
+          "order_id": "r000000-o00001",
+          "payment_active_ended_s": 540.6266036744697,
+          "payment_completed_s": 540.6266036744697,
+          "payment_started_s": 513.8556408974872,
+          "payment_wait_s": 7.208853803834586,
+          "permanence_s": 129.61409663000438,
+          "person_id": "r000000-o00001-p02",
+          "preparation_elapsed_s": 95.63428004918728,
+          "preparation_queue_wait_s": 0,
+          "preparation_started_s": 540.6266036744697,
+          "state": "completed",
+          "transaction_elapsed_s": 26.770962776982515,
+          "unavailable_fields": [
+            {
+              "field": "withdrawal_wait_s",
+              "reason": "not_withdrawn"
+            }
+          ],
+          "withdrawal_wait_s": null
+        },
+        {
+          "abandonment_s": null,
+          "arrival_s": 808.1855232901876,
+          "cohort": "new",
+          "delivery_s": 934.411583193192,
+          "order_id": "r000000-o00002",
+          "payment_active_ended_s": 833.2972555832845,
+          "payment_completed_s": 833.2972555832845,
+          "payment_started_s": 808.1855232901876,
+          "payment_wait_s": 0,
+          "permanence_s": 126.2260599030044,
+          "person_id": "r000000-o00002-p01",
+          "preparation_elapsed_s": 101.11432760990749,
+          "preparation_queue_wait_s": 0,
+          "preparation_started_s": 833.2972555832845,
+          "state": "completed",
+          "transaction_elapsed_s": 25.111732293096907,
+          "unavailable_fields": [
+            {
+              "field": "withdrawal_wait_s",
+              "reason": "not_withdrawn"
+            }
+          ],
+          "withdrawal_wait_s": null
+        },
+        {
+          "abandonment_s": null,
+          "arrival_s": 1066.904026805378,
+          "cohort": "new",
+          "delivery_s": 1222.8520718016662,
+          "order_id": "r000000-o00003",
+          "payment_active_ended_s": 1097.4952756734383,
+          "payment_completed_s": 1097.4952756734383,
+          "payment_started_s": 1066.904026805378,
+          "payment_wait_s": 0,
+          "permanence_s": 155.94804499628822,
+          "person_id": "r000000-o00003-p01",
+          "preparation_elapsed_s": 125.35679612822787,
+          "preparation_queue_wait_s": 0,
+          "preparation_started_s": 1097.4952756734383,
+          "state": "completed",
+          "transaction_elapsed_s": 30.591248868060347,
+          "unavailable_fields": [
+            {
+              "field": "withdrawal_wait_s",
+              "reason": "not_withdrawn"
+            }
+          ],
+          "withdrawal_wait_s": null
+        },
+        {
+          "abandonment_s": null,
+          "arrival_s": 1093.5226152934404,
+          "cohort": "new",
+          "delivery_s": 1253.451671330555,
+          "order_id": "r000000-o00004",
+          "payment_active_ended_s": 1132.5968593891307,
+          "payment_completed_s": 1132.5968593891307,
+          "payment_started_s": 1097.4952756734383,
+          "payment_wait_s": 3.972660379997933,
+          "permanence_s": 159.9290560371146,
+          "person_id": "r000000-o00004-p01",
+          "preparation_elapsed_s": 120.85481194142426,
+          "preparation_queue_wait_s": 0,
+          "preparation_started_s": 1132.5968593891307,
+          "state": "completed",
+          "transaction_elapsed_s": 35.10158371569241,
+          "unavailable_fields": [
+            {
+              "field": "withdrawal_wait_s",
+              "reason": "not_withdrawn"
+            }
+          ],
+          "withdrawal_wait_s": null
+        },
+        {
+          "abandonment_s": null,
+          "arrival_s": 1146.0033548973674,
+          "cohort": "new",
+          "delivery_s": 1278.2821852528364,
+          "order_id": "r000000-o00005",
+          "payment_active_ended_s": 1187.7158368878042,
+          "payment_completed_s": 1187.7158368878042,
+          "payment_started_s": 1146.0033548973674,
+          "payment_wait_s": 0,
+          "permanence_s": 132.27883035546893,
+          "person_id": "r000000-o00005-p01",
+          "preparation_elapsed_s": 90.56634836503213,
+          "preparation_queue_wait_s": 0,
+          "preparation_started_s": 1187.7158368878042,
+          "state": "completed",
+          "transaction_elapsed_s": 41.7124819904368,
+          "unavailable_fields": [
+            {
+              "field": "withdrawal_wait_s",
+              "reason": "not_withdrawn"
+            }
+          ],
+          "withdrawal_wait_s": null
+        }
+      ],
+      "queue_series": [
+        {
+          "end_s": 506.6467870936526,
+          "order_count": 0,
+          "person_count": 0,
+          "queue": "payment",
+          "start_s": 0
+        },
+        {
+          "end_s": 1200,
+          "order_count": 0,
+          "person_count": 0,
+          "queue": "preparation",
+          "start_s": 0
+        },
+        {
+          "end_s": 513.8556408974872,
+          "order_count": 1,
+          "person_count": 2,
+          "queue": "payment",
+          "start_s": 506.6467870936526
+        },
+        {
+          "end_s": 1093.5226152934404,
+          "order_count": 0,
+          "person_count": 0,
+          "queue": "payment",
+          "start_s": 513.8556408974872
+        },
+        {
+          "end_s": 1097.4952756734383,
+          "order_count": 1,
+          "person_count": 1,
+          "queue": "payment",
+          "start_s": 1093.5226152934404
+        },
+        {
+          "end_s": 1200,
+          "order_count": 0,
+          "person_count": 0,
+          "queue": "payment",
+          "start_s": 1097.4952756734383
+        }
+      ],
+      "resource_usage": [
+        {
+          "active_fraction": 0.15293027799354078,
+          "active_worker_s": 183.51633359224894,
+          "available_worker_s": 1200,
+          "capacity": 1,
+          "component": "payment",
+          "pool": "cashier",
+          "reserved_fraction": 0.15293027799354078,
+          "reserved_worker_s": 183.51633359224894
+        },
+        {
+          "active_fraction": 0,
+          "active_worker_s": 0,
+          "available_worker_s": 1200,
+          "capacity": 1,
+          "component": "preparation",
+          "pool": "cashier",
+          "reserved_fraction": 0,
+          "reserved_worker_s": 0
+        },
+        {
+          "active_fraction": 0,
+          "active_worker_s": 0,
+          "available_worker_s": 1200,
+          "capacity": 1,
+          "component": "external_confirmation",
+          "pool": "cashier",
+          "reserved_fraction": 0,
+          "reserved_worker_s": 0
+        },
+        {
+          "active_fraction": 0.41436240547336856,
+          "active_worker_s": 497.23488656804227,
+          "available_worker_s": 1200,
+          "capacity": 1,
+          "component": "total",
+          "pool": "cashier",
+          "reserved_fraction": 0.41436240547336856,
+          "reserved_worker_s": 497.23488656804227
+        },
+        {
+          "active_fraction": 0,
+          "active_worker_s": 0,
+          "available_worker_s": 4800,
+          "capacity": 4,
+          "component": "payment",
+          "pool": "preparer",
+          "reserved_fraction": 0,
+          "reserved_worker_s": 0
+        },
+        {
+          "active_fraction": 0.10359060136834214,
+          "active_worker_s": 497.23488656804227,
+          "available_worker_s": 4800,
+          "capacity": 4,
+          "component": "preparation",
+          "pool": "preparer",
+          "reserved_fraction": 0.10359060136834214,
+          "reserved_worker_s": 497.23488656804227
+        },
+        {
+          "active_fraction": 0,
+          "active_worker_s": 0,
+          "available_worker_s": 4800,
+          "capacity": 4,
+          "component": "external_confirmation",
+          "pool": "preparer",
+          "reserved_fraction": 0,
+          "reserved_worker_s": 0
+        },
+        {
+          "active_fraction": 0.10359060136834214,
+          "active_worker_s": 497.23488656804227,
+          "available_worker_s": 4800,
+          "capacity": 4,
+          "component": "total",
+          "pool": "preparer",
+          "reserved_fraction": 0.10359060136834214,
+          "reserved_worker_s": 497.23488656804227
+        },
+        {
+          "active_fraction": null,
+          "active_worker_s": 0,
+          "available_worker_s": 0,
+          "capacity": 0,
+          "component": "payment",
+          "pool": "integrated",
+          "reserved_fraction": null,
+          "reserved_worker_s": 0
+        },
+        {
+          "active_fraction": null,
+          "active_worker_s": 0,
+          "available_worker_s": 0,
+          "capacity": 0,
+          "component": "preparation",
+          "pool": "integrated",
+          "reserved_fraction": null,
+          "reserved_worker_s": 0
+        },
+        {
+          "active_fraction": null,
+          "active_worker_s": 0,
+          "available_worker_s": 0,
+          "capacity": 0,
+          "component": "external_confirmation",
+          "pool": "integrated",
+          "reserved_fraction": null,
+          "reserved_worker_s": 0
+        },
+        {
+          "active_fraction": null,
+          "active_worker_s": 497.23488656804227,
+          "available_worker_s": 0,
+          "capacity": 0,
+          "component": "total",
+          "pool": "integrated",
+          "reserved_fraction": null,
+          "reserved_worker_s": 497.23488656804227
+        },
+        {
+          "active_fraction": 0.11345853669338188,
+          "active_worker_s": 680.7512201602913,
+          "available_worker_s": 6000,
+          "capacity": 5,
+          "component": "total",
+          "pool": "all",
+          "reserved_fraction": 0.11345853669338188,
+          "reserved_worker_s": 680.7512201602913
+        }
+      ]
+    },
+    "replication_index": 0,
+    "root_seed": 424242,
+    "scenario": {
+      "assumptions": [
+        "Los valores de enseñanza son sintéticos y no son estimaciones de datos de Boquitas.",
+        "Cada orden compartida tiene un pago y una preparación, sin importar el tamaño del grupo.",
+        "El estado inicial está vacío; no se supone trabajo previo que no haya sido observado.",
+        "No se aplica un periodo de calentamiento; las medidas de ventana empiezan en la apertura.",
+        "Los parámetros editados en la interfaz son supuestos del usuario y no provienen de una calibración de las observaciones."
+      ],
+      "contract_version": 1,
+      "default_root_seed": 424242,
+      "display_name": "Demostración sintética · sin calibrar",
+      "engine_config": {
+        "cashiers": 1,
+        "contract_version": 1,
+        "horizon_s": 1200,
+        "integrated_workers": 0,
+        "mode": "tuesday",
+        "opening_time": "15:00:00",
+        "preparers": 4
+      },
+      "group_sizes": [
+        {
+          "probability": 0.6,
+          "size": 1
+        },
+        {
+          "probability": 0.4,
+          "size": 2
+        }
+      ],
+      "initial_state": [],
+      "interarrival": {
+        "kind": "exponential",
+        "mean_s": 180
+      },
+      "patience": null,
+      "payment_active": {
+        "high_s": 45,
+        "kind": "triangular",
+        "low_s": 15,
+        "mode_s": 30
+      },
+      "preparation": {
+        "high_s": 180,
+        "kind": "triangular",
+        "low_s": 60,
+        "mode_s": 120
+      },
+      "provenance": "user_assumptions",
+      "scenario_id": "synthetic-demo-tuesday",
+      "transfer_confirmation": {
+        "high_s": 90,
+        "kind": "triangular",
+        "low_s": 30,
+        "mode_s": 60
+      },
+      "transfer_probability": 0.25
+    },
+    "trace": {
+      "config": {
+        "cashiers": 1,
+        "contract_version": 1,
+        "horizon_s": 1200,
+        "integrated_workers": 0,
+        "mode": "tuesday",
+        "opening_time": "15:00:00",
+        "preparers": 4
+      },
+      "contract_version": 1,
+      "declared_resource_ids": [
+        "cashier-1",
+        "preparer-1",
+        "preparer-2",
+        "preparer-3",
+        "preparer-4"
+      ],
+      "drain_end_s": 1278.2821852528364,
+      "events": [
+        {
+          "data": {
+            "arrival_s": null,
+            "initial_stage": null,
+            "queue": "payment",
+            "queue_rank": null,
+            "remaining_s": null,
+            "stage": "waiting_payment",
+            "worker_active": false,
+            "worker_reserved": false
+          },
+          "order_id": "r000000-o00000",
+          "person_ids": [
+            "r000000-o00000-p01"
+          ],
+          "seq": 0,
+          "time_s": 489.62731694950725,
+          "type": "order_arrived",
+          "worker_id": null
+        },
+        {
+          "data": {
+            "arrival_s": null,
+            "initial_stage": null,
+            "queue": null,
+            "queue_rank": null,
+            "remaining_s": null,
+            "stage": "payment_active",
+            "worker_active": true,
+            "worker_reserved": true
+          },
+          "order_id": "r000000-o00000",
+          "person_ids": [
+            "r000000-o00000-p01"
+          ],
+          "seq": 1,
+          "time_s": 489.62731694950725,
+          "type": "payment_started",
+          "worker_id": "cashier-1"
+        },
+        {
+          "data": {
+            "arrival_s": null,
+            "initial_stage": null,
+            "queue": "payment",
+            "queue_rank": null,
+            "remaining_s": null,
+            "stage": "waiting_payment",
+            "worker_active": false,
+            "worker_reserved": false
+          },
+          "order_id": "r000000-o00001",
+          "person_ids": [
+            "r000000-o00001-p01",
+            "r000000-o00001-p02"
+          ],
+          "seq": 2,
+          "time_s": 506.6467870936526,
+          "type": "order_arrived",
+          "worker_id": null
+        },
+        {
+          "data": {
+            "arrival_s": null,
+            "initial_stage": null,
+            "queue": null,
+            "queue_rank": null,
+            "remaining_s": null,
+            "stage": "waiting_preparation",
+            "worker_active": false,
+            "worker_reserved": false
+          },
+          "order_id": "r000000-o00000",
+          "person_ids": [
+            "r000000-o00000-p01"
+          ],
+          "seq": 3,
+          "time_s": 513.8556408974872,
+          "type": "payment_active_ended",
+          "worker_id": "cashier-1"
+        },
+        {
+          "data": {
+            "arrival_s": null,
+            "initial_stage": null,
+            "queue": "preparation",
+            "queue_rank": null,
+            "remaining_s": null,
+            "stage": "waiting_preparation",
+            "worker_active": false,
+            "worker_reserved": false
+          },
+          "order_id": "r000000-o00000",
+          "person_ids": [
+            "r000000-o00000-p01"
+          ],
+          "seq": 4,
+          "time_s": 513.8556408974872,
+          "type": "payment_completed",
+          "worker_id": null
+        },
+        {
+          "data": {
+            "arrival_s": null,
+            "initial_stage": null,
+            "queue": null,
+            "queue_rank": null,
+            "remaining_s": null,
+            "stage": "payment_active",
+            "worker_active": true,
+            "worker_reserved": true
+          },
+          "order_id": "r000000-o00001",
+          "person_ids": [
+            "r000000-o00001-p01",
+            "r000000-o00001-p02"
+          ],
+          "seq": 5,
+          "time_s": 513.8556408974872,
+          "type": "payment_started",
+          "worker_id": "cashier-1"
+        },
+        {
+          "data": {
+            "arrival_s": null,
+            "initial_stage": null,
+            "queue": null,
+            "queue_rank": null,
+            "remaining_s": null,
+            "stage": "preparation",
+            "worker_active": true,
+            "worker_reserved": true
+          },
+          "order_id": "r000000-o00000",
+          "person_ids": [
+            "r000000-o00000-p01"
+          ],
+          "seq": 6,
+          "time_s": 513.8556408974872,
+          "type": "preparation_started",
+          "worker_id": "preparer-1"
+        },
+        {
+          "data": {
+            "arrival_s": null,
+            "initial_stage": null,
+            "queue": null,
+            "queue_rank": null,
+            "remaining_s": null,
+            "stage": "waiting_preparation",
+            "worker_active": false,
+            "worker_reserved": false
+          },
+          "order_id": "r000000-o00001",
+          "person_ids": [
+            "r000000-o00001-p01",
+            "r000000-o00001-p02"
+          ],
+          "seq": 7,
+          "time_s": 540.6266036744697,
+          "type": "payment_active_ended",
+          "worker_id": "cashier-1"
+        },
+        {
+          "data": {
+            "arrival_s": null,
+            "initial_stage": null,
+            "queue": "preparation",
+            "queue_rank": null,
+            "remaining_s": null,
+            "stage": "waiting_preparation",
+            "worker_active": false,
+            "worker_reserved": false
+          },
+          "order_id": "r000000-o00001",
+          "person_ids": [
+            "r000000-o00001-p01",
+            "r000000-o00001-p02"
+          ],
+          "seq": 8,
+          "time_s": 540.6266036744697,
+          "type": "payment_completed",
+          "worker_id": null
+        },
+        {
+          "data": {
+            "arrival_s": null,
+            "initial_stage": null,
+            "queue": null,
+            "queue_rank": null,
+            "remaining_s": null,
+            "stage": "preparation",
+            "worker_active": true,
+            "worker_reserved": true
+          },
+          "order_id": "r000000-o00001",
+          "person_ids": [
+            "r000000-o00001-p01",
+            "r000000-o00001-p02"
+          ],
+          "seq": 9,
+          "time_s": 540.6266036744697,
+          "type": "preparation_started",
+          "worker_id": "preparer-2"
+        },
+        {
+          "data": {
+            "arrival_s": null,
+            "initial_stage": null,
+            "queue": null,
+            "queue_rank": null,
+            "remaining_s": null,
+            "stage": "completed",
+            "worker_active": false,
+            "worker_reserved": false
+          },
+          "order_id": "r000000-o00000",
+          "person_ids": [
+            "r000000-o00000-p01"
+          ],
+          "seq": 10,
+          "time_s": 632.149891756808,
+          "type": "order_delivered",
+          "worker_id": "preparer-1"
+        },
+        {
+          "data": {
+            "arrival_s": null,
+            "initial_stage": null,
+            "queue": null,
+            "queue_rank": null,
+            "remaining_s": null,
+            "stage": "completed",
+            "worker_active": false,
+            "worker_reserved": false
+          },
+          "order_id": "r000000-o00001",
+          "person_ids": [
+            "r000000-o00001-p01",
+            "r000000-o00001-p02"
+          ],
+          "seq": 11,
+          "time_s": 636.260883723657,
+          "type": "order_delivered",
+          "worker_id": "preparer-2"
+        },
+        {
+          "data": {
+            "arrival_s": null,
+            "initial_stage": null,
+            "queue": "payment",
+            "queue_rank": null,
+            "remaining_s": null,
+            "stage": "waiting_payment",
+            "worker_active": false,
+            "worker_reserved": false
+          },
+          "order_id": "r000000-o00002",
+          "person_ids": [
+            "r000000-o00002-p01"
+          ],
+          "seq": 12,
+          "time_s": 808.1855232901876,
+          "type": "order_arrived",
+          "worker_id": null
+        },
+        {
+          "data": {
+            "arrival_s": null,
+            "initial_stage": null,
+            "queue": null,
+            "queue_rank": null,
+            "remaining_s": null,
+            "stage": "payment_active",
+            "worker_active": true,
+            "worker_reserved": true
+          },
+          "order_id": "r000000-o00002",
+          "person_ids": [
+            "r000000-o00002-p01"
+          ],
+          "seq": 13,
+          "time_s": 808.1855232901876,
+          "type": "payment_started",
+          "worker_id": "cashier-1"
+        },
+        {
+          "data": {
+            "arrival_s": null,
+            "initial_stage": null,
+            "queue": null,
+            "queue_rank": null,
+            "remaining_s": null,
+            "stage": "waiting_preparation",
+            "worker_active": false,
+            "worker_reserved": false
+          },
+          "order_id": "r000000-o00002",
+          "person_ids": [
+            "r000000-o00002-p01"
+          ],
+          "seq": 14,
+          "time_s": 833.2972555832845,
+          "type": "payment_active_ended",
+          "worker_id": "cashier-1"
+        },
+        {
+          "data": {
+            "arrival_s": null,
+            "initial_stage": null,
+            "queue": "preparation",
+            "queue_rank": null,
+            "remaining_s": null,
+            "stage": "waiting_preparation",
+            "worker_active": false,
+            "worker_reserved": false
+          },
+          "order_id": "r000000-o00002",
+          "person_ids": [
+            "r000000-o00002-p01"
+          ],
+          "seq": 15,
+          "time_s": 833.2972555832845,
+          "type": "payment_completed",
+          "worker_id": null
+        },
+        {
+          "data": {
+            "arrival_s": null,
+            "initial_stage": null,
+            "queue": null,
+            "queue_rank": null,
+            "remaining_s": null,
+            "stage": "preparation",
+            "worker_active": true,
+            "worker_reserved": true
+          },
+          "order_id": "r000000-o00002",
+          "person_ids": [
+            "r000000-o00002-p01"
+          ],
+          "seq": 16,
+          "time_s": 833.2972555832845,
+          "type": "preparation_started",
+          "worker_id": "preparer-1"
+        },
+        {
+          "data": {
+            "arrival_s": null,
+            "initial_stage": null,
+            "queue": null,
+            "queue_rank": null,
+            "remaining_s": null,
+            "stage": "completed",
+            "worker_active": false,
+            "worker_reserved": false
+          },
+          "order_id": "r000000-o00002",
+          "person_ids": [
+            "r000000-o00002-p01"
+          ],
+          "seq": 17,
+          "time_s": 934.411583193192,
+          "type": "order_delivered",
+          "worker_id": "preparer-1"
+        },
+        {
+          "data": {
+            "arrival_s": null,
+            "initial_stage": null,
+            "queue": "payment",
+            "queue_rank": null,
+            "remaining_s": null,
+            "stage": "waiting_payment",
+            "worker_active": false,
+            "worker_reserved": false
+          },
+          "order_id": "r000000-o00003",
+          "person_ids": [
+            "r000000-o00003-p01"
+          ],
+          "seq": 18,
+          "time_s": 1066.904026805378,
+          "type": "order_arrived",
+          "worker_id": null
+        },
+        {
+          "data": {
+            "arrival_s": null,
+            "initial_stage": null,
+            "queue": null,
+            "queue_rank": null,
+            "remaining_s": null,
+            "stage": "payment_active",
+            "worker_active": true,
+            "worker_reserved": true
+          },
+          "order_id": "r000000-o00003",
+          "person_ids": [
+            "r000000-o00003-p01"
+          ],
+          "seq": 19,
+          "time_s": 1066.904026805378,
+          "type": "payment_started",
+          "worker_id": "cashier-1"
+        },
+        {
+          "data": {
+            "arrival_s": null,
+            "initial_stage": null,
+            "queue": "payment",
+            "queue_rank": null,
+            "remaining_s": null,
+            "stage": "waiting_payment",
+            "worker_active": false,
+            "worker_reserved": false
+          },
+          "order_id": "r000000-o00004",
+          "person_ids": [
+            "r000000-o00004-p01"
+          ],
+          "seq": 20,
+          "time_s": 1093.5226152934404,
+          "type": "order_arrived",
+          "worker_id": null
+        },
+        {
+          "data": {
+            "arrival_s": null,
+            "initial_stage": null,
+            "queue": null,
+            "queue_rank": null,
+            "remaining_s": null,
+            "stage": "waiting_preparation",
+            "worker_active": false,
+            "worker_reserved": false
+          },
+          "order_id": "r000000-o00003",
+          "person_ids": [
+            "r000000-o00003-p01"
+          ],
+          "seq": 21,
+          "time_s": 1097.4952756734383,
+          "type": "payment_active_ended",
+          "worker_id": "cashier-1"
+        },
+        {
+          "data": {
+            "arrival_s": null,
+            "initial_stage": null,
+            "queue": "preparation",
+            "queue_rank": null,
+            "remaining_s": null,
+            "stage": "waiting_preparation",
+            "worker_active": false,
+            "worker_reserved": false
+          },
+          "order_id": "r000000-o00003",
+          "person_ids": [
+            "r000000-o00003-p01"
+          ],
+          "seq": 22,
+          "time_s": 1097.4952756734383,
+          "type": "payment_completed",
+          "worker_id": null
+        },
+        {
+          "data": {
+            "arrival_s": null,
+            "initial_stage": null,
+            "queue": null,
+            "queue_rank": null,
+            "remaining_s": null,
+            "stage": "payment_active",
+            "worker_active": true,
+            "worker_reserved": true
+          },
+          "order_id": "r000000-o00004",
+          "person_ids": [
+            "r000000-o00004-p01"
+          ],
+          "seq": 23,
+          "time_s": 1097.4952756734383,
+          "type": "payment_started",
+          "worker_id": "cashier-1"
+        },
+        {
+          "data": {
+            "arrival_s": null,
+            "initial_stage": null,
+            "queue": null,
+            "queue_rank": null,
+            "remaining_s": null,
+            "stage": "preparation",
+            "worker_active": true,
+            "worker_reserved": true
+          },
+          "order_id": "r000000-o00003",
+          "person_ids": [
+            "r000000-o00003-p01"
+          ],
+          "seq": 24,
+          "time_s": 1097.4952756734383,
+          "type": "preparation_started",
+          "worker_id": "preparer-1"
+        },
+        {
+          "data": {
+            "arrival_s": null,
+            "initial_stage": null,
+            "queue": null,
+            "queue_rank": null,
+            "remaining_s": null,
+            "stage": "waiting_preparation",
+            "worker_active": false,
+            "worker_reserved": false
+          },
+          "order_id": "r000000-o00004",
+          "person_ids": [
+            "r000000-o00004-p01"
+          ],
+          "seq": 25,
+          "time_s": 1132.5968593891307,
+          "type": "payment_active_ended",
+          "worker_id": "cashier-1"
+        },
+        {
+          "data": {
+            "arrival_s": null,
+            "initial_stage": null,
+            "queue": "preparation",
+            "queue_rank": null,
+            "remaining_s": null,
+            "stage": "waiting_preparation",
+            "worker_active": false,
+            "worker_reserved": false
+          },
+          "order_id": "r000000-o00004",
+          "person_ids": [
+            "r000000-o00004-p01"
+          ],
+          "seq": 26,
+          "time_s": 1132.5968593891307,
+          "type": "payment_completed",
+          "worker_id": null
+        },
+        {
+          "data": {
+            "arrival_s": null,
+            "initial_stage": null,
+            "queue": null,
+            "queue_rank": null,
+            "remaining_s": null,
+            "stage": "preparation",
+            "worker_active": true,
+            "worker_reserved": true
+          },
+          "order_id": "r000000-o00004",
+          "person_ids": [
+            "r000000-o00004-p01"
+          ],
+          "seq": 27,
+          "time_s": 1132.5968593891307,
+          "type": "preparation_started",
+          "worker_id": "preparer-2"
+        },
+        {
+          "data": {
+            "arrival_s": null,
+            "initial_stage": null,
+            "queue": "payment",
+            "queue_rank": null,
+            "remaining_s": null,
+            "stage": "waiting_payment",
+            "worker_active": false,
+            "worker_reserved": false
+          },
+          "order_id": "r000000-o00005",
+          "person_ids": [
+            "r000000-o00005-p01"
+          ],
+          "seq": 28,
+          "time_s": 1146.0033548973674,
+          "type": "order_arrived",
+          "worker_id": null
+        },
+        {
+          "data": {
+            "arrival_s": null,
+            "initial_stage": null,
+            "queue": null,
+            "queue_rank": null,
+            "remaining_s": null,
+            "stage": "payment_active",
+            "worker_active": true,
+            "worker_reserved": true
+          },
+          "order_id": "r000000-o00005",
+          "person_ids": [
+            "r000000-o00005-p01"
+          ],
+          "seq": 29,
+          "time_s": 1146.0033548973674,
+          "type": "payment_started",
+          "worker_id": "cashier-1"
+        },
+        {
+          "data": {
+            "arrival_s": null,
+            "initial_stage": null,
+            "queue": null,
+            "queue_rank": null,
+            "remaining_s": null,
+            "stage": "waiting_preparation",
+            "worker_active": false,
+            "worker_reserved": false
+          },
+          "order_id": "r000000-o00005",
+          "person_ids": [
+            "r000000-o00005-p01"
+          ],
+          "seq": 30,
+          "time_s": 1187.7158368878042,
+          "type": "payment_active_ended",
+          "worker_id": "cashier-1"
+        },
+        {
+          "data": {
+            "arrival_s": null,
+            "initial_stage": null,
+            "queue": "preparation",
+            "queue_rank": null,
+            "remaining_s": null,
+            "stage": "waiting_preparation",
+            "worker_active": false,
+            "worker_reserved": false
+          },
+          "order_id": "r000000-o00005",
+          "person_ids": [
+            "r000000-o00005-p01"
+          ],
+          "seq": 31,
+          "time_s": 1187.7158368878042,
+          "type": "payment_completed",
+          "worker_id": null
+        },
+        {
+          "data": {
+            "arrival_s": null,
+            "initial_stage": null,
+            "queue": null,
+            "queue_rank": null,
+            "remaining_s": null,
+            "stage": "preparation",
+            "worker_active": true,
+            "worker_reserved": true
+          },
+          "order_id": "r000000-o00005",
+          "person_ids": [
+            "r000000-o00005-p01"
+          ],
+          "seq": 32,
+          "time_s": 1187.7158368878042,
+          "type": "preparation_started",
+          "worker_id": "preparer-3"
+        },
+        {
+          "data": {
+            "arrival_s": null,
+            "initial_stage": null,
+            "queue": null,
+            "queue_rank": null,
+            "remaining_s": null,
+            "stage": null,
+            "worker_active": null,
+            "worker_reserved": null
+          },
+          "order_id": null,
+          "person_ids": [],
+          "seq": 33,
+          "time_s": 1200,
+          "type": "admissions_closed",
+          "worker_id": null
+        },
+        {
+          "data": {
+            "arrival_s": null,
+            "initial_stage": null,
+            "queue": null,
+            "queue_rank": null,
+            "remaining_s": null,
+            "stage": "completed",
+            "worker_active": false,
+            "worker_reserved": false
+          },
+          "order_id": "r000000-o00003",
+          "person_ids": [
+            "r000000-o00003-p01"
+          ],
+          "seq": 34,
+          "time_s": 1222.8520718016662,
+          "type": "order_delivered",
+          "worker_id": "preparer-1"
+        },
+        {
+          "data": {
+            "arrival_s": null,
+            "initial_stage": null,
+            "queue": null,
+            "queue_rank": null,
+            "remaining_s": null,
+            "stage": "completed",
+            "worker_active": false,
+            "worker_reserved": false
+          },
+          "order_id": "r000000-o00004",
+          "person_ids": [
+            "r000000-o00004-p01"
+          ],
+          "seq": 35,
+          "time_s": 1253.451671330555,
+          "type": "order_delivered",
+          "worker_id": "preparer-2"
+        },
+        {
+          "data": {
+            "arrival_s": null,
+            "initial_stage": null,
+            "queue": null,
+            "queue_rank": null,
+            "remaining_s": null,
+            "stage": "completed",
+            "worker_active": false,
+            "worker_reserved": false
+          },
+          "order_id": "r000000-o00005",
+          "person_ids": [
+            "r000000-o00005-p01"
+          ],
+          "seq": 36,
+          "time_s": 1278.2821852528364,
+          "type": "order_delivered",
+          "worker_id": "preparer-3"
+        },
+        {
+          "data": {
+            "arrival_s": null,
+            "initial_stage": null,
+            "queue": null,
+            "queue_rank": null,
+            "remaining_s": null,
+            "stage": null,
+            "worker_active": null,
+            "worker_reserved": null
+          },
+          "order_id": null,
+          "person_ids": [],
+          "seq": 37,
+          "time_s": 1278.2821852528364,
+          "type": "run_finished",
+          "worker_id": null
+        }
+      ],
+      "final_orders": [
+        {
+          "arrival_s": 489.62731694950725,
+          "order_id": "r000000-o00000",
+          "person_ids": [
+            "r000000-o00000-p01"
+          ],
+          "state": "completed",
+          "worker_id": null
+        },
+        {
+          "arrival_s": 506.6467870936526,
+          "order_id": "r000000-o00001",
+          "person_ids": [
+            "r000000-o00001-p01",
+            "r000000-o00001-p02"
+          ],
+          "state": "completed",
+          "worker_id": null
+        },
+        {
+          "arrival_s": 808.1855232901876,
+          "order_id": "r000000-o00002",
+          "person_ids": [
+            "r000000-o00002-p01"
+          ],
+          "state": "completed",
+          "worker_id": null
+        },
+        {
+          "arrival_s": 1066.904026805378,
+          "order_id": "r000000-o00003",
+          "person_ids": [
+            "r000000-o00003-p01"
+          ],
+          "state": "completed",
+          "worker_id": null
+        },
+        {
+          "arrival_s": 1093.5226152934404,
+          "order_id": "r000000-o00004",
+          "person_ids": [
+            "r000000-o00004-p01"
+          ],
+          "state": "completed",
+          "worker_id": null
+        },
+        {
+          "arrival_s": 1146.0033548973674,
+          "order_id": "r000000-o00005",
+          "person_ids": [
+            "r000000-o00005-p01"
+          ],
+          "state": "completed",
+          "worker_id": null
+        }
+      ],
+      "final_people": [
+        {
+          "order_id": "r000000-o00000",
+          "person_id": "r000000-o00000-p01",
+          "state": "completed"
+        },
+        {
+          "order_id": "r000000-o00001",
+          "person_id": "r000000-o00001-p01",
+          "state": "completed"
+        },
+        {
+          "order_id": "r000000-o00001",
+          "person_id": "r000000-o00001-p02",
+          "state": "completed"
+        },
+        {
+          "order_id": "r000000-o00002",
+          "person_id": "r000000-o00002-p01",
+          "state": "completed"
+        },
+        {
+          "order_id": "r000000-o00003",
+          "person_id": "r000000-o00003-p01",
+          "state": "completed"
+        },
+        {
+          "order_id": "r000000-o00004",
+          "person_id": "r000000-o00004-p01",
+          "state": "completed"
+        },
+        {
+          "order_id": "r000000-o00005",
+          "person_id": "r000000-o00005-p01",
+          "state": "completed"
+        }
+      ],
+      "final_workers": [
+        {
+          "active": false,
+          "assigned_order_id": null,
+          "pool": "cashier",
+          "reserved": false,
+          "stage": null,
+          "worker_id": "cashier-1"
+        },
+        {
+          "active": false,
+          "assigned_order_id": null,
+          "pool": "preparer",
+          "reserved": false,
+          "stage": null,
+          "worker_id": "preparer-1"
+        },
+        {
+          "active": false,
+          "assigned_order_id": null,
+          "pool": "preparer",
+          "reserved": false,
+          "stage": null,
+          "worker_id": "preparer-2"
+        },
+        {
+          "active": false,
+          "assigned_order_id": null,
+          "pool": "preparer",
+          "reserved": false,
+          "stage": null,
+          "worker_id": "preparer-3"
+        },
+        {
+          "active": false,
+          "assigned_order_id": null,
+          "pool": "preparer",
+          "reserved": false,
+          "stage": null,
+          "worker_id": "preparer-4"
+        }
+      ],
+      "initialized_order_ids": [],
+      "new_order_ids": [
+        "r000000-o00000",
+        "r000000-o00001",
+        "r000000-o00002",
+        "r000000-o00003",
+        "r000000-o00004",
+        "r000000-o00005"
+      ],
+      "window_end_s": 1200
+    }
+  }
+}

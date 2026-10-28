@@ -1,0 +1,19 @@
+{
+  "test": "runs the installed demonstration in Tuesday and regular modes",
+  "status": "passed",
+  "expectedStatus": "passed",
+  "localOrigin": "http://127.0.0.1:8000",
+  "serviceWorkers": "blocked",
+  "guardActive": true,
+  "localHttpRequestCount": 7,
+  "localRequestPaths": [
+    "GET /",
+    "GET /assets/index-8DDEw5Zk.js",
+    "GET /assets/index-CzQhLbVk.css",
+    "GET /api/v1/health",
+    "GET /api/v1/demo",
+    "POST /api/v1/runs",
+    "POST /api/v1/runs"
+  ],
+  "externalHttpAttempts": []
+}

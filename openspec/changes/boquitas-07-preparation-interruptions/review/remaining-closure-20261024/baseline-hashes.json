@@ -1,0 +1,930 @@
+[
+  {
+    "path": "src\\boquitas\\__init__.py",
+    "sha256": "5C5BF65BDC6895760C070BD9643C3E7B3ED3CF65A96C3B4D7A430492EF656314"
+  },
+  {
+    "path": "src\\boquitas\\__main__.py",
+    "sha256": "B07831C6BBFA59813258EF88ADAD6E93DB73DA3DFCE8E012C1055017AC7BF1F2"
+  },
+  {
+    "path": "src\\boquitas\\api_models.py",
+    "sha256": "E6A58A0CB478EB10FBF283F63E2F49414B2FC43C2348E8C1265866A00EC7E0B0"
+  },
+  {
+    "path": "src\\boquitas\\api.py",
+    "sha256": "7C3624EDA8835746ACF1F3E1F11C6128493EEEC7C50226B166BA3D1A3C05C23A"
+  },
+  {
+    "path": "src\\boquitas\\demand.py",
+    "sha256": "2D24D2B802C6034555547FC7F7F1AA586C7A84488BB26CC47E128D7C8513EB58"
+  },
+  {
+    "path": "src\\boquitas\\engine.py",
+    "sha256": "874795A0AEA4D1320348333124BCC904364F0184D707AA4214C68978C23536B2"
+  },
+  {
+    "path": "src\\boquitas\\experiments.py",
+    "sha256": "ED997D4267DEA7AE673CBE59FEF7DBDA904A25BF582F36B532B6E49CF85D92D5"
+  },
+  {
+    "path": "src\\boquitas\\exports.py",
+    "sha256": "EA71B6617F71483506F6AD13D783855DC826C4DBFAAE280B4B922317E99F8C88"
+  },
+  {
+    "path": "src\\boquitas\\file_limits.py",
+    "sha256": "A54A3EF92119FB02B93122156F5C644AE8C164686D83890BACD0352DD5A45B3A"
+  },
+  {
+    "path": "src\\boquitas\\metrics_models.py",
+    "sha256": "FD214BF22A6C2A3C479FB68FF827547D30CEA0796AAC4A375765442E379CBE99"
+  },
+  {
+    "path": "src\\boquitas\\metrics.py",
+    "sha256": "3EB1312E8DA3DDD34FD7E29D553EDC167FB84AAC95F6511DC46C1F18338C4A0F"
+  },
+  {
+    "path": "src\\boquitas\\models.py",
+    "sha256": "5315ADE934D0DDF65FA2A41D07CC97D05A190EC3526EA82E20DDD597DE954261"
+  },
+  {
+    "path": "src\\boquitas\\observation_import.py",
+    "sha256": "882D137DD7A8D67E12242735C95AD19D648308B43D0A27ADA08364DBE35CB6EF"
+  },
+  {
+    "path": "src\\boquitas\\scenarios.py",
+    "sha256": "BF84281B79AF7802A02B1BB3AE5B697A57631E2401D115347AB1911B840E215D"
+  },
+  {
+    "path": "src\\boquitas\\statistics.py",
+    "sha256": "13443019D690ED5807E6C64DA7EBD0B79FC99B3984B5A3700D9C16380AC14DA6"
+  },
+  {
+    "path": "src\\boquitas\\__pycache__\\__init__.cpython-313.pyc",
+    "sha256": "1964908E0830072DF1FAC6244E0479F8E45342554768D2244670CC7BBD365FB2"
+  },
+  {
+    "path": "src\\boquitas\\__pycache__\\__main__.cpython-313.pyc",
+    "sha256": "9B8CE7B17CC7DAC8EE17BF67B809E6AC5F3169E52DFDFF5C6EC1E23891125130"
+  },
+  {
+    "path": "src\\boquitas\\__pycache__\\api_models.cpython-313.pyc",
+    "sha256": "D46BF0ED6A9F85A7CEBE7CD533B9BF620BDD924296632D9CE9006E6CE5A81FFC"
+  },
+  {
+    "path": "src\\boquitas\\__pycache__\\api.cpython-313.pyc",
+    "sha256": "BC6B129B694963413474B78E966D4FE30B618F9952549661C2831AAC74AF23C1"
+  },
+  {
+    "path": "src\\boquitas\\__pycache__\\demand.cpython-313.pyc",
+    "sha256": "2BE1B3BF6D9308740006F3BF2EE4E91EC5C608B6D3DC214BBED21A963021704F"
+  },
+  {
+    "path": "src\\boquitas\\__pycache__\\engine.cpython-313.pyc",
+    "sha256": "5F311B45FE2073138033651137B45651DEC1AFBEAD4AE42B3CF8F97DB2A95F52"
+  },
+  {
+    "path": "src\\boquitas\\__pycache__\\experiments.cpython-313.pyc",
+    "sha256": "04B41B790E81D548B3598D0C6659DD15DBBA3D02D166EC90253CDF5EBAC5A81D"
+  },
+  {
+    "path": "src\\boquitas\\__pycache__\\exports.cpython-313.pyc",
+    "sha256": "DE86947B8301F952E402598C5FA39B32654211531B111808EE14A31BCDCFF61A"
+  },
+  {
+    "path": "src\\boquitas\\__pycache__\\file_limits.cpython-313.pyc",
+    "sha256": "84A7A71EF71BED7813E572C17510B98F50A78AAB530C872F0A45B5DF1979387C"
+  },
+  {
+    "path": "src\\boquitas\\__pycache__\\metrics_models.cpython-313.pyc",
+    "sha256": "A1435DE83AF762B01C934DD2FBDCBE4DDD7DFD9D1BB57DE4A894BD34EDEADC31"
+  },
+  {
+    "path": "src\\boquitas\\__pycache__\\metrics.cpython-313.pyc",
+    "sha256": "3E57C667A4B73F8D278B627BA0318025EF97B52C1D617C8ACA96EAE435593B05"
+  },
+  {
+    "path": "src\\boquitas\\__pycache__\\models.cpython-313.pyc",
+    "sha256": "F7EB3DEDD1DA46DC53D165F58AB6F2AAD84CFBEC1B094F92EA084130CB4EDEC5"
+  },
+  {
+    "path": "src\\boquitas\\__pycache__\\observation_import.cpython-313.pyc",
+    "sha256": "3C1ECB3C87F0FF2DC9CD410F83AA39457A93E7DB08F58DCDA68ED8D1C6E11ECB"
+  },
+  {
+    "path": "src\\boquitas\\__pycache__\\scenarios.cpython-313.pyc",
+    "sha256": "4FD1E85EE0A3C098C2B9779BD2B8253A559234F8EAFDB88199279EEF62D50A09"
+  },
+  {
+    "path": "src\\boquitas\\__pycache__\\statistics.cpython-313.pyc",
+    "sha256": "E82A0FC68CE2805B04DA71CF2703F54E7518D65B4B4B5BC23439DA711B620921"
+  },
+  {
+    "path": "tests\\test_api.py",
+    "sha256": "A58758D58F0883EF48F59945950CAE4C4F29BE7EFDBC21F33E15DEAE3162AF83"
+  },
+  {
+    "path": "tests\\test_demand.py",
+    "sha256": "8C9ADFF8AA189AF989869139E5EAEE3B89165C990763CE8C11F76936C04D811C"
+  },
+  {
+    "path": "tests\\test_empirical_readiness.py",
+    "sha256": "4D934EDE04B840D08EA9005309651064A260C5B99498A9A7CF753EB64343B14A"
+  },
+  {
+    "path": "tests\\test_experiments.py",
+    "sha256": "D97D431B30A242C90EE0AE73AFD2C27BAB027782DAE90BD4AA0094CC53ED3E12"
+  },
+  {
+    "path": "tests\\test_exports.py",
+    "sha256": "0147CFF66D16B8AB02439FF3942695BE7F8FB486828B6E75067FC6D8D726118A"
+  },
+  {
+    "path": "tests\\test_interruption_api_diagnostics.py",
+    "sha256": "E6DB3FCD5FFDFCB3B164C74A120166CC4E76E4FB11E2EB0CBAFEA38201D4BAE6"
+  },
+  {
+    "path": "tests\\test_interruption_api.py",
+    "sha256": "3FCC4E413D4B492448BD39D990A005708B1957D29118AEB3A9A1260C3F2E4F34"
+  },
+  {
+    "path": "tests\\test_interruption_contracts.py",
+    "sha256": "435188278C1DDDE662CA2B71085C79BE35C055E92AD44E2E748628CFA780B204"
+  },
+  {
+    "path": "tests\\test_interruption_engine.py",
+    "sha256": "898C71992F0BFF2A4480CA53FDBEA1603B49AD23FAF1F30A92A5D2F81E2C4A71"
+  },
+  {
+    "path": "tests\\test_interruption_experiments.py",
+    "sha256": "6EE608E16559F6194E3DE0434BD4EE52D97BEAD0FEF20BF5CD40B73EDC574311"
+  },
+  {
+    "path": "tests\\test_interruption_exports.py",
+    "sha256": "9193FEB666C6DD08D743C0085EDF74F38146AA6F1FD3907594B12E69274CD6A3"
+  },
+  {
+    "path": "tests\\test_interruption_metrics.py",
+    "sha256": "F799A4F73C996D8E904ED69C593C5C8701E823A116BCD98BCDB5351A328A5676"
+  },
+  {
+    "path": "tests\\test_interruption_review.py",
+    "sha256": "9770D5CE75A0DDA567E4AD47B857A27B5A373B16558B69EC56CB013D93049911"
+  },
+  {
+    "path": "tests\\test_large_result_reopen.py",
+    "sha256": "69033C595649447EB144FACBB4CA9AFF2AFE510E8BCC3A973B7E1FD1A67EBA23"
+  },
+  {
+    "path": "tests\\test_launcher.py",
+    "sha256": "824AE106678A9B1F328B1D6D6803021A70BF1888540ADCD0B10373BD30803444"
+  },
+  {
+    "path": "tests\\test_metrics.py",
+    "sha256": "7C4B33A06421451DE00607BAC9D54FC5946AACA36EDF5986A0B0D7A0F0BDF6DC"
+  },
+  {
+    "path": "tests\\test_observation_import.py",
+    "sha256": "FAE450F11F621EE2733F1E2F451945BE3BB99381F160AA4A889CC8DEE4F01A79"
+  },
+  {
+    "path": "tests\\test_scenarios.py",
+    "sha256": "1EF4078E280761D61327DCEDBC1BB87E4EE5A98C428404102F25165FC6BB16E3"
+  },
+  {
+    "path": "tests\\test_simulation_engine.py",
+    "sha256": "15D545341C903D9F50939B6308C6AA4422407B655A4C67E6D1365268BA0A160F"
+  },
+  {
+    "path": "tests\\test_statistics.py",
+    "sha256": "30BBF02C347506B631FA896322AB0E3D60925A2AFAB3E23B50F20BD1EDE2457C"
+  },
+  {
+    "path": "tests\\fixtures\\api-static\\index.html",
+    "sha256": "3FA2A238D6D6437C2F210D5E17D8D06CD3EF41438DA3876D7E445D1C74154B25"
+  },
+  {
+    "path": "tests\\fixtures\\observation-import\\corrected-reference.txt",
+    "sha256": "480ADE881FD14BC88D8C94F037CEA9EF4C2869B7BA400CBFFDA772F6F470CAEA"
+  },
+  {
+    "path": "tests\\fixtures\\observation-import\\original.txt",
+    "sha256": "845F8C6E56A7AF120754AB0A5A789F318B65214E11F91737FD25032B7E51573D"
+  },
+  {
+    "path": "tests\\fixtures\\observation-import\\source-manifest.json",
+    "sha256": "82DBB4F5C56E08B2149497510206897C26D958A24C99A939C21C3C54162D68DA"
+  },
+  {
+    "path": "tests\\__pycache__\\test_api.cpython-313-pytest-9.1.1.pyc",
+    "sha256": "3F8FC20245F1F218DD91AEC1C89062A8476BF36E5812329423AE41E2A417AFB9"
+  },
+  {
+    "path": "tests\\__pycache__\\test_demand.cpython-313-pytest-9.1.1.pyc",
+    "sha256": "E3BEB0ED49295DCFE72DF6D4F33230C0C7AB3E84591FA687A8E5E3AC67D821DC"
+  },
+  {
+    "path": "tests\\__pycache__\\test_empirical_readiness.cpython-313-pytest-9.1.1.pyc",
+    "sha256": "2B277013D63A4AECD2BDEC7EBF41D44F57F54D537DC7C8015FB009579B746715"
+  },
+  {
+    "path": "tests\\__pycache__\\test_empirical_readiness.cpython-313.pyc",
+    "sha256": "18B25925CF3A3EEC70C21D79C3F75EBEFE972BC9A65E50E7CB6AD2E027CFA74D"
+  },
+  {
+    "path": "tests\\__pycache__\\test_experiments.cpython-313-pytest-9.1.1.pyc",
+    "sha256": "584F702F96832B822D03AD325E6B9406B17C6E77803EB92B86CBDA4846B65D52"
+  },
+  {
+    "path": "tests\\__pycache__\\test_exports.cpython-313-pytest-9.1.1.pyc",
+    "sha256": "16F075EA0EE1B7AE5228949C93323BC5C0A41C9BB44C1CC74195EEE11A3D0899"
+  },
+  {
+    "path": "tests\\__pycache__\\test_interruption_api_diagnostics.cpython-313-pytest-9.1.1.pyc",
+    "sha256": "0371C0526D07766E30373B18D81F83551FF04AB3597EA01C0C804C65CB61E033"
+  },
+  {
+    "path": "tests\\__pycache__\\test_interruption_api.cpython-313-pytest-9.1.1.pyc",
+    "sha256": "399A8934E9E8BC7EEE89AEAB8766A998ED725901C055B42C50E777495FD7E8FC"
+  },
+  {
+    "path": "tests\\__pycache__\\test_interruption_contracts.cpython-313-pytest-9.1.1.pyc",
+    "sha256": "53746C109F4ED41E1915A7C3F20C736E05DED6D69190B802E024C30619771DB3"
+  },
+  {
+    "path": "tests\\__pycache__\\test_interruption_engine.cpython-313-pytest-9.1.1.pyc",
+    "sha256": "8079DCEB9EA0093944FCCA9F85B910195FE605E6F6ADDA662EBEF12A8341CE57"
+  },
+  {
+    "path": "tests\\__pycache__\\test_interruption_experiments.cpython-313-pytest-9.1.1.pyc",
+    "sha256": "0C517C6D6D68CC6FFF1419F29F807BB371B23617E47A17083D2A4CB036A2C66B"
+  },
+  {
+    "path": "tests\\__pycache__\\test_interruption_exports.cpython-313-pytest-9.1.1.pyc",
+    "sha256": "1C8663AC93E19AB0608D5F7546451FBCA8E6DFA63DAE600129644DF6CCBD8377"
+  },
+  {
+    "path": "tests\\__pycache__\\test_interruption_metrics.cpython-313-pytest-9.1.1.pyc",
+    "sha256": "DFD1DD11A618EA967893249FF008C11B0B7DE21ABB70FA3CE42A05CEAA9268F7"
+  },
+  {
+    "path": "tests\\__pycache__\\test_interruption_review.cpython-313-pytest-9.1.1.pyc",
+    "sha256": "5C8EB3827DE8E59BF906CE9810C923399CE3B5FC45B74C7E5B69DC405D5EE52B"
+  },
+  {
+    "path": "tests\\__pycache__\\test_large_result_reopen.cpython-313-pytest-9.1.1.pyc",
+    "sha256": "16DD0C4C7FD63B905D3753352B48FE1353F2BB2B68044AB555880B6F79AB2748"
+  },
+  {
+    "path": "tests\\__pycache__\\test_launcher.cpython-313-pytest-9.1.1.pyc",
+    "sha256": "42861BCEF789A88740B4B87CF228547445073240856402BB0C7C2B9CFA034322"
+  },
+  {
+    "path": "tests\\__pycache__\\test_metrics.cpython-313-pytest-9.1.1.pyc",
+    "sha256": "50C403E724E62AEBF9CBD7897BA53A4F496710ADC44803C929B36A460F6EAE5D"
+  },
+  {
+    "path": "tests\\__pycache__\\test_observation_import.cpython-313-pytest-9.1.1.pyc",
+    "sha256": "FD44192F1E6F6F59E0224743DB90831A703062FAF36F31E1C1BBDAA8CF2D3465"
+  },
+  {
+    "path": "tests\\__pycache__\\test_scenarios.cpython-313-pytest-9.1.1.pyc",
+    "sha256": "F30AC3FE75D29A9BD19A69601ED0DDA06EF38103344C55C1E41D2D9F9A1E50C8"
+  },
+  {
+    "path": "tests\\__pycache__\\test_simulation_engine.cpython-313-pytest-9.1.1.pyc",
+    "sha256": "25F1CC099D64003482E6ABC4B5C343BB9A09872F453DFDD032C86E7328C3EE87"
+  },
+  {
+    "path": "tests\\__pycache__\\test_statistics.cpython-313-pytest-9.1.1.pyc",
+    "sha256": "CD8C4FECC3D970860393A0E5B07409DB0ECD8910B7E07167265C24BA2E40262F"
+  },
+  {
+    "path": "web\\src\\main.ts",
+    "sha256": "12DAE87936B6B76FC68E4B0557F89A5245122A9D5385DD537A7A891F447DCF10"
+  },
+  {
+    "path": "web\\src\\styles.css",
+    "sha256": "01CB38435FE0B61455591E27D58824D4408B46C88FD55494D806BCAAC4B486F2"
+  },
+  {
+    "path": "web\\src\\api\\schema.d.ts",
+    "sha256": "9049DA867B1DBC196834F086F946CFD7F0DFF3EE61C5221C0FC5128AFFF70896"
+  },
+  {
+    "path": "web\\src\\api\\types.ts",
+    "sha256": "60BC77270D77408D536D428DB2C58234F6F1613C21098229FF0E8C09CB20C1CF"
+  },
+  {
+    "path": "web\\src\\components\\observations.ts",
+    "sha256": "CF615F69656A1148726E6F8BF16A53AD08C86FC2DEF638EE5FF05F72DF3B06DF"
+  },
+  {
+    "path": "web\\src\\components\\results.ts",
+    "sha256": "DE1356A5F33D6986358010744F4B5E7BCF0DECBE90563548290ED106D1EC0491"
+  },
+  {
+    "path": "web\\src\\components\\scenario-editor.ts",
+    "sha256": "707E6D671EA00C26D88185B78B6A5183A368E13E4479418D1912DB2CC09177FE"
+  },
+  {
+    "path": "web\\src\\components\\shell.ts",
+    "sha256": "BC0122400781A095AED28C73CBB2891CD3B7E423CF9FEB268A8DBDE089F16239"
+  },
+  {
+    "path": "web\\src\\domain\\errors.ts",
+    "sha256": "27BC1227D36FF0B7AAAFAB7F5FE4CA0F6B55EFD84B3C0E9BEEA2AF8F9AF9BD8F"
+  },
+  {
+    "path": "web\\src\\domain\\file-limits.ts",
+    "sha256": "669505A526B1DEDFB0C87923F8D74FEEF3D04476D3FD958E4E6B3586DD8CEE4C"
+  },
+  {
+    "path": "web\\src\\domain\\format.ts",
+    "sha256": "0771B4B43B876AC578F76D0EE79FF5588ECA76D51DD8446D6543DD54E9088E0E"
+  },
+  {
+    "path": "web\\src\\replay\\clock.ts",
+    "sha256": "78E8BABD4D8F5BC4597616355208E282AB0F9363446CC3FA9B17858D20AD6313"
+  },
+  {
+    "path": "web\\src\\replay\\host.ts",
+    "sha256": "FC5BCFD901E10D42F04171CF99A6EF58D406A1BD00535688F9914976BDB11905"
+  },
+  {
+    "path": "web\\src\\replay\\project.ts",
+    "sha256": "A145FC494DCC7DC634F71DE5D6A4D29EA65745ABC352237F104BE8875F8945D9"
+  },
+  {
+    "path": "web\\src\\replay\\scene.ts",
+    "sha256": "FB0508CF9B3F104A430B360A6AA3406CA93D722E4C93BD5FC5E02F3FB27B39C9"
+  },
+  {
+    "path": "web\\src\\services\\api.ts",
+    "sha256": "E8777FDF7B8447EB4DE34FEB07ED195ADC15F7BD7793982E39D27933E1B43007"
+  },
+  {
+    "path": "web\\tests\\domain-errors.test.ts",
+    "sha256": "61EDA9851412E608A8011B53841EB15AB0906779AC2340CBDE0FFD035DDBD5B7"
+  },
+  {
+    "path": "web\\tests\\file-size-policy.test.ts",
+    "sha256": "C5FD74526EE087304BAAEBABA284555737BBF78BCFCDABE409B1D63376C1C45C"
+  },
+  {
+    "path": "web\\tests\\interruption-form.test.ts",
+    "sha256": "C1A924D204A4469D8C65AC6723676FAB7B34A7C46A0AFBAE01ADCB398F763534"
+  },
+  {
+    "path": "web\\tests\\interruption-replay.test.ts",
+    "sha256": "E9393100408FFC690EA8EEB631D0AA4FA90C0EC56AFEDBD520E03119A28C433C"
+  },
+  {
+    "path": "web\\tests\\interruption-results.test.ts",
+    "sha256": "7748DD29E980286377C5ABAC08E8709BC6049CBDE189CC8CAF198AD01817281B"
+  },
+  {
+    "path": "web\\tests\\json-precision.test.ts",
+    "sha256": "F875579E0E1D864C51465C7722238498015F132468B1DFDCFD38EF5A5B6470EF"
+  },
+  {
+    "path": "web\\tests\\observations-audit.test.ts",
+    "sha256": "E3F3CD6B077422FFD097D7139242B7852C98CA918B467A0A56F84B644BD531D1"
+  },
+  {
+    "path": "web\\tests\\replay-clock.test.ts",
+    "sha256": "4156E7E6CCCB3141D073B578D551EEBA7C2A6F7C6FE8F862752BDA20C7488A59"
+  },
+  {
+    "path": "web\\tests\\replay.test.ts",
+    "sha256": "4106E27B199BB6D6C1A86F27BA2AB8F1B38951F45DA9C5DDD56DA2427A62DFC7"
+  },
+  {
+    "path": "web\\tests\\results-readback.test.ts",
+    "sha256": "7398325BE7D5ADD6AD8C9796F9CC5518E3D6B09962DCAC3BC4B42B8C9BC3113B"
+  },
+  {
+    "path": "web\\tests\\scenario-form.test.ts",
+    "sha256": "BEAC57891821EDEE9685B1DB1EE53DE4EFCB821816951C9CFAC1A3449BE674BC"
+  },
+  {
+    "path": "web\\tests\\server-response-json.test.ts",
+    "sha256": "5F212C9EE739DAE46BFEC8C37B2D261634152DC3C8521B231FB8A6325222F533"
+  },
+  {
+    "path": "web\\tests\\service-error.test.ts",
+    "sha256": "768108A499C2516C0CE6C6A15B7644AB31171215CE9F8EBD0426C26A66A99817"
+  },
+  {
+    "path": "web\\tests\\time-format.test.ts",
+    "sha256": "B768312C51B99EB4DC02C60401E03542F66B9B80F3093196BD7ACB9BE6654E97"
+  },
+  {
+    "path": "web\\tests\\fixtures\\replay\\interruption-core-v2.json",
+    "sha256": "4A041306B25ABE769D05C794B095F8140C07D731B4FA65B3DE8C6C6779C3A890"
+  },
+  {
+    "path": "web\\tests\\fixtures\\replay\\long-timeline.json",
+    "sha256": "676475728C8BF984CEE77F53D3A641CD0D05B206BECE0231786BDE8A835DB94B"
+  },
+  {
+    "path": "web\\tests\\fixtures\\replay\\queues.json",
+    "sha256": "EC4861980792FEC8C20259AEB1F1F6E224C27C8B581B0644BCF3851AE63D2E9A"
+  },
+  {
+    "path": "web\\tests\\fixtures\\replay\\regular.json",
+    "sha256": "21B0352EB1B0D9A209A4B1C1CB74798F5E0309623A9D79EC3EE6745C73F7805B"
+  },
+  {
+    "path": "web\\tests\\fixtures\\replay\\tuesday.json",
+    "sha256": "86D24C22CD58F2FC1AA5D26F99FF55B0E926F4549A248B85C8D270C2F94DF3D4"
+  },
+  {
+    "path": "web\\e2e\\local-workflows.spec.ts",
+    "sha256": "DAE51674CABD7FE1525F7E61D2A7610C8A9C534CD1452E0456EABF1BED1A8483"
+  },
+  {
+    "path": "web\\e2e\\visual-navigation.spec.ts",
+    "sha256": "9722F700A7E44FDC5C62E82902CA48273B1CE0EA01F0D67A9FFBF4D157A8923B"
+  },
+  {
+    "path": "docs\\acceptance-report.md",
+    "sha256": "A769B21364048672CEB8FEFBB7F54A0DA53F97F86C9836266DAB348731BB123E"
+  },
+  {
+    "path": "docs\\empirical-validation-protocol.md",
+    "sha256": "D2FDFB0B1A51D15767F0C90FDD07F04AD4E1CA9C185D71C86A50E11236F90BBE"
+  },
+  {
+    "path": "docs\\estado-hallazgos-2026-10-24.md",
+    "sha256": "33AB4FF8CAE2C4C006AA2428D9F679E8503631E2458AF848F2E5F06DC02AFEE1"
+  },
+  {
+    "path": "docs\\guia-de-uso.md",
+    "sha256": "00DB82725B8E6D918114CEA180254D78B4CD691B24AA0D66512152E1DB97B12B"
+  },
+  {
+    "path": "docs\\MANUAL_USUARIO.md",
+    "sha256": "266F9D1D1F118598424AB0BACA9CCC4259AEE4C508790C3F741C1BC267647041"
+  },
+  {
+    "path": "docs\\technical-guide.md",
+    "sha256": "B8405EF053CEC8D7C888F4A140798276D8FE9CC431FE6043A95156729CF478EC"
+  },
+  {
+    "path": "docs\\visual-refresh-2026-10-23.md",
+    "sha256": "D1F7E3F2D1F606B97F620C4AB89936D926F8498A8FD5FB6693CF48F276CBF601"
+  },
+  {
+    "path": "docs\\audit-remediation-2026-10-24\\academic-document-manifest.json",
+    "sha256": "A202C9169E72FD982C587648AC00F20CB9F122B2A60DE3EE573E7C5E3D52E067"
+  },
+  {
+    "path": "docs\\audit-remediation-2026-10-24\\academic-document-verification.md",
+    "sha256": "1B72526D150009D05F13E928B9308EA1CA1D61B5A67AFA2F359A0F4374456F4B"
+  },
+  {
+    "path": "docs\\audit-remediation-2026-10-24\\H01-verification.md",
+    "sha256": "B2765559989B0D4AD8502500C5DC4E5A3DFB944565FA69525EC313DFB899C3F0"
+  },
+  {
+    "path": "docs\\audit-remediation-2026-10-24\\preserved-sources.json",
+    "sha256": "A76BB6934D9050F84259C166FDF99421DF7E444CA555D67CC5A9FCC5547E654D"
+  },
+  {
+    "path": "docs\\audit-remediation-2026-10-24\\playwright-results\\.last-run.json",
+    "sha256": "91D1C43004802CD49950D78EB11C8FA7D05DA8FFFFE219A8B13B2F561BC00903"
+  },
+  {
+    "path": "docs\\audit-remediation-2026-10-24\\playwright-results\\large-result-roundtrip-dow-9628c-ay-comparison-byte-for-byte\\full-day-comparison.json",
+    "sha256": "8F400CA7A59BF3381926B4E96CAFD0E72F82FA8538E4987467B36156B04D6C58"
+  },
+  {
+    "path": "docs\\audit-remediation-2026-10-24\\playwright-results\\large-result-roundtrip-dow-9628c-ay-comparison-byte-for-byte\\large-result-reopened.png",
+    "sha256": "99761F08321075A92A5CB70BC257A460780BE09A247B44DE75557FECB1B162B7"
+  },
+  {
+    "path": "docs\\field-kit\\acceptance-checklist.md",
+    "sha256": "DE1D1FDB6386B3B5AA1750D7489B7B5BDCA0EA98B9CA974AED62970F3424BB26"
+  },
+  {
+    "path": "docs\\field-kit\\implementation-notes.md",
+    "sha256": "0753714DB838964F30AFA892E42BB434BD93331B28E3898FB5A869A76A6ADB27"
+  },
+  {
+    "path": "docs\\field-kit\\README.md",
+    "sha256": "AA59BC79A0F3FF5AAE12A3FB170878D0DFA80CF287C3BAC4462CA0390913F09F"
+  },
+  {
+    "path": "docs\\field-kit\\software-handoff-checklist.md",
+    "sha256": "564980B4CA4033B124308CD1F9A22D4F78E33A928331EB01C16EEEFDADF0792A"
+  },
+  {
+    "path": "docs\\field-kit\\templates\\analysis_plan.json",
+    "sha256": "F9025D896A8CA9CDEA4E7C004AF01DD588BBB838988BAB75C9DECAAFFD2416FB"
+  },
+  {
+    "path": "docs\\field-kit\\templates\\order_people.csv",
+    "sha256": "B674F20DEB27D5BAFCE07D16F285914577964474CE01613B20BFC016A0F560C7"
+  },
+  {
+    "path": "docs\\field-kit\\templates\\orders.csv",
+    "sha256": "187B4DF48F20685634A7E6A02EEE251F94C392F8D4FB60257713BB5A27A07E55"
+  },
+  {
+    "path": "docs\\field-kit\\templates\\parameter_provenance.csv",
+    "sha256": "D6BD94FB9B0F7A277948AF168156720A6AE7182CD11B8C2E3AE5004FFDC550F6"
+  },
+  {
+    "path": "docs\\field-kit\\templates\\scenario_design.csv",
+    "sha256": "65E2FB90667A16EDE34FFEB5F359CB7959D779F3824C9FB21EFFA8EFCB1B0E16"
+  },
+  {
+    "path": "docs\\field-kit\\templates\\source_manifest.csv",
+    "sha256": "A9A09B289AC9FF37C38C1299A70E8F5142D95CC7EBD9F30FFB93D48D950C380D"
+  },
+  {
+    "path": "docs\\field-kit\\templates\\visit_split.csv",
+    "sha256": "BC742696A3D9319751C7714B27787CCB7E65645A122CDD9559AB862AB378B274"
+  },
+  {
+    "path": "docs\\field-kit\\templates\\visits.csv",
+    "sha256": "F58B519979B53B79FE3715F685EF846F32A6FBF2955C42B59EE0BEF9BA021FBA"
+  },
+  {
+    "path": "docs\\field-kit\\templates\\worker_segments.csv",
+    "sha256": "2A250DAA84E3307B31D9BD27A3243AC1E3324863A4CC3673AD9DB9EB0503A0E3"
+  },
+  {
+    "path": "scripts\\check_empirical_readiness.py",
+    "sha256": "3FC725C850E07105F339F6E03DC3307E66E64006A16C385464102B90E06457DB"
+  },
+  {
+    "path": "scripts\\export_web_contracts.py",
+    "sha256": "FBB890D765F77076C6E142FAF98F566124BB625B53BA46589AC42433EDE07806"
+  },
+  {
+    "path": "openspec\\changes\\boquitas-07-preparation-interruptions\\.openspec.yaml",
+    "sha256": "E2EBAEBEE255CCC1E09B64BA38D9B09C360A7392FC110A48CA2525E1EA49FA46"
+  },
+  {
+    "path": "openspec\\changes\\boquitas-07-preparation-interruptions\\design.md",
+    "sha256": "07CB88205ED0F9CF35B9DA9E76E9C86CD729A88795090A09C2252AFADC0FC3FB"
+  },
+  {
+    "path": "openspec\\changes\\boquitas-07-preparation-interruptions\\planning-evidence.json",
+    "sha256": "660D02901F06477B776CCA13DE15B16F7EEC2FCAFA76292109B33BA9E0A1F06D"
+  },
+  {
+    "path": "openspec\\changes\\boquitas-07-preparation-interruptions\\planning-verification.md",
+    "sha256": "5C1BB101C5CAEEAAB6E592C5BFC0D98DAFF12A9D484E2B126D00111C000DE9BC"
+  },
+  {
+    "path": "openspec\\changes\\boquitas-07-preparation-interruptions\\proposal.md",
+    "sha256": "E8A301D3E3EA0B6C82C7A6B9D35122847C796D371BE1028C26B225CE828CA2CE"
+  },
+  {
+    "path": "openspec\\changes\\boquitas-07-preparation-interruptions\\tasks.md",
+    "sha256": "62A5A6D4D6F9FA3F5F0B8B09887DB79E3E683F6D52AE1F9F64431B91E6F5696E"
+  },
+  {
+    "path": "openspec\\changes\\boquitas-07-preparation-interruptions\\review\\api-main-review.md",
+    "sha256": "58CD9E9182C91B143D47504C199E4E5FA56A0F3281BA47C9446E2C6290ACDF68"
+  },
+  {
+    "path": "openspec\\changes\\boquitas-07-preparation-interruptions\\review\\baseline-verification.md",
+    "sha256": "03990E1CCA8F7117F78C15849302A7EBB38C3967C7F4BB4E43313BDFED2681CA"
+  },
+  {
+    "path": "openspec\\changes\\boquitas-07-preparation-interruptions\\review\\block1-luna.md",
+    "sha256": "400B305239B54A9AF39DC4AF8D8ECC6B7547D0D86672FB0C72800765BA732AE0"
+  },
+  {
+    "path": "openspec\\changes\\boquitas-07-preparation-interruptions\\review\\block1-main-review.md",
+    "sha256": "111A419DEBAAB328722B249F97B3803650C0E0CC77CF0A90F8F725EDB71E8A89"
+  },
+  {
+    "path": "openspec\\changes\\boquitas-07-preparation-interruptions\\review\\block2-luna.md",
+    "sha256": "E6CBF29645A15C34D0C9431D393A68E48EBEDFC07D26F282C86E7C98CECFC663"
+  },
+  {
+    "path": "openspec\\changes\\boquitas-07-preparation-interruptions\\review\\block3-metrics-luna.md",
+    "sha256": "A4A014B8837C72A6BCE0FB7881206864E0FD88B5DAD671B0AC9FA91BD9F422FA"
+  },
+  {
+    "path": "openspec\\changes\\boquitas-07-preparation-interruptions\\review\\block4-api-luna.md",
+    "sha256": "FAA19CCD2D3545DE4ADA335042C485652AA7B7A462C0EBB70D88665646FEF02F"
+  },
+  {
+    "path": "openspec\\changes\\boquitas-07-preparation-interruptions\\review\\block6-replay-luna.md",
+    "sha256": "AF5BB8E6D45358887A5102D5C7DCC19FD6B18451851108572EB7414AD0F21822"
+  },
+  {
+    "path": "openspec\\changes\\boquitas-07-preparation-interruptions\\review\\block6-ui-luna.md",
+    "sha256": "A696F58713891392B6201DCE937289AF0314A3D4920AA5EB5870CB91EE33B0E0"
+  },
+  {
+    "path": "openspec\\changes\\boquitas-07-preparation-interruptions\\review\\block7-docs-luna.md",
+    "sha256": "2A99AD18AA176EB6413ECFF39B109E5DC9B31B93E24F8F5EBFD31C3E1F46D6C5"
+  },
+  {
+    "path": "openspec\\changes\\boquitas-07-preparation-interruptions\\review\\browser-acceptance.json",
+    "sha256": "50EAB7A8C48776F0BDE8348CD061FF62E8BB30726EFB0C1D6A020EEFD07BB0A4"
+  },
+  {
+    "path": "openspec\\changes\\boquitas-07-preparation-interruptions\\review\\browser-acceptance.mjs",
+    "sha256": "C7AEE02D9F35E0A75E923AE598DC3F6E3D48982FA9E4D3ECD7244A9E3DFD6078"
+  },
+  {
+    "path": "openspec\\changes\\boquitas-07-preparation-interruptions\\review\\browser-confirmation-t8.png",
+    "sha256": "839936C14CA89384D59EAAF4CBBBAE24C3DB862174B06901A3A880075D6EFC0C"
+  },
+  {
+    "path": "openspec\\changes\\boquitas-07-preparation-interruptions\\review\\browser-core-result.json",
+    "sha256": "71ED2286A5DEFE555373567E4AFA8FCBDA72F3D97C200C20DFF8FF00BF2F548D"
+  },
+  {
+    "path": "openspec\\changes\\boquitas-07-preparation-interruptions\\review\\browser-core-t6.png",
+    "sha256": "23C7C04FE3B52221C27ABAF4A3A7858950BCCB240D96CE78E0A9FACF3851A582"
+  },
+  {
+    "path": "openspec\\changes\\boquitas-07-preparation-interruptions\\review\\browser-core-t8.png",
+    "sha256": "69C9A3507AE052A028D7825CDAA08C32C11DBAE661660026951611B7AFA9B8EE"
+  },
+  {
+    "path": "openspec\\changes\\boquitas-07-preparation-interruptions\\review\\browser-edited-scenario.json",
+    "sha256": "C3389C8378D5CB088B7658F9E8359C8EF4734C9AA04B98046BD378AADBBD27B7"
+  },
+  {
+    "path": "openspec\\changes\\boquitas-07-preparation-interruptions\\review\\browser-failure.png",
+    "sha256": "E0F9DF0BAB5549AE03F61AE4EBA5E59371FFEDD1F25F213E23C78D9BF34290E5"
+  },
+  {
+    "path": "openspec\\changes\\boquitas-07-preparation-interruptions\\review\\browser-fallback-result.json",
+    "sha256": "71ED2286A5DEFE555373567E4AFA8FCBDA72F3D97C200C20DFF8FF00BF2F548D"
+  },
+  {
+    "path": "openspec\\changes\\boquitas-07-preparation-interruptions\\review\\browser-first-run.json",
+    "sha256": "23F755AFDCF10AC3464F390CD4B0DB1CA72A1DFFE4306A8171460EE466CE15EB"
+  },
+  {
+    "path": "openspec\\changes\\boquitas-07-preparation-interruptions\\review\\browser-graphics-fallback.png",
+    "sha256": "277F701AD96681A4E9B2369B75F9DA245EB417FFD517F8ADF4A79C6C167BE26E"
+  },
+  {
+    "path": "openspec\\changes\\boquitas-07-preparation-interruptions\\review\\browser-mixed-fixture-check.json",
+    "sha256": "9E2666C139F9980EAC2D2B8E1E9996FE6292C74B30D3C0DC6E877A163D6F534F"
+  },
+  {
+    "path": "openspec\\changes\\boquitas-07-preparation-interruptions\\review\\browser-mobile-editor.png",
+    "sha256": "6CCEA529AE5C8AA06B490799D0B91F969423CE580B190B8214E8C7ED75D438F9"
+  },
+  {
+    "path": "openspec\\changes\\boquitas-07-preparation-interruptions\\review\\browser-orders.csv",
+    "sha256": "CCC5A0E56AA9616E788B256F146C5B7DE69997B3DFD41627343566CD39CDAE00"
+  },
+  {
+    "path": "openspec\\changes\\boquitas-07-preparation-interruptions\\review\\browser-reopened-result.json",
+    "sha256": "71ED2286A5DEFE555373567E4AFA8FCBDA72F3D97C200C20DFF8FF00BF2F548D"
+  },
+  {
+    "path": "openspec\\changes\\boquitas-07-preparation-interruptions\\review\\browser-result-after-edit.json",
+    "sha256": "71ED2286A5DEFE555373567E4AFA8FCBDA72F3D97C200C20DFF8FF00BF2F548D"
+  },
+  {
+    "path": "openspec\\changes\\boquitas-07-preparation-interruptions\\review\\browser-result-after-rejection.json",
+    "sha256": "71ED2286A5DEFE555373567E4AFA8FCBDA72F3D97C200C20DFF8FF00BF2F548D"
+  },
+  {
+    "path": "openspec\\changes\\boquitas-07-preparation-interruptions\\review\\browser-scenario.json",
+    "sha256": "E8EA2348ACA3214515F68BB9A773974A5D59219191AF12F4891DA9F22FE1E4D1"
+  },
+  {
+    "path": "openspec\\changes\\boquitas-07-preparation-interruptions\\review\\browser-selected-v1.json",
+    "sha256": "EEDE8BAB6911CB629FB693987E74E4E3D4E53C98E2A02EAA39105857C22D86D6"
+  },
+  {
+    "path": "openspec\\changes\\boquitas-07-preparation-interruptions\\review\\browser-selected-v2.json",
+    "sha256": "AE3B2D2F00BD9D0B72C0043C8B23060E415172959DB2C7F6ED5E26A000C506D0"
+  },
+  {
+    "path": "openspec\\changes\\boquitas-07-preparation-interruptions\\review\\domain-main-checks.json",
+    "sha256": "90225AF7C5E281C1DE2E0C62154A5EF1449D3C91261EAAB4143E8CD29FC9A502"
+  },
+  {
+    "path": "openspec\\changes\\boquitas-07-preparation-interruptions\\review\\domain-main-review.md",
+    "sha256": "2FA3597A04296D00E756307D29B00C3C4F04D335AB736A88074162FA138B61B2"
+  },
+  {
+    "path": "openspec\\changes\\boquitas-07-preparation-interruptions\\review\\final-input-integrity.json",
+    "sha256": "A461CC505622141E3AF8AC72C185CF32A13B81615B3FE5E605046914C6600810"
+  },
+  {
+    "path": "openspec\\changes\\boquitas-07-preparation-interruptions\\review\\final-preservation-check.json",
+    "sha256": "DA4328E664DB4B5884136BD231CB58F6E7A919437ED90B0C339D02FAF99FF71E"
+  },
+  {
+    "path": "openspec\\changes\\boquitas-07-preparation-interruptions\\review\\implementation-baseline.json",
+    "sha256": "A81EFB1BD078E6BDADBFCAFECD4C5DE479A275004D6625172D32FFDBBDB3C9B1"
+  },
+  {
+    "path": "openspec\\changes\\boquitas-07-preparation-interruptions\\review\\legacy-regular-before.json",
+    "sha256": "D0093084B4E99E59000725AE99C8CAB2603BB3F7A666C986F731B06B5C157E69"
+  },
+  {
+    "path": "openspec\\changes\\boquitas-07-preparation-interruptions\\review\\modern-web-guidance-forms.md",
+    "sha256": "2992FCF983312BD98027EC62EA61F02353B308DEC4DE20D1301799DD45D26DE8"
+  },
+  {
+    "path": "openspec\\changes\\boquitas-07-preparation-interruptions\\review\\replay-main-review.md",
+    "sha256": "11EB4C7D76ABA7554B36D665B21B7FF0969C9078047D15A4475AD7CEDA0A827B"
+  },
+  {
+    "path": "openspec\\changes\\boquitas-07-preparation-interruptions\\review\\scripted-demo-input.json",
+    "sha256": "AD60A4FB2040FEA46ABA7AE8C748D5409DC664229DC98C918C934B22240E4533"
+  },
+  {
+    "path": "openspec\\changes\\boquitas-07-preparation-interruptions\\review\\scripted-demo-legacy-reference.json",
+    "sha256": "68ABCA2C6CCEDDE9910DCFC9D15FA1CE92C39F9D5D45E4E9FD80D39CA8835F28"
+  },
+  {
+    "path": "openspec\\changes\\boquitas-07-preparation-interruptions\\review\\ui-capacity-conflict.png",
+    "sha256": "AE9E46AC754CA0E68A755AB3D97AAA5F9E354BA4B6EE4C46C0747752331FCD66"
+  },
+  {
+    "path": "openspec\\changes\\boquitas-07-preparation-interruptions\\review\\ui-core-t6.png",
+    "sha256": "CF78DA905BAC0058E4CD6D6B351191B3D212C5F1E77FB4FEB6A5D60890070708"
+  },
+  {
+    "path": "openspec\\changes\\boquitas-07-preparation-interruptions\\review\\ui-core-t8.png",
+    "sha256": "EB864655FB154A275657150A7B6D7C5E6ECF9ED1A54EE55D5A2FE7430D4D9F6A"
+  },
+  {
+    "path": "openspec\\changes\\boquitas-07-preparation-interruptions\\review\\after-h01-baseline\\manifest.json",
+    "sha256": "34A611806AA876C799D4E63308A03F47D7976B37EBB45C42AC0A62DBAAE84D89"
+  },
+  {
+    "path": "openspec\\changes\\boquitas-07-preparation-interruptions\\review\\after-h01-baseline\\src\\boquitas\\api.py",
+    "sha256": "1C3BF93014E4CE02E502A2639E3AA6DB4F1A3A332B6BA3264CC92EA49671444D"
+  },
+  {
+    "path": "openspec\\changes\\boquitas-07-preparation-interruptions\\review\\after-h01-baseline\\src\\boquitas\\file_limits.py",
+    "sha256": "A54A3EF92119FB02B93122156F5C644AE8C164686D83890BACD0352DD5A45B3A"
+  },
+  {
+    "path": "openspec\\changes\\boquitas-07-preparation-interruptions\\review\\after-h01-baseline\\tests\\test_api.py",
+    "sha256": "A58758D58F0883EF48F59945950CAE4C4F29BE7EFDBC21F33E15DEAE3162AF83"
+  },
+  {
+    "path": "openspec\\changes\\boquitas-07-preparation-interruptions\\review\\after-h01-baseline\\tests\\test_large_result_reopen.py",
+    "sha256": "69033C595649447EB144FACBB4CA9AFF2AFE510E8BCC3A973B7E1FD1A67EBA23"
+  },
+  {
+    "path": "openspec\\changes\\boquitas-07-preparation-interruptions\\review\\after-h01-baseline\\web\\src\\main.ts",
+    "sha256": "DA74068442F735D42222818762D1EE8BFDEA82419666B81C5A90B5A10D517084"
+  },
+  {
+    "path": "openspec\\changes\\boquitas-07-preparation-interruptions\\review\\after-h01-baseline\\web\\src\\domain\\file-limits.ts",
+    "sha256": "669505A526B1DEDFB0C87923F8D74FEEF3D04476D3FD958E4E6B3586DD8CEE4C"
+  },
+  {
+    "path": "openspec\\changes\\boquitas-07-preparation-interruptions\\review\\after-h01-baseline\\web\\src\\domain\\format.ts",
+    "sha256": "0771B4B43B876AC578F76D0EE79FF5588ECA76D51DD8446D6543DD54E9088E0E"
+  },
+  {
+    "path": "openspec\\changes\\boquitas-07-preparation-interruptions\\review\\after-h01-baseline\\web\\src\\services\\api.ts",
+    "sha256": "E8777FDF7B8447EB4DE34FEB07ED195ADC15F7BD7793982E39D27933E1B43007"
+  },
+  {
+    "path": "openspec\\changes\\boquitas-07-preparation-interruptions\\review\\after-h01-baseline\\web\\tests\\file-size-policy.test.ts",
+    "sha256": "C5FD74526EE087304BAAEBABA284555737BBF78BCFCDABE409B1D63376C1C45C"
+  },
+  {
+    "path": "openspec\\changes\\boquitas-07-preparation-interruptions\\review\\after-h01-baseline\\web\\tests\\json-precision.test.ts",
+    "sha256": "F875579E0E1D864C51465C7722238498015F132468B1DFDCFD38EF5A5B6470EF"
+  },
+  {
+    "path": "openspec\\changes\\boquitas-07-preparation-interruptions\\review\\after-h01-baseline\\web\\tests\\server-response-json.test.ts",
+    "sha256": "5F212C9EE739DAE46BFEC8C37B2D261634152DC3C8521B231FB8A6325222F533"
+  },
+  {
+    "path": "openspec\\changes\\boquitas-07-preparation-interruptions\\review\\dev-playwright-results\\.last-run.json",
+    "sha256": "91D1C43004802CD49950D78EB11C8FA7D05DA8FFFFE219A8B13B2F561BC00903"
+  },
+  {
+    "path": "openspec\\changes\\boquitas-07-preparation-interruptions\\review\\pre-browser-originals\\manifest.json",
+    "sha256": "CFDD1B04FBE38341C8CA16F2CE8EC0043A67BDC964D317A647A9BEC4AE75FAFD"
+  },
+  {
+    "path": "openspec\\changes\\boquitas-07-preparation-interruptions\\review\\pre-browser-originals\\openspec\\changes\\boquitas-04-local-web-app\\review\\import-desktop-after-fix.png",
+    "sha256": "AE96B06ABE5C7EDE6D80F895985459569C7CF3285B108C3666DFF3888E024F5C"
+  },
+  {
+    "path": "openspec\\changes\\boquitas-07-preparation-interruptions\\review\\pre-browser-originals\\openspec\\changes\\boquitas-04-local-web-app\\review\\import-mobile-after-fix.png",
+    "sha256": "E72896824B915079E86227A3A66D3ADB327FD287947567386C510BE023C19327"
+  },
+  {
+    "path": "openspec\\changes\\boquitas-07-preparation-interruptions\\review\\pre-browser-originals\\openspec\\changes\\boquitas-06-validation-and-delivery\\review\\release-demo-regular-run.png",
+    "sha256": "A89E4093C502BC61649DBB72446E9B56F40D51CEE3956A01DC2D9F23DC17B2A0"
+  },
+  {
+    "path": "openspec\\changes\\boquitas-07-preparation-interruptions\\review\\pre-browser-originals\\openspec\\changes\\boquitas-06-validation-and-delivery\\review\\release-demo-tuesday-run.png",
+    "sha256": "9EE27C5AB80DC620FBAFDF771F2B6FC6295A3D3A76E22D9A518D3EA48860A80E"
+  },
+  {
+    "path": "openspec\\changes\\boquitas-07-preparation-interruptions\\review\\pre-browser-originals\\openspec\\changes\\boquitas-06-validation-and-delivery\\review\\release-indexed-replication-replay.png",
+    "sha256": "803C487F49EAF96D02FA83A2DF462688FBA10ACB8D76CFFADBB474413864A8D1"
+  },
+  {
+    "path": "openspec\\changes\\boquitas-07-preparation-interruptions\\review\\pre-browser-originals\\openspec\\changes\\boquitas-06-validation-and-delivery\\review\\release-initial-preparer-capacity-update.png",
+    "sha256": "9778BF57DFBA7B4C4C44DED06B7A5808C224396CA8A06AD719FC794910108079"
+  },
+  {
+    "path": "openspec\\changes\\boquitas-07-preparation-interruptions\\review\\pre-browser-originals\\openspec\\changes\\boquitas-06-validation-and-delivery\\review\\release-json-reopened-result.png",
+    "sha256": "3BF0FC1C66F1E0CAB6230FAD75A78DC8ADE63C749C5D0336D49D92A433DC9EEB"
+  },
+  {
+    "path": "openspec\\changes\\boquitas-07-preparation-interruptions\\review\\pre-browser-originals\\openspec\\changes\\boquitas-06-validation-and-delivery\\review\\release-network-audit-commits-a-preparer-increase-on-the-first-run-click-and-exposes-the-new-worker.json",
+    "sha256": "C4ECF2E3F0D683B50996626464866D0FD3CC5CFAF7A0E0AA540A846252B0ED13"
+  },
+  {
+    "path": "openspec\\changes\\boquitas-07-preparation-interruptions\\review\\pre-browser-originals\\openspec\\changes\\boquitas-06-validation-and-delivery\\review\\release-network-audit-compares-30-matched-staffing-replications-selects-one-indexed-run-and-downloads-csv.json",
+    "sha256": "EDE33CC1F0BA42D65B6483342777662D3053FB4185F293E515E06595182682C7"
+  },
+  {
+    "path": "openspec\\changes\\boquitas-07-preparation-interruptions\\review\\pre-browser-originals\\openspec\\changes\\boquitas-06-validation-and-delivery\\review\\release-network-audit-exports-and-reopens-json-and-matches-the-full-scientific-sha-256-reference.json",
+    "sha256": "E34872D11259C78C00CCF07CF41B49D234A55029257B972A5EB8D347E4A2422D"
+  },
+  {
+    "path": "openspec\\changes\\boquitas-07-preparation-interruptions\\review\\pre-browser-originals\\openspec\\changes\\boquitas-06-validation-and-delivery\\review\\release-network-audit-imports-original-and-corrected-sources-with-their-policies-and-exposes-the-known-overlap.json",
+    "sha256": "BDD3AFE73594B74003DD64F5391918FA8A997DE1958144241358AB761207FDB0"
+  },
+  {
+    "path": "openspec\\changes\\boquitas-07-preparation-interruptions\\review\\pre-browser-originals\\openspec\\changes\\boquitas-06-validation-and-delivery\\review\\release-network-audit-inspects-3d-stages-playback-camera-controls-and-repeated-replay-mounts.json",
+    "sha256": "A93EA8A0DE64E9A0EFDD9DB3543CA3F03A31CF3D48CBEE61490E3F60A1208718"
+  },
+  {
+    "path": "openspec\\changes\\boquitas-07-preparation-interruptions\\review\\pre-browser-originals\\openspec\\changes\\boquitas-06-validation-and-delivery\\review\\release-network-audit-runs-the-installed-demonstration-in-tuesday-and-regular-modes.json",
+    "sha256": "A244B34E2058FE7853CD2E2F95E9D1A00A14C14A65A8D1F3178912D56C182425"
+  },
+  {
+    "path": "openspec\\changes\\boquitas-07-preparation-interruptions\\review\\pre-browser-originals\\openspec\\changes\\boquitas-06-validation-and-delivery\\review\\release-observation-corrected-reference.png",
+    "sha256": "77D88E1E2564EA340B4BB979ADBDF1E0EB520E03751A6F3090F6BD5FA6DD030B"
+  },
+  {
+    "path": "openspec\\changes\\boquitas-07-preparation-interruptions\\review\\pre-browser-originals\\openspec\\changes\\boquitas-06-validation-and-delivery\\review\\release-observation-original-corrected-overlap.png",
+    "sha256": "7A0FBE507B18CF514688C269925556868BDA4B5896E8B7750E82FA0FA8AA2B8D"
+  },
+  {
+    "path": "openspec\\changes\\boquitas-07-preparation-interruptions\\review\\pre-browser-originals\\openspec\\changes\\boquitas-06-validation-and-delivery\\review\\release-paired-staffing-30-replications.png",
+    "sha256": "670BED84BD2A79F280CFEF0186BCD1492F7A9E37FD5A695624D28686AED6ECB3"
+  },
+  {
+    "path": "openspec\\changes\\boquitas-07-preparation-interruptions\\review\\pre-browser-originals\\openspec\\changes\\boquitas-06-validation-and-delivery\\review\\release-replay-abandonment.png",
+    "sha256": "C41D3935F33063DF1A0FD3D4967283F16349DDAFB92FC88E55E3976CEF7FCBD1"
+  },
+  {
+    "path": "openspec\\changes\\boquitas-07-preparation-interruptions\\review\\pre-browser-originals\\openspec\\changes\\boquitas-06-validation-and-delivery\\review\\release-replay-after-page-reload.png",
+    "sha256": "E55CCD719CA029FA73E4715D3ECDDCDD9E607392E89DFA38EED5ED90A75E89E4"
+  },
+  {
+    "path": "openspec\\changes\\boquitas-07-preparation-interruptions\\review\\pre-browser-originals\\openspec\\changes\\boquitas-06-validation-and-delivery\\review\\release-replay-motion-playing.png",
+    "sha256": "EB381E7318347556CDD45D131CCD9D94196AF163835A93FFC2835ABB77385332"
+  },
+  {
+    "path": "openspec\\changes\\boquitas-07-preparation-interruptions\\review\\pre-browser-originals\\openspec\\changes\\boquitas-06-validation-and-delivery\\review\\release-replay-payment-active.png",
+    "sha256": "1D53504E3464479839F2D59DE12BF514C2E01B47E4117582DAD2874B7E6339A1"
+  },
+  {
+    "path": "openspec\\changes\\boquitas-07-preparation-interruptions\\review\\pre-browser-originals\\openspec\\changes\\boquitas-06-validation-and-delivery\\review\\release-replay-preparation.png",
+    "sha256": "D36D308523459AFE6293A3737FE20D873595DA5CCF72E28A872FD53660474643"
+  },
+  {
+    "path": "openspec\\changes\\boquitas-07-preparation-interruptions\\review\\pre-browser-originals\\openspec\\changes\\boquitas-06-validation-and-delivery\\review\\release-replay-repeated-mounts.png",
+    "sha256": "E55CCD719CA029FA73E4715D3ECDDCDD9E607392E89DFA38EED5ED90A75E89E4"
+  },
+  {
+    "path": "openspec\\changes\\boquitas-07-preparation-interruptions\\review\\pre-browser-originals\\openspec\\changes\\boquitas-06-validation-and-delivery\\review\\release-replay-transfer-pending.png",
+    "sha256": "6E72B28D6E5E01AD054AF6642C754E693EE3E78B888C0C542D8AC57A28A4A1EE"
+  },
+  {
+    "path": "openspec\\changes\\boquitas-07-preparation-interruptions\\review\\pre-browser-originals\\openspec\\changes\\boquitas-06-validation-and-delivery\\review\\release-reproducibility-reference.json",
+    "sha256": "8315884F31E57B7885D721BCA67417D57A59D99EE35A420226A876011C0B1854"
+  },
+  {
+    "path": "openspec\\changes\\boquitas-07-preparation-interruptions\\review\\pre-browser-originals\\openspec\\changes\\boquitas-06-validation-and-delivery\\review\\release-run-export.json",
+    "sha256": "03090AFA30537454F0FBE5EA1CC7DE5A94BDF873CB9840D1742101C36F4415F8"
+  },
+  {
+    "path": "openspec\\changes\\boquitas-07-preparation-interruptions\\review\\pre-browser-originals\\openspec\\changes\\boquitas-06-validation-and-delivery\\review\\release-selected-replication.csv",
+    "sha256": "F9B68BB92FA28C1C08C951993C154E8153AB6FB1FAEB24C404E46A94DD2B6DE8"
+  },
+  {
+    "path": "openspec\\changes\\boquitas-07-preparation-interruptions\\review\\production-playwright-results\\.last-run.json",
+    "sha256": "91D1C43004802CD49950D78EB11C8FA7D05DA8FFFFE219A8B13B2F561BC00903"
+  },
+  {
+    "path": "openspec\\changes\\boquitas-07-preparation-interruptions\\specs\\preparation-interruptions\\spec.md",
+    "sha256": "2846DDA797CDD3ED512B885171DC4D7991A5FE4D2516F042D8BB16AF1E09627C"
+  }
+]

@@ -1,4 +1,5 @@
 # Keep fixture and provenance bytes stable across platform line-ending settings.
+*.md -text
 tests/fixtures/observation-import/*.txt -text
 web/tests/fixtures/** -text
 openspec/changes/** -text

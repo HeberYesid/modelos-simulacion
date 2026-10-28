@@ -1,0 +1,33 @@
+{
+  "protected_sources_unchanged": {
+    "C:\\Users\\HeberYesid\\OneDrive - UNIVERSIDAD DE SANTANDER - UDES\\Universidad\\8\\MODELOS\\Boquitas - Trabajo académico APA 7.docx": true,
+    "C:\\Users\\HeberYesid\\OneDrive - UNIVERSIDAD DE SANTANDER - UDES\\Universidad\\8\\MODELOS\\Datos Boquitas 2026-10-20 corregidos.txt": true,
+    "C:\\Users\\HeberYesid\\OneDrive - UNIVERSIDAD DE SANTANDER - UDES\\Universidad\\8\\MODELOS\\Boquitas - Hallazgos y pendientes del proyecto - 2026-10-24.docx": true,
+    "C:\\Users\\HeberYesid\\Desktop\\Universidad Trabajos\\Modelos-simulación\\plans\\evidence\\normal-2026-10-23-caja.txt": true,
+    "C:\\Users\\HeberYesid\\Desktop\\Universidad Trabajos\\Modelos-simulación\\plans\\evidence\\normal-2026-10-23-entrega.txt": true,
+    "C:\\Users\\HeberYesid\\Desktop\\Universidad Trabajos\\Modelos-simulación\\openspec\\changes\\boquitas-06-validation-and-delivery\\reference-demo-run.json": true
+  },
+  "legacy_scientific_byte_identical": {
+    "tuesday": {
+      "bytes": 895752,
+      "sha256": "8bbe6b117f59dde367816d8ed63bb013b0ad624d916a57159c084fcff4051dd7"
+    },
+    "regular": {
+      "bytes": 976770,
+      "sha256": "d0093084b4e99e59000725ae99c8cab2603bb3f7a666c986f731b06b5c157e69"
+    }
+  },
+  "original_engine_test_unchanged": true,
+  "changed_since_turn_baseline": [
+    "src\\boquitas\\api.py",
+    "tests\\test_interruption_api_diagnostics.py",
+    "docs\\estado-hallazgos-2026-10-24.md",
+    "docs\\guia-de-uso.md",
+    "docs\\MANUAL_USUARIO.md",
+    "docs\\technical-guide.md",
+    "openspec\\changes\\boquitas-07-preparation-interruptions\\tasks.md"
+  ],
+  "changed_test_files": [
+    "tests\\test_interruption_api_diagnostics.py"
+  ]
+}

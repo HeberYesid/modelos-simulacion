@@ -1,0 +1,24 @@
+{
+  "os": "Windows-10-10.0.19045-SP0",
+  "python": "3.13.7",
+  "packages": {
+    "boquitas": "0.1.0",
+    "fastapi": "0.160.0",
+    "uvicorn": "0.54.0",
+    "numpy": "2.5.4",
+    "scipy": "1.18.1",
+    "simpy": "4.1.2",
+    "pydantic": "2.14.1",
+    "pytest": "9.1.1",
+    "ruff": "0.17.1",
+    "mypy": "2.4.0"
+  },
+  "hashes": {
+    "C:\\Users\\HeberYesid\\Desktop\\Universidad Trabajos\\Modelos-simulaci\u00f3n\\uv.lock": "d4010691bdebcb5511a67a58141187f6f7bfa342147e30bfd59ea35c53d9bb12",
+    "C:\\Users\\HeberYesid\\Desktop\\Universidad Trabajos\\Modelos-simulaci\u00f3n\\web\\pnpm-lock.yaml": "4fee7fcf5bd35d802fddd7d932dccc283753c2555d909892334b7de55eec8fb3",
+    "C:\\Users\\HeberYesid\\Desktop\\Universidad Trabajos\\Modelos-simulaci\u00f3n\\tests\\fixtures\\observation-import\\original.txt": "845f8c6e56a7af120754ab0a5a789f318b65214e11f91737fd25032b7e51573d",
+    "C:\\Users\\HeberYesid\\Desktop\\Universidad Trabajos\\Modelos-simulaci\u00f3n\\tests\\fixtures\\observation-import\\corrected-reference.txt": "480ade881fd14bc88d8c94f037cea9ef4c2869b7ba400cbffda772f6f470caea",
+    "C:\\Users\\HeberYesid\\OneDrive - UNIVERSIDAD DE SANTANDER - UDES\\Universidad\\8\\MODELOS\\Datos Boquitas 2026-10-20 corregidos.txt": "480ade881fd14bc88d8c94f037cea9ef4c2869b7ba400cbffda772f6f470caea",
+    "C:\\Users\\HeberYesid\\.codex\\attachments\\c6ca76f1-31ba-40f8-ba7f-9651e5fe5b9b\\Pasted text.txt": "845f8c6e56a7af120754ab0a5a789f318b65214e11f91737fd25032b7e51573d"
+  }
+}

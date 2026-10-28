@@ -1,0 +1,109 @@
+{
+  "date": "2026-10-25",
+  "source_path": "C:\\Users\\HeberYesid\\OneDrive - UNIVERSIDAD DE SANTANDER - UDES\\Universidad\\8\\MODELOS\\Boquitas - Trabajo académico actualizado - 2026-10-24.docx",
+  "source_sha256": "af031ff02d46e87face2ce4e80b4babc728b95efb00b0568a623c8afd393daf7",
+  "before_edit_backup_path": "C:\\Users\\HeberYesid\\.codex\\visualizations\\2026\\10\\24\\01a16f75-55bd-7de0-8497-65d2b64a25a4\\h07-before-20261025\\Boquitas - Trabajo académico actualizado - 2026-10-24.docx",
+  "before_edit_backup_sha256": "af031ff02d46e87face2ce4e80b4babc728b95efb00b0568a623c8afd393daf7",
+  "target_path": "C:\\Users\\HeberYesid\\Desktop\\Universidad Trabajos\\Modelos-simulación\\docs\\academic\\Boquitas - Trabajo académico actualizado - 2026-10-25.docx",
+  "target_sha256_after_text_refresh": "1856cffd3bb4ae17e16f1d291044918958d116c017fb214b45e076dc96f2ffab",
+  "paragraph_indexing": "zero-based direct body paragraphs in word/document.xml, excluding table-cell paragraphs",
+  "paragraph_edits": [
+    {
+      "source_paragraph_index": 56,
+      "before": "El avance comprende la definición del sistema, la formulación, la implementación informática y su verificación de ingeniería. La recolección, la validación, la experimentación y la interpretación requieren evidencia propia, conforme a las etapas de la asignatura (Rodríguez Galezo, 2022). Los registros de campo permiten una comparación descriptiva de las dos visitas; no acreditan capacidad predictiva del modelo ni mejoras operativas del negocio. La extensión de versión 2 para interrupciones explícitamente programadas de un trabajador integrado está en implementación; todavía no se presenta como una capacidad aceptada.",
+      "after": "El avance comprende la definición del sistema, la formulación, la implementación informática y su verificación de ingeniería. La versión 2, que incorpora interrupciones explícitamente programadas para un trabajador integrado, completó su aceptación de ingeniería. La recolección adicional, la validación empírica, la experimentación y la interpretación de resultados para el negocio requieren evidencia propia, conforme a las etapas de la asignatura (Rodríguez Galezo, 2022). Los registros de campo permiten una comparación descriptiva de las dos visitas; no acreditan capacidad predictiva del modelo ni mejoras operativas del negocio."
+    },
+    {
+      "source_paragraph_index": 59,
+      "before": "La interpretación del desempeño está limitada por dos visitas y por la cobertura y precisión de sus registros. En el martes, los identificadores de caja y entrega no están vinculados. En el día normal se confirmó el enlace de ocho pedidos, sin conocer sus tamaños de grupo. Las ventanas de pago y preparación son tiempos transcurridos; no equivalen necesariamente a trabajo activo. Faltan límites efectivos de observación, estado inicial, segmentos de actividad y asignaciones suficientes para estimar demanda y utilización con respaldo empírico.",
+      "after": "La interpretación del desempeño se limita a dos visitas. Según la declaración del observador confirmada el 25 de octubre, la observación fue continua y completa, sin pausas de observación ni pedidos omitidos, entre 16:45:35 y 18:41:30 el martes (6.955 s) y entre 17:20:23 y 18:21:09 el viernes (3.646 s). Al inicio del martes había clientes esperando; la cantidad y la estación no se registraron y el observador no puede recordarlas. El viernes no había clientes esperando. Se desconoce si había pedidos en preparación al inicio de cualquiera de las visitas. Los IDs del martes no enlazan caja y entrega; solo se confirmaron ocho enlaces para el viernes. Las ventanas de pago y preparación son tiempos transcurridos, no trabajo activo. La base y la precisión del reloj, los tamaños de grupo y los segmentos de actividad siguen sin confirmarse, por lo que no se estiman con respaldo empírico la demanda global ni la utilización."
+    },
+    {
+      "source_paragraph_index": 134,
+      "before": "En la versión 1, el trabajador integrado finaliza el cobro y la preparación de un pedido antes de atender el siguiente. La confirmación externa mantiene reservado el recurso, pero no se cuenta como trabajo activo. El 23 de octubre se confirmó que la misma persona pausó la preparación del pedido 6 para cobrar el pedido 7 y después la retomó. La extensión de versión 2 para interrupciones explícitamente programadas de un trabajador integrado está en implementación; todavía no se presenta como una capacidad aceptada. No se infiere una prioridad automática al cobro en el negocio.",
+      "after": "En la versión 1, el trabajador integrado finaliza el cobro y la preparación de un pedido antes de atender el siguiente. La confirmación externa mantiene reservado el recurso, pero no se cuenta como trabajo activo. El 23 de octubre se confirmó que la misma persona pausó la preparación del pedido 6 para cobrar el pedido 7 y después la retomó; los límites exactos de la pausa no se midieron. La versión 2 implementa interrupciones explícitamente programadas para un trabajador integrado en modo normal, conserva el trabajo restante y permite cobrar otro pedido y reanudar la preparación. Esta capacidad fue aceptada como comportamiento del software; el guion es un supuesto y no implica una prioridad automática al cobro en el negocio."
+    },
+    {
+      "source_paragraph_index": 141,
+      "before": "La verificación documentada de la versión 1 incluye conservación de entidades, tiempos no negativos, reglas de recursos y reproducción de resultados. Los retiros se permiten antes del primer inicio de pago conforme a la configuración; su existencia no establece una distribución empírica de paciencia. Las verificaciones de la ampliación de interrupciones deben comprobar además trabajo restante, plazos de finalización, pausas y compatibilidad. No se afirma que estas pruebas validen el comportamiento del negocio.",
+      "after": "La verificación documentada de la versión 1 incluye conservación de entidades, tiempos no negativos, reglas de recursos y reproducción de resultados. Los retiros se permiten antes del primer inicio de pago conforme a la configuración; su existencia no establece una distribución empírica de paciencia. La verificación de la versión 2 comprobó además el trabajo restante, los plazos de finalización, las pausas, las reanudaciones y la compatibilidad. Estas pruebas verifican el software, no el comportamiento del negocio."
+    },
+    {
+      "source_paragraph_index": 161,
+      "before": "El informe de aceptación de ingeniería del 23 de octubre registró 131 pruebas de Python, 21 pruebas unitarias del frontend, 12 flujos de navegador existentes y 6 de aceptación de producción, además de análisis estático, tipos, contratos y compilación. Es evidencia histórica de la versión evaluada. La auditoría del 24 de octubre volvió a comprobar las suites de Python y frontend y detectó, fuera de esa cobertura, un defecto de reapertura de comparaciones grandes. Las correcciones posteriores y la versión 2 requieren su propia evidencia de aceptación.",
+      "after": "El informe de aceptación de ingeniería del 23 de octubre registró 131 pruebas de Python, 21 pruebas unitarias del frontend, 12 flujos de navegador existentes y 6 de aceptación de producción, además de análisis estático, revisión de tipos y contratos y compilación; esos resultados corresponden a la versión evaluada en esa fecha. El informe final de Spec07 registra 28 de 28 tareas aceptadas, 259 pruebas de Python y 37 del frontend, además de comprobaciones de tipos, contratos, lint, compilación y flujos de navegador y revisión visual. Estos resultados documentan aceptación de ingeniería del software, no validación empírica."
+    },
+    {
+      "source_paragraph_index": 163,
+      "before": "La demostración científica se reprodujo con una semilla y entradas determinadas. Esa reproducibilidad verifica el cálculo bajo esas entradas; no estima parámetros de Boquitas ni sustituye la validación con observaciones independientes. La extensión de versión 2 para interrupciones explícitamente programadas de un trabajador integrado está en implementación; todavía no se presenta como una capacidad aceptada.",
+      "after": "La demostración científica se reprodujo con una semilla y entradas determinadas. Esa reproducibilidad verifica el cálculo bajo esas entradas; no estima parámetros de Boquitas ni sustituye la validación con observaciones independientes. La versión 2 para interrupciones explícitas de un trabajador integrado completó la verificación de ingeniería; sus guiones son supuestos de escenario y no reconstruyen las pausas reales ni calibran el modelo."
+    },
+    {
+      "source_paragraph_index": 165,
+      "before": "El martes tiene 61 filas de caja, incluidos tres retiros, y 58 de entrega. El día normal contiene ocho pedidos con enlace confirmado entre sus ocho filas de caja y ocho de entrega. La Tabla 3 resume únicamente registros completos por estación: 58 del martes y 8 del día normal para cada medida. Esos denominadores corresponden a registros de pedidos o intentos de pago, no a cantidades de personas.",
+      "after": "El martes se registraron 61 eventos de caja, incluidos 58 registros completos y 3 retiros, y 58 entregas finales. El viernes se enlazaron ocho pedidos, con ocho registros de caja y ocho de entrega. La Tabla 3 resume registros completos por estación: 58 del martes y 8 del viernes para cada medida. Los denominadores corresponden a registros de pedidos o intentos de pago, no a cantidades de personas."
+    },
+    {
+      "source_paragraph_index": 170,
+      "before": "Las diferencias son descriptivas: no se realizó una prueba de significancia ni se atribuyen a una causa. No se calcula permanencia total del martes porque sus estaciones no están enlazadas. La ausencia de retiros en los ocho pedidos del viernes no demuestra que no ocurrieran en la jornada. Los tres retiros del martes tampoco establecen una distribución de paciencia. El conflicto de seis ventanas simultáneas frente a cuatro preparadores requiere corroboración de campo.",
+      "after": "Las diferencias son descriptivas: no se realizó una prueba de significancia ni se atribuyen a una causa. No se calcula permanencia total del martes porque sus estaciones no están enlazadas. En la ventana observada del viernes, entre 17:20:23 y 18:21:09, no se registraron retiros en caja; esto no permite afirmar que no ocurrieran fuera de esa ventana ni durante toda la jornada. Los tres retiros del martes tampoco establecen una distribución de paciencia. El conflicto de seis ventanas simultáneas frente a cuatro preparadores requiere corroboración de campo."
+    }
+  ],
+  "inserted_paragraphs": [
+    {
+      "insert_after_source_paragraph_index": 168,
+      "order": 1,
+      "text": "En la ventana del martes se registraron 61 eventos de caja en 6.955 s (31,57 registros por hora observada), incluidos 58 registros completos (30,02) y 3 retiros (1,55); las 58 entregas finales equivalen a 30,02 registros por hora observada. En la ventana del viernes, los 8 registros completos de caja y las 8 entregas finales durante 3.646 s equivalen a 7,90 registros por hora observada en cada estación. Los cocientes se calcularon como conteo × 3.600 / segundos observados. Son densidades descriptivas de registros por estación, no tasas globales de llegadas, capacidad, utilización o rendimiento de equilibrio. La fila inicial no cuantificada del martes y los pedidos que ya estaban en preparación pueden contribuir a los conteos."
+    },
+    {
+      "insert_after_source_paragraph_index": 168,
+      "order": 2,
+      "text": "Las ventanas de captura incluyen ambos extremos y la última entrega de cada visita ocurre exactamente al final: ID 59 el martes y ID 8 el viernes. El simulador cuenta eventos de la ventana en [0,H), por lo que excluye el evento en H. Para un contraste futuro, el evento de H puede contarse por separado usando 0 ≤ t ≤ H, sin alterar la definición nativa de las métricas ni modificar las marcas de tiempo fuente."
+    }
+  ],
+  "package_integrity": {
+    "package_parts_before": 21,
+    "package_parts_after": 21,
+    "changed_package_parts": [
+      "word/document.xml"
+    ],
+    "unchanged_package_parts": 20,
+    "media_parts": 2,
+    "table_count_before": 5,
+    "table_count_after": 5,
+    "paragraph_count_before": 192,
+    "paragraph_count_after": 194
+  },
+  "toc_refresh": "Completed with local Microsoft Word; final index checked against rendered headings.",
+  "main_review_wording_correction": {
+    "before": "La fila inicial no cuantificada del martes y los pedidos que ya estaban en preparación pueden contribuir a los conteos.",
+    "after": "La espera inicial no cuantificada del martes y los posibles pedidos ya en preparación pueden contribuir a los conteos; no se confirmó preparación en curso al inicio.",
+    "reason": "Initial preparation is unconfirmed in both visits."
+  },
+  "main_layout_paragraph_edits": [
+    {
+      "before": "Después de validar se definirán escenarios y criterios de comparación, se justificará la cantidad de réplicas por precisión y se analizará sensibilidad a las entradas inciertas. Una comparación de dotaciones con demanda controlada responde una pregunta distinta de describir dos visitas con demanda y personal diferentes. Los experimentos sintéticos pueden comprobar el software; sus resultados no se presentarán como mejoras demostradas del negocio.",
+      "after": "Después de validar se definirán escenarios y comparaciones, se justificarán las réplicas por precisión y se analizará sensibilidad a entradas inciertas. Comparar dotaciones con demanda controlada difiere de describir dos visitas con demanda y personal distintos. Los experimentos sintéticos comprueban el software; no demuestran mejoras del negocio."
+    },
+    {
+      "before": "La entrega práctica también requiere que otro integrante siga la guía en un entorno limpio y reproduzca la referencia científica. Las pruebas realizadas por el desarrollador en el equipo instalado no sustituyen esa aceptación por otra persona. Los resultados y dificultades de esa actividad se registrarán cuando ocurra.",
+      "after": "La entrega requiere que otro integrante siga la guía en un entorno limpio, reproduzca la referencia científica y registre resultados y dificultades. Las pruebas del desarrollador no sustituyen esa aceptación."
+    }
+  ],
+  "main_independent_acceptance": {
+    "verified_on": "2026-10-25",
+    "output_sha256": "0a5d14f0ae524fe84399955febcde3cedb06b3880ca241ede2595b48a1092168",
+    "page_count": 27,
+    "native_toc_refreshed": true,
+    "visual_qa": "All final pages inspected directly or byte-identical to a page inspected in the immediately preceding render. Page 3 and pages 24-27 reinspected after the final layout refinement.",
+    "final_render_directory": "C:\\Users\\HeberYesid\\.codex\\visualizations\\2026\\10\\24\\01a16f75-55bd-7de0-8497-65d2b64a25a4\\h07-final-render-2",
+    "protected_sources_unchanged": 6,
+    "media_parts_byte_identical": 2,
+    "table_count_and_all_cell_texts_preserved": 5,
+    "section_page_size_and_margins_preserved": true,
+    "body_text_matches_approved_edits": true,
+    "minimum_page_text_characters": 313,
+    "software_checks": "Not rerun: document-only changes; software counts cite the historical Spec07 acceptance report.",
+    "pending": "Cover identity and delivery fields; additional field evidence, real calibration, independent empirical validation, business experiments and acceptance by another person."
+  }
+}

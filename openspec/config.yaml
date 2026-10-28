@@ -1,20 +1,70 @@
 schema: spec-driven
 
-# Project context (optional)
-# This is shown to AI when creating artifacts.
-# Add your tech stack, conventions, style guides, domain knowledge, etc.
-# Example:
-#   context: |
-#     Tech stack: TypeScript, React, Node.js
-#     We use conventional commits
-#     Domain: e-commerce platform
+context: |
+  Boquitas is an academic discrete-event simulation of an ice cream shop in
+  Libertadores, Cucuta. The approved planning baseline is openspec/README.md.
+  Specs 01 through 06 define the implemented version-1 baseline.
+  On 2026-10-24 the user approved the preparation-interruption proposal and
+  authorized only a new planning change, boquitas-07-preparation-interruptions.
+  The user subsequently approved Spec 07 implementation on 2026-10-24 in bounded
+  GPT-6 Luna blocks with independent main-agent review and version-1 preservation.
+  Spec 07 adds explicit version-2 scripted pauses for one integrated worker;
+  mark implementation tasks only after independently observed verification.
+  The user approved specs 01 through 05 and on 2026-10-23 authorized implementation
+  and independent review of boquitas-06-validation-and-delivery.
+  Release engineering acceptance does not authorize empirical validation claims,
+  synchronization, archiving, commits, pushes, pull requests or deployment.
+  Planned stack: Python 3.13, SimPy, NumPy, SciPy, FastAPI; TypeScript,
+  Vite and Three.js. Local browser use, offline after installation.
+  People are analysis entities linked to orders. Shared orders incur one
+  payment and one preparation. Groups arrive, receive and abandon together
+  in v1. Tuesday: separate cashier(s) and preparers; default 1 and 4.
+  Each preparer finishes one entire order before another. Other days:
+  integrated workers, default 1; version 1 finishes payment, preparation and
+  delivery before the next order. Planned opt-in version 2 can pause preparation
+  for one scripted cashier transaction, then resume its remaining work.
+  Cashier starts FIFO by arrival; Tuesday
+  preparation starts FIFO by payment completion. Distinguish active payment
+  work from external transfer confirmation and resource reservation.
+  Observations are not calibrated parameters. Tuesday station IDs are independent.
+  The user confirmed matching cashier/delivery IDs 1 through 8 only for the
+  2026-10-23 normal visit, preparation-start semantics, and same-worker pause/resume.
+  Exact pause boundaries and real active preparation durations remain unknown.
+  Retain original data and auditable corrections; never invent station links,
+  people counts, active work or worker capacity from ambiguous observations.
+  Main agent owns orchestration and review. GPT-6 Luna implements bounded
+  tasks; continue the GPT-6 Luna max-effort workflow used for changes 01 and 02.
+  Use GPT-6.1 Sol when needed. Main-agent review precedes user approval.
+  The user adopted selective TDD on 2026-10-22; see AGENTS.md and
+  openspec/README.md#selective-tdd-policy. Preserve the 37-test baseline.
+  Test uncovered critical rules/calculations and regressions first; ordinary
+  integration/UI/tooling can be implemented in coherent verified blocks.
+  No blanket RED requirement applies to every edit or acceptance example.
+  Technical artifacts and code: English. User interface and user manual: Spanish.
+  User confirmed TDD boundaries: import, simulation engine, experiments,
+  local API, and replay/UI. Existing authorization is sufficient; do not
+  request confirmation of these same boundaries again.
+  Keep main specs empty until accepted implementation is separately authorized
+  for synchronization or archiving; do not rewrite predecessor change packages.
+  No commits, pushes, pull requests or deployment without their own authorization.
 
-# Per-artifact rules (optional)
-# Add custom rules for specific artifacts.
-# Example:
-#   rules:
-#     proposal:
-#       - Keep proposals under 500 words
-#       - Always include a "Non-goals" section
-#     tasks:
-#       - Break tasks into chunks of max 2 hours
+rules:
+  proposal:
+    - Declare dependencies and non-goals, and distinguish hypothetical scenarios from empirical validation.
+    - Declare exactly the capability owned by the change; reference upstream contracts instead of duplicating them.
+  specs:
+    - Use SHALL or MUST for requirements and GIVEN/WHEN/THEN scenarios with independently checkable outcomes.
+    - Preserve one payment and preparation per shared order and distinguish people from orders in every metric.
+  design:
+    - Define public inputs, outputs, units, defaults and error behavior before implementation.
+    - Reference openspec/README.md and the owning upstream design for shared contracts.
+    - Record model assumptions and unresolved field-data issues without making them implementation blockers for synthetic scenarios.
+  tasks:
+    - Keep all implementation tasks unchecked while only planning is authorized.
+    - Use selective TDD; write focused failing tests first for uncovered critical domain rules, numerical/data-integrity behavior and bug regressions.
+    - Implement ordinary integration, UI, graphics and tooling in small coherent blocks and verify them before acceptance; no artificial RED is required for every edit.
+    - Preserve the 37 existing tests; add meaningful coverage without weakening assertions or disabling checks.
+    - Record concise evidence per block and honest RED/GREEN evidence only for selected test-first cycles; passing existing coverage is not a process blocker.
+    - Test approved public boundaries rather than private methods or internal mocks.
+    - If the test runner is unavailable or unusable, report the blocker and pause affected implementation.
+    - Main-agent acceptance requires independent diff review and actual applicable check results; an agent report is insufficient.

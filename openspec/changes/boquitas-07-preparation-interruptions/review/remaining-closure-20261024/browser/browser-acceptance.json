@@ -1,0 +1,42 @@
+{
+  "checks": [
+    "incompatible mode/capacity and incomplete rows retain scripts; explicit resolution and numeric V2 scenario download",
+    "core A/B 14/17, active/paused/count/elapsed 10/2/1/12, real graphics, repeated 6/8 seeks, speed controls, exact server-byte download",
+    "edited scenario keeps script and immutable completed bytes; actual CSV download",
+    "invalid nested V2 saved script identifies the exact indexed field and retains the previous completed bytes without rerunning",
+    "reopen without simulation POST, exact bytes and retained result after mismatched-version rejection",
+    "real WebGL loss keeps V2 inspector, timeline, metrics and exact export usable",
+    "external confirmation at t8 reserves one inactive worker; A/B deliveries 17/20",
+    "mobile V2 script editor has no document horizontal overflow",
+    "mixed V2 experiment reopens and selects exact indexed V2/V1 members with matching stored metrics and actual JSON downloads"
+  ],
+  "requests": [
+    "GET /",
+    "GET /assets/index-CcuhCTBa.js",
+    "GET /assets/index-DuO-lDds.css",
+    "GET /api/v1/health",
+    "GET /api/v1/demo",
+    "POST /api/v1/files/validate",
+    "POST /api/v1/files/validate",
+    "POST /api/v1/runs",
+    "POST /api/v1/files/validate",
+    "POST /api/v1/exports/csv",
+    "GET /",
+    "GET /assets/index-CcuhCTBa.js",
+    "GET /assets/index-DuO-lDds.css",
+    "GET /api/v1/health",
+    "GET /api/v1/demo",
+    "POST /api/v1/files/validate",
+    "POST /api/v1/files/validate",
+    "POST /api/v1/files/validate",
+    "POST /api/v1/files/validate",
+    "POST /api/v1/runs",
+    "POST /api/v1/files/validate",
+    "POST /api/v1/experiments",
+    "POST /api/v1/runs",
+    "POST /api/v1/runs"
+  ],
+  "external": [],
+  "errors": [],
+  "passed": true
+}

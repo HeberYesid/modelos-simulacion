@@ -1,0 +1,266 @@
+{
+  "reviewed_on": "2026-10-24",
+  "scope": "Existing-source traceability and independent descriptive arithmetic only",
+  "result": "PASS_WITH_EMPIRICAL_GAPS",
+  "source_checks": [
+    {
+      "source_id": "boquitas_tuesday_corrected_2026-10-20",
+      "sha256": "480ade881fd14bc88d8c94f037cea9ef4c2869b7ba400cbffda772f6f470caea",
+      "all_raw_values_lines_and_elapsed_intervals_match": true,
+      "record_count": 119
+    },
+    {
+      "source_id": "boquitas_normal_cashier_2026-10-23",
+      "sha256": "253e1f5fea2a9a998414a3aa9accc7f4c69df68bd3c48910c9f149fdb0ca896d",
+      "all_raw_values_lines_and_elapsed_intervals_match": true,
+      "record_count": 8
+    },
+    {
+      "source_id": "boquitas_normal_delivery_2026-10-23",
+      "sha256": "306894afd30abded545c5ffb6e62446cd1d7926264f162775f45bda03295f220",
+      "all_raw_values_lines_and_elapsed_intervals_match": true,
+      "record_count": 8
+    }
+  ],
+  "station_checks": [
+    {
+      "visit_date": "2026-10-20",
+      "station": "entrega",
+      "records": 58,
+      "complete_records": 58,
+      "withdrawals": 0,
+      "wait_mean_s": 22.948275862068964,
+      "interval_mean_s": 285.0344827586207,
+      "peak_window_overlap": 6,
+      "peak_at": "17:00:10",
+      "peak_local_ids": [
+        "6",
+        "7",
+        "8",
+        "9",
+        "10",
+        "11"
+      ],
+      "matches_prior_descriptive_analysis": true
+    },
+    {
+      "visit_date": "2026-10-20",
+      "station": "caja",
+      "records": 61,
+      "complete_records": 58,
+      "withdrawals": 3,
+      "wait_mean_s": 109.53448275862068,
+      "interval_mean_s": 83.03448275862068,
+      "peak_window_overlap": 3,
+      "peak_at": "16:51:10",
+      "peak_local_ids": [
+        "3",
+        "4",
+        "5"
+      ],
+      "matches_prior_descriptive_analysis": true
+    },
+    {
+      "visit_date": "2026-10-23",
+      "station": "caja",
+      "records": 8,
+      "complete_records": 8,
+      "withdrawals": 0,
+      "wait_mean_s": 41.0,
+      "interval_mean_s": 22.5,
+      "peak_window_overlap": 1,
+      "peak_at": "17:20:44",
+      "peak_local_ids": [
+        "1"
+      ],
+      "matches_prior_descriptive_analysis": true
+    },
+    {
+      "visit_date": "2026-10-23",
+      "station": "entrega",
+      "records": 8,
+      "complete_records": 8,
+      "withdrawals": 0,
+      "wait_mean_s": 15.5,
+      "interval_mean_s": 146.0,
+      "peak_window_overlap": 1,
+      "peak_at": "17:21:12",
+      "peak_local_ids": [
+        "1"
+      ],
+      "matches_prior_descriptive_analysis": true
+    }
+  ],
+  "records_verified": 135,
+  "normal_order_joins_verified": 8,
+  "normal_total_elapsed_sum_s": 1813.0,
+  "normal_total_elapsed_mean_s": 226.625,
+  "normal_total_elapsed_median_s": 247.0,
+  "tuesday_order_joins_created": 0,
+  "template_files_unchanged": 9,
+  "local_links_checked": 26,
+  "field_collection_performed": false,
+  "fitting_performed": false,
+  "empirical_validation_performed": false,
+  "empirical_status": "NOT_READY",
+  "evidence_sha256": "11680062ff28235642a0108b7e1f7830a8e28a3b7491ce7cc82c3736660df4e0",
+  "template_readiness_check": {
+    "process_exit_code": 2,
+    "status": "NOT_READY",
+    "pending_count": 24,
+    "structural_error_count": 0
+  },
+  "confirmation_update": {
+    "reviewed_on": "2026-10-25",
+    "confirmed_observation_starts": [
+      {
+        "visit_date": "2026-10-20",
+        "confirmed_start_at": "2026-10-20T16:45:35",
+        "source_record_id": "boquitas_tuesday_corrected_2026-10-20:line:060"
+      },
+      {
+        "visit_date": "2026-10-23",
+        "confirmed_start_at": "2026-10-23T17:20:23",
+        "source_record_id": "boquitas_normal_cashier_2026-10-23:line:002"
+      }
+    ],
+    "raw_records_unchanged": 135,
+    "confirmed_order_joins_unchanged": 8,
+    "source_hashes_unchanged": 3,
+    "observation_end_still_unknown": true,
+    "coverage_initial_state_clock_basis_still_unknown": true,
+    "basis": "User clarification; source timestamps checked against the earliest recorded arrival for each date.",
+    "status": "historical_start_only_review_before_end_confirmation",
+    "superseded_for_observation_end_by": "observation_end_confirmation_update",
+    "superseded_for_coverage_by": "coverage_confirmation_update"
+  },
+  "observation_end_confirmation_update": {
+    "reviewed_on": "2026-10-25",
+    "confirmed_observation_ends": [
+      {
+        "visit_date": "2026-10-20",
+        "confirmed_end_at": "2026-10-20T18:41:30",
+        "observation_window_elapsed_s": 6955,
+        "source_record_id": "boquitas_tuesday_corrected_2026-10-20:line:059",
+        "source_field": "hora_fin"
+      },
+      {
+        "visit_date": "2026-10-23",
+        "confirmed_end_at": "2026-10-23T18:21:09",
+        "observation_window_elapsed_s": 3646,
+        "source_record_id": "boquitas_normal_delivery_2026-10-23:line:009",
+        "source_field": "hora_fin"
+      }
+    ],
+    "raw_records_unchanged": 135,
+    "source_hashes_unchanged": 3,
+    "basis": "User clarification; latest timestamp checked across all four time fields of every station row for each visit.",
+    "coverage_initial_state_clock_basis_still_unknown": true,
+    "superseded_for_coverage_by": "coverage_confirmation_update"
+  },
+  "coverage_confirmation_update": {
+    "reviewed_on": "2026-10-25",
+    "basis": "Explicit user statement; completeness is reported by the observer, not inferred from station row counts.",
+    "visits_confirmed": [
+      {
+        "visit_id": "visit_2026-10-20_tuesday_promotion",
+        "coverage_status": "complete",
+        "coverage_start_at": "2026-10-20T16:45:35",
+        "coverage_end_at": "2026-10-20T18:41:30"
+      },
+      {
+        "visit_id": "visit_2026-10-23_regular",
+        "coverage_status": "complete",
+        "coverage_start_at": "2026-10-23T17:20:23",
+        "coverage_end_at": "2026-10-23T18:21:09"
+      }
+    ],
+    "raw_records_unchanged": 135,
+    "order_joins_unchanged": 8,
+    "source_hashes_unchanged": 3,
+    "initial_state_clock_basis_groups_and_active_segments_still_unknown": true,
+    "does_not_assert_absence_of_operational_pauses": true,
+    "superseded_for_initial_state_by": "initial_waiting_customers_confirmation_update"
+  },
+  "initial_waiting_customers_confirmation_update": {
+    "reviewed_on": "2026-10-25",
+    "basis": "Explicit retrospective user confirmation; initial queue sizes and in-progress work are not reconstructed from station rows.",
+    "initial_states": [
+      {
+        "visit_date": "2026-10-20",
+        "waiting_customers_present": true,
+        "waiting_customer_count": null,
+        "orders_in_preparation_present": null
+      },
+      {
+        "visit_date": "2026-10-23",
+        "waiting_customers_present": false,
+        "waiting_customer_count": 0,
+        "orders_in_preparation_present": null
+      }
+    ],
+    "raw_records_unchanged": 135,
+    "confirmed_order_joins_unchanged": 8,
+    "source_hashes_unchanged": 3,
+    "friday_empty_system_not_assumed": true,
+    "full_initial_state_remains_partial": true,
+    "superseded_for_missing_count_and_station_by": "unrecorded_initial_waiters_update"
+  },
+  "unrecorded_initial_waiters_update": {
+    "reviewed_on": "2026-10-25",
+    "visit_date": "2026-10-20",
+    "waiting_customer_count_status": "not_recorded",
+    "waiting_queue_station_status": "not_recorded",
+    "values_remain_null": true,
+    "basis": "The observer cannot recall either field and explicitly requested not-recorded treatment.",
+    "raw_records_unchanged": 135,
+    "source_hashes_unchanged": 3,
+    "zero_or_source_row_mapping_not_imputed": true
+  },
+  "window_description_independent_review": {
+    "reviewed_on": "2026-10-25",
+    "result": "PASS_DESCRIPTIVE_SCOPE_ONLY",
+    "method": "Reparsed unchanged raw CSV source lines; independently counted station outcomes and recomputed rates with exact Fraction arithmetic and durations with datetime.",
+    "raw_records_verified": 135,
+    "source_hashes_verified": 3,
+    "rates_verified": 6,
+    "count_checks": [
+      {
+        "visit_date": "2026-10-20",
+        "cashier_records": 61,
+        "cashier_complete": 58,
+        "withdrawals": 3,
+        "delivery_records": 58,
+        "elapsed_s": 6955
+      },
+      {
+        "visit_date": "2026-10-23",
+        "cashier_records": 8,
+        "cashier_complete": 8,
+        "withdrawals": 0,
+        "delivery_records": 8,
+        "elapsed_s": 3646
+      }
+    ],
+    "endpoint_checks": [
+      {
+        "visit_id": "visit_2026-10-20_tuesday_promotion",
+        "closed_interval_delivery_count": 58,
+        "half_open_interval_delivery_count": 57
+      },
+      {
+        "visit_id": "visit_2026-10-23_regular",
+        "closed_interval_delivery_count": 8,
+        "half_open_interval_delivery_count": 7
+      }
+    ],
+    "parameter_identifiability_rows_read": 8,
+    "window_description_json_sha256": "ebb2f6cdcf77d8c26e2e5f3085a54a76eb5aa234a53802a6426bcf00dffe4ec9",
+    "window_description_md_sha256": "de411dc2a2a9c737b408772b2d6d6060b3a24ec057a29e46f5eef3bc2ae8c832",
+    "template_files_unchanged": 9,
+    "local_links_checked": 34,
+    "template_readiness_status": "NOT_READY",
+    "template_pending_issues": 24,
+    "fitting_or_empirical_validation_performed": false
+  }
+}

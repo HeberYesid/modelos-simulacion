@@ -1,0 +1,46 @@
+# Pendientes de las dos visitas disponibles
+
+Revisión actualizada el 25 de octubre de 2026. El usuario confirmó que solo están disponibles las visitas del 20 y 23 de octubre, que el primer dato de cada fecha marca el inicio y que se retiraba a la hora del último registro. Las ventanas quedan en 16:45:35–18:41:30 del martes y 17:20:23–18:21:09 del viernes. Los registros permiten describir esas sesiones y documentar limitaciones. Todavía no permiten cerrar H03 para toda la pregunta del estudio, estimar los parámetros activos del simulador o ejecutar una validación empírica independiente.
+
+La [evidencia consolidada](existing-visits/README.md) conserva los registros con sus fuentes y enlaces confirmados. El usuario confirmó además que registró todos los pedidos durante ambas ventanas, sin pausas de observación ni omisiones; la cobertura de pedidos queda completa según su declaración. La cobertura completa no elimina las pausas operativas conocidas. Una aclaración posterior confirma clientes esperando al inicio del martes y ninguno esperando al inicio del viernes; el estado inicial completo sigue pendiente. Las respuestas, definiciones y decisiones señaladas abajo siguen **por confirmar**; no se ha registrado aprobación del operador.
+
+## Qué debe aclararse con el operador
+
+| Pendiente | Referencia concreta | Información que hace falta | Tratamiento mientras no exista |
+| --- | --- | --- | --- |
+| Estado inicial parcial y datos no registrados | Clientes esperando al inicio del martes; ninguno esperando al inicio del viernes. El observador no recuerda cuántos había el martes ni en qué fila | Cantidad y estación inicial del martes: **no registradas**, sin reconstrucción de memoria. Identidad de pedidos iniciales y preparación ya en curso: no confirmadas | Conservar valores nulos con estado `not_recorded` para cantidad y fila del martes; no volver a solicitarlos sin una fuente adicional. No inventar cantidades ni asignar filas a clientes iniciales. Ausencia de espera el viernes no confirma ausencia de preparación en curso. |
+| Base y precisión del reloj | Las tres fuentes | Dispositivo/base horaria, sincronización entre observadores y precisión real. | Conservar las horas escritas. Que tengan segundos no demuestra precisión de un segundo ni sincronización. |
+| Significado de las llegadas | Campos `hora_llegada` de caja y entrega | Evento físico que disparó cada registro; distinguir llegada al local, llegada a la fila de caja y llegada al punto de entrega. | Usar los nombres de estación; no presentar llegada a caja como llegada global confirmada ni sumar tiempos de personas. |
+| Solapamientos de preparación del martes | Entrega IDs 6–11; seis intervalos abiertos a las 17:00:10, frente a cuatro preparadores reportados | Si las ventanas incluyen pausas, preparación por lotes, intervención de varias personas u otras actividades; qué respaldo permite aclararlo. | Conservar los tiempos y la discrepancia. No aumentar el personal, repartir pedidos ni inventar pausas para hacer coincidir el modelo. |
+| Solapamientos de caja del martes | Caja IDs 3, 4 y 5; tres ventanas abiertas a las 16:51:10, con una persona reportada | Si `hora_inicio`–`hora_fin` incluye confirmación externa, espera u otra actividad; si existe registro individual de trabajo. | Tratarlo como ventana de cobro transcurrida, no como ocupación activa exclusiva. |
+| Pausa del viernes | Preparación 6: 18:13:13–18:16:16; cobro 7: 18:14:19–18:14:29 | Límites de pausa/reanudación y segmentos activos solo si existe evidencia contemporánea que los documente. | Conservar el hecho confirmado de la interrupción. Mantener desconocidas sus fronteras exactas y la preparación activa. No convertir 183 − 10 = 173 s en una medición activa. |
+| Pedidos, grupos y personas | Ambas visitas; enlaces de caja/entrega solo para los IDs 1–8 del viernes | Tamaños de grupo y personas observadas; base de cualquier vínculo adicional entre estaciones. | Mantener los tamaños desconocidos y los ID locales. No enlazar el martes por coincidencia numérica ni interpretar ocho pedidos como ocho personas. |
+| Retiros y censura | Caja del martes IDs 16, 19 y 49; cobertura de pedidos confirmada dentro de las ventanas | Qué se observó del retiro y si hubo pedidos que ya estaban presentes o seguían pendientes al terminar la visita. | Conservar los tres retiros y las marcas registradas. No asignarles servicio cero ni deducir una distribución de paciencia; la cobertura completa dentro de la ventana no aporta la historia anterior al inicio ni posterior al fin. |
+
+Para cada respuesta, conservar fecha, persona que la confirma, pregunta, alcance por visita, referencia verificable y tipo de evidencia. Distinguir una aclaración retrospectiva de un segmento cronometrado. Si no hay respaldo, registrar **no registrado** o **por confirmar**; un recuerdo no proporciona segundos de trabajo activo. No sobrescribir la fuente: cualquier corrección adicional necesita su propio antes/después, motivo y autorización. La cantidad y fila inicial del martes ya se cerraron como **no registradas**, por instrucción expresa del usuario; esa decisión resuelve su tratamiento, no recupera el dato perdido.
+
+## Qué puede analizarse con estas fuentes
+
+| Medida | Alcance disponible | Límite |
+| --- | --- | --- |
+| Espera registrada antes del cobro y ventana del cobro | Registros completos de cada estación: 58 del martes y ocho del viernes. Los tres retiros del martes se conservan aparte. | Ventana del cobro no equivale a trabajo activo. |
+| Espera registrada antes de preparar y preparación hasta entrega | 58 registros del martes y ocho del viernes. | Preparación transcurrida puede incluir pausas y otras actividades; no es una entrada activa calibrada. |
+| Llegada a caja hasta entrega final | Ocho pedidos enlazados del viernes; media descriptiva existente 226,625 s. | No hay recorrido enlazado del martes ni tamaño conocido de los grupos. |
+| Diferencias entre las visitas | Comparación descriptiva por etapa, con sus denominadores y unidades. | No estima un efecto causal de personal o tipo de día ni desempeño general de otras jornadas. |
+
+Con las ventanas y la cobertura ahora confirmadas se pueden calcular **registros de estación por hora observada**, conservando numerador, unidad y duración. Esa densidad descriptiva no es una tasa de nuevas llegadas al sistema: el martes había clientes iniciales no identificados y no se ha cerrado la definición de llegada global. El [análisis por ventana](existing-visits/window-description.md) documenta los cálculos y la disponibilidad de entradas para el modelo.
+
+No se estiman utilización real, tasa global de nuevas llegadas por hora, parámetros de preparación activa, probabilidad general de interrupción ni métricas por persona a partir de estos datos incompletos.
+
+## Decisiones previas para H05
+
+El [plan de análisis](templates/analysis_plan.json) ya enumera las decisiones requeridas. Deben resolverse y justificarse antes de ajustar parámetros y evaluar datos reservados; no corresponde rellenar sus estados con aprobaciones inexistentes.
+
+- Precisar qué significa llegada, cada etapa de pago, preparación activa, pausa, reanudación, entrega final y retiro. El alcance actual del simulador usa entrega completa por pedido; registrar recibos parciales, si se observan, no activa esa capacidad en el modelo.
+- Elegir medidas con la misma unidad, población, cohorte y ventana en el modelo y en campo. Las medidas descriptivas de la tabla anterior son candidatas **por valorar**, no criterios de aceptación ya aprobados.
+- Alinear los extremos de conteo antes de comparar: las capturas incluyen el primer y el último evento registrado; la última entrega coincide exactamente con el fin en cada visita. Las métricas nativas del simulador usan `[0,H)` y excluirían esa entrega del conteo de ventana. Para un contraste futuro con esos conteos observados, calcular por separado el conteo de eventos de la traza en `0 <= t <= H`, conservar las métricas nativas con su etiqueta original y no alterar horas fuente ni agregar un épsilon para forzar coincidencias. Esta regla de compatibilidad no constituye validación ni fija una tolerancia de aceptación.
+- Justificar muestra, cobertura, precisión, tolerancias, tratamiento de faltantes/censura y método de estimación. No se fijan números sin esa justificación ni se copian las 30 réplicas de demostración como tamaño de muestra de campo.
+- Definir y congelar la separación por visitas completas. Estas dos sesiones ya fueron examinadas y la del viernes ayudó a diseñar las interrupciones. No existe una reserva independiente documentada; no dividir sus filas al azar para afirmar validación por visita ni usar el único día de un tipo como validación equivalente del otro tipo.
+- Registrar el dictamen del responsable y del operador cuando realmente ocurra. La revisión automatizada solo comprueba estructura; no aprueba esas decisiones ni la suficiencia de los datos.
+
+Si las aclaraciones no recuperan evidencia suficiente, H03 requiere nuevas capturas de cobertura, grupos y segmentos. Mientras tanto, el cierre alcanzado es la organización trazable de las fuentes existentes y de sus faltantes. H04 y H05 permanecen pendientes, y las ejecuciones sintéticas de Spec07 conservan su alcance de ingeniería.

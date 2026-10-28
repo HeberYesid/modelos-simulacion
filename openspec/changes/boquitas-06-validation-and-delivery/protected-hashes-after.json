@@ -1,0 +1,9 @@
+{
+  "checked_preexisting_files": 55,
+  "unchanged_files": 53,
+  "reviewed_scoped_frontend_fix": [
+    "web/src/main.ts",
+    "web/src/components/scenario-editor.ts"
+  ],
+  "preexisting_tests_changed": false
+}

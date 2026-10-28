@@ -1,0 +1,20 @@
+{
+  "test": "compares 30 matched staffing replications, selects one indexed run, and downloads CSV",
+  "status": "passed",
+  "expectedStatus": "passed",
+  "localOrigin": "http://127.0.0.1:8000",
+  "serviceWorkers": "blocked",
+  "guardActive": true,
+  "localHttpRequestCount": 8,
+  "localRequestPaths": [
+    "GET /",
+    "GET /assets/index-8DDEw5Zk.js",
+    "GET /assets/index-CzQhLbVk.css",
+    "GET /api/v1/health",
+    "GET /api/v1/demo",
+    "POST /api/v1/experiments",
+    "POST /api/v1/runs",
+    "POST /api/v1/exports/csv"
+  ],
+  "externalHttpAttempts": []
+}

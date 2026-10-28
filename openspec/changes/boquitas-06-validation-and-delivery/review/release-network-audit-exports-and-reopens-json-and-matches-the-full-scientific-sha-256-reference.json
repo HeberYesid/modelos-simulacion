@@ -1,0 +1,20 @@
+{
+  "test": "exports and reopens JSON and matches the full scientific SHA-256 reference",
+  "status": "passed",
+  "expectedStatus": "passed",
+  "localOrigin": "http://127.0.0.1:8000",
+  "serviceWorkers": "blocked",
+  "guardActive": true,
+  "localHttpRequestCount": 8,
+  "localRequestPaths": [
+    "GET /",
+    "GET /assets/index-CcuhCTBa.js",
+    "GET /assets/index-DuO-lDds.css",
+    "GET /api/v1/health",
+    "GET /api/v1/demo",
+    "POST /api/v1/runs",
+    "POST /api/v1/files/validate",
+    "POST /api/v1/runs"
+  ],
+  "externalHttpAttempts": []
+}

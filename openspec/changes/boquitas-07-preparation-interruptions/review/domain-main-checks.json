@@ -1,0 +1,81 @@
+{
+  "checks": {
+    "core": {
+      "deliveries": {
+        "A": 14,
+        "B": 17
+      },
+      "A_active_s": 10.0,
+      "A_paused_s": 2.0,
+      "pause_count": 1
+    },
+    "confirmation": {
+      "deliveries": {
+        "A": 17,
+        "B": 20
+      },
+      "A_active_s": 10.0,
+      "A_paused_s": 5.0,
+      "pause_count": 1
+    },
+    "repeated": {
+      "deliveries": {
+        "A": 15,
+        "B": 18,
+        "C": 19
+      },
+      "A_active_s": 10.0,
+      "A_paused_s": 3.0,
+      "pause_count": 2
+    },
+    "resume_boundary": {
+      "deliveries": {
+        "A": 15,
+        "B": 18,
+        "C": 19
+      },
+      "A_active_s": 10.0,
+      "A_paused_s": 3.0,
+      "pause_count": 2
+    },
+    "shared_group": {
+      "person_active_mean_s": 7.666666666666667,
+      "order_active_mean_s": 6.5,
+      "worker_active_fraction": 0.85,
+      "paid_queue_mean_orders": 0.35
+    },
+    "initial_unknown_history": {
+      "A_delivery_s": 11,
+      "B_delivery_s": 12,
+      "full_active_s": null,
+      "full_elapsed_s": null
+    },
+    "after_close": {
+      "deliveries": [
+        14,
+        17
+      ],
+      "H": 4,
+      "overtime_s": 13
+    }
+  },
+  "V1_differential_cases": [
+    {
+      "mode": "regular",
+      "trace_and_metrics_byte_identical": true
+    },
+    {
+      "mode": "regular",
+      "trace_and_metrics_byte_identical": true
+    },
+    {
+      "mode": "tuesday",
+      "trace_and_metrics_byte_identical": true
+    },
+    {
+      "mode": "regular",
+      "trace_and_metrics_byte_identical": true
+    }
+  ],
+  "verification": "independently observed actual engine and metrics; synthetic acceptance inputs only"
+}

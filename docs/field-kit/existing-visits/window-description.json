@@ -1,0 +1,250 @@
+{
+  "artifact_version": 1,
+  "prepared_on": "2026-10-25",
+  "empirical_status": "NOT_READY",
+  "purpose": "Descriptive station-record counts per confirmed observation hour, with an identifiability summary for current model inputs.",
+  "method": {
+    "rate_unit": "station_records_per_observed_hour",
+    "formula": "count * 3600 / observation_window_elapsed_s",
+    "rounding_decimals": 2,
+    "coverage_basis": "The observer confirmed all orders were recorded during both windows, with no observation breaks or omitted orders.",
+    "field_endpoint_convention": "The confirmed start and end timestamps are included in the source counts. The last delivery event in each visit is exactly at the confirmed end.",
+    "clock_basis": "Unconfirmed; elapsed window seconds use the recorded local clock times only."
+  },
+  "source_refs": {
+    "visit_records": "evidence.json",
+    "independent_review": "review.json",
+    "prior_station_and_linked_order_calculations": "../../../plans/evidence/comparison-calculations.json",
+    "measurement_pending_list": "../pendientes-de-medicion.md"
+  },
+  "raw_source_sha256": {
+    "tuesday_corrected": "480ade881fd14bc88d8c94f037cea9ef4c2869b7ba400cbffda772f6f470caea",
+    "regular_cashier": "253e1f5fea2a9a998414a3aa9accc7f4c69df68bd3c48910c9f149fdb0ca896d",
+    "regular_delivery": "306894afd30abded545c5ffb6e62446cd1d7926264f162775f45bda03295f220"
+  },
+  "visits": [
+    {
+      "visit_id": "visit_2026-10-20_tuesday_promotion",
+      "visit_date": "2026-10-20",
+      "day_type_as_recorded": "Martes 2x1",
+      "observation_window": {
+        "start_at": "2026-10-20T16:45:35",
+        "end_at": "2026-10-20T18:41:30",
+        "elapsed_s": 6955,
+        "elapsed_h": 1.93194444444444
+      },
+      "initial_state": {
+        "waiting_customers_present": true,
+        "waiting_customer_count": null,
+        "waiting_customer_count_status": "not_recorded",
+        "waiting_queue_station": null,
+        "waiting_queue_station_status": "not_recorded",
+        "basis": "The observer stated the count and station were not recorded and cannot be recalled; neither value is reconstructed."
+      },
+      "staffing_as_reported": {
+        "cashier": 1,
+        "preparation": 4
+      },
+      "station_counts": {
+        "cashier": {
+          "records": 61,
+          "classified_complete": 58,
+          "withdrawals": 3
+        },
+        "delivery": {
+          "records": 58,
+          "classified_complete": 58,
+          "withdrawals": 0
+        }
+      }
+    },
+    {
+      "visit_id": "visit_2026-10-23_regular",
+      "visit_date": "2026-10-23",
+      "day_type_as_recorded": "Día normal",
+      "observation_window": {
+        "start_at": "2026-10-23T17:20:23",
+        "end_at": "2026-10-23T18:21:09",
+        "elapsed_s": 3646,
+        "elapsed_h": 1.01277777777778
+      },
+      "initial_state": {
+        "waiting_customers_present": false,
+        "waiting_customer_count": 0,
+        "waiting_queue_station": null,
+        "orders_in_preparation_present": null,
+        "basis": "No waiting customers were reported at the start; initial order identities and preparation already in progress remain unconfirmed. An entirely empty system is not assumed."
+      },
+      "staffing_as_reported": {
+        "integrated_worker": 1
+      },
+      "station_counts": {
+        "cashier": {
+          "records": 8,
+          "classified_complete": 8,
+          "withdrawals": 0
+        },
+        "delivery": {
+          "records": 8,
+          "classified_complete": 8,
+          "withdrawals": 0
+        }
+      }
+    }
+  ],
+  "window_rates": [
+    {
+      "visit_id": "visit_2026-10-20_tuesday_promotion",
+      "measure": "cashier_station_records",
+      "numerator": 61,
+      "numerator_unit": "cashier records",
+      "denominator": 6955,
+      "denominator_unit": "observed seconds",
+      "rate_per_observed_hour": 31.574406901509704
+    },
+    {
+      "visit_id": "visit_2026-10-20_tuesday_promotion",
+      "measure": "cashier_records_classified_complete",
+      "numerator": 58,
+      "numerator_unit": "cashier records classified complete",
+      "denominator": 6955,
+      "denominator_unit": "observed seconds",
+      "rate_per_observed_hour": 30.0215672178289
+    },
+    {
+      "visit_id": "visit_2026-10-20_tuesday_promotion",
+      "measure": "cashier_withdrawals_recorded",
+      "numerator": 3,
+      "numerator_unit": "withdrawals recorded at cashier",
+      "denominator": 6955,
+      "denominator_unit": "observed seconds",
+      "rate_per_observed_hour": 1.5528396836808052
+    },
+    {
+      "visit_id": "visit_2026-10-20_tuesday_promotion",
+      "measure": "delivery_station_records",
+      "numerator": 58,
+      "numerator_unit": "final-delivery records",
+      "denominator": 6955,
+      "denominator_unit": "observed seconds",
+      "rate_per_observed_hour": 30.0215672178289
+    },
+    {
+      "visit_id": "visit_2026-10-23_regular",
+      "measure": "cashier_records_classified_complete",
+      "numerator": 8,
+      "numerator_unit": "cashier records classified complete",
+      "denominator": 3646,
+      "denominator_unit": "observed seconds",
+      "rate_per_observed_hour": 7.899067471201317
+    },
+    {
+      "visit_id": "visit_2026-10-23_regular",
+      "measure": "delivery_station_records",
+      "numerator": 8,
+      "numerator_unit": "final-delivery records",
+      "denominator": 3646,
+      "denominator_unit": "observed seconds",
+      "rate_per_observed_hour": 7.899067471201317
+    }
+  ],
+  "parameter_identifiability": [
+    {
+      "model_input": "active_cashier_duration",
+      "status": "not_measured_not_identifiable",
+      "source_support": "Recorded cashier intervals are elapsed windows, not active-work segments. On Tuesday, three cashier windows overlap at 16:51:10 while one cashier is reported."
+    },
+    {
+      "model_input": "active_preparation_duration",
+      "status": "not_measured_not_identifiable",
+      "source_support": "Preparation start-to-end intervals are elapsed time. Friday has a confirmed cashier interruption during preparation, but exact pause boundaries are unknown; Tuesday has six overlapping delivery windows at 17:00:10 while four preparation staff are reported."
+    },
+    {
+      "model_input": "interarrival_and_global_arrival_definition_initial_cohort",
+      "status": "not_identifiable",
+      "source_support": "Station arrival fields do not establish a global arrival definition or pre-start history. Tuesday customers were already waiting, but their count and station were not recorded and cannot be recalled. Initial work in preparation remains unconfirmed in both visits."
+    },
+    {
+      "model_input": "group_sizes",
+      "status": "not_recorded",
+      "source_support": "Station-local order records do not identify people or group size. The eight confirmed cashier-delivery links on Friday do not supply group counts; Tuesday station IDs remain unlinked."
+    },
+    {
+      "model_input": "payment_transfer_probability_and_confirmation_wait",
+      "status": "not_identifiable",
+      "source_support": "Payment medium was not recorded and external payment confirmation waiting was not separated from active cashier work. A timestamp gap between cashier and delivery does not measure banking confirmation or identify the probability of paying by transfer."
+    },
+    {
+      "model_input": "patience",
+      "status": "not_identifiable",
+      "source_support": "Three Tuesday cashier withdrawals are recorded, but the current records do not identify a general patience input or distribution; the initial queue count and station are unavailable."
+    },
+    {
+      "model_input": "scripted_pause_boundaries",
+      "status": "not_measured_not_identifiable",
+      "source_support": "A Friday interruption of preparation to perform cashier work is confirmed, but its exact pause and resume boundaries were not timed. The 183-second elapsed preparation interval is not active preparation time."
+    },
+    {
+      "model_input": "reported_staffing_configuration",
+      "status": "reported_configuration_only",
+      "values": {
+        "2026-10-20": {
+          "cashier": 1,
+          "preparation": 4
+        },
+        "2026-10-23": {
+          "integrated_worker": 1
+        }
+      },
+      "source_support": "Reported staffing can describe the observed configurations. Tuesday overlap counts are an unresolved consistency warning, not a basis to infer additional workers, assignments, or service capacity."
+    }
+  ],
+  "additional_descriptive_measure": {
+    "visit_id": "visit_2026-10-23_regular",
+    "measure": "cashier_arrival_to_final_delivery_elapsed_time",
+    "n_linked_orders": 8,
+    "mean_s_per_order": 226.625,
+    "scope": "Descriptive elapsed time for the eight confirmed same-order IDs on Friday; not active labor time. No Tuesday end-to-end join is established."
+  },
+  "limits": [
+    "The rates are recorded station-stage counts per observed hour, not global arrival rate, equilibrium throughput, service capacity, utilization, or causal staffing/day-type effects.",
+    "Initial work can contribute to records observed after the start; the Tuesday initial waiting-customer count and queue station are not recorded and cannot be recalled.",
+    "Field counts include events at both confirmed endpoints; each final delivery is exactly at the end. Simulator counts using [0,H) are not directly comparable until a common endpoint-counting rule is applied.",
+    "No parameters were fitted, no acceptance thresholds were set, and no calibration or empirical validation was performed."
+  ],
+  "review_basis": {
+    "existing_review_result": "PASS_WITH_EMPIRICAL_GAPS",
+    "source_record_count": 135,
+    "confirmed_friday_order_joins": 8,
+    "independent_review_artifact": "review.json"
+  },
+  "evidence_sha256": "11680062ff28235642a0108b7e1f7830a8e28a3b7491ce7cc82c3736660df4e0",
+  "endpoint_alignment": [
+    {
+      "visit_id": "visit_2026-10-20_tuesday_promotion",
+      "closed_interval_delivery_count": 58,
+      "half_open_interval_delivery_count": 57,
+      "deliveries_exactly_at_end": [
+        {
+          "record_id": "boquitas_tuesday_corrected_2026-10-20:line:059",
+          "station_local_id": "59",
+          "source_line": 59,
+          "time": "18:41:30"
+        }
+      ]
+    },
+    {
+      "visit_id": "visit_2026-10-23_regular",
+      "closed_interval_delivery_count": 8,
+      "half_open_interval_delivery_count": 7,
+      "deliveries_exactly_at_end": [
+        {
+          "record_id": "boquitas_normal_delivery_2026-10-23:line:009",
+          "station_local_id": "8",
+          "source_line": 9,
+          "time": "18:21:09"
+        }
+      ]
+    }
+  ]
+}

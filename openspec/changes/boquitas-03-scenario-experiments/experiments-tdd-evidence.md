@@ -1,0 +1,22 @@
+# EXP-01/02 and EXP-07/08 implementation evidence
+
+Date: 2026-10-22. This record covers tasks 1.1-1.4 and 3.1-3.4 only. Metrics tasks 2.1-2.5 and main-agent acceptance task 4.1 are owned elsewhere.
+
+## Selected test-first cycles
+
+- Scenario inputs: `tests/test_scenarios.py` first failed collection because `boquitas.scenarios` did not yet exist. The public model now validates finite time distributions, positive interarrival support, unique weighted group sizes, active pools and initial state; the synthetic demonstration test checks the exact labeled defaults and empty/no-warm-up assumptions.
+- Indexed generation: `tests/test_demand.py` first failed collection because `boquitas.demand` did not yet exist. The resulting tests show stable replication-indexed tapes, call-order independence, identity/timing equality across staffing modes, and the 10,000-order explicit failure.
+- Replication statistics: `tests/test_statistics.py` first failed collection because `boquitas.statistics` did not yet exist. A later focused run reproduced three defects before their fixes: the finite `[1e200, 2e200, 3e200]` sample produced infinite endpoints, `[1e-200, 2e-200, 3e-200]` was treated as constant, and the independent boolean group-size check accepted `True`. Scaled variance and strict integer validation now cover these cases. The `[1, 2, 3]` oracle, insufficient samples, zero variance, crossed physical bounds and unrepresentable endpoints have explicit checks.
+- Paired comparisons: `tests/test_experiments.py` first failed collection because `boquitas.experiments` did not yet exist. A focused regression then showed horizon differences were missing from demand-generation assumptions (`demand_matched=True` while tapes differed); the horizon now participates in the signature, and tape identity is disclosed separately. Replicate differences use the same index and candidate-minus-reference order.
+- Exports: `tests/test_exports.py` first failed collection because `boquitas.exports` did not yet exist. Coherent JSON/CSV integration checks found nested metric models were not JSON-serializable when passed in tuples; recursive conversion fixed that. Round-trip, nested unsupported-version rejection, rectangular tables, formula-safe text, numeric negatives, blank unavailable values with reasons, observation provenance and aggregate metadata are covered.
+- Final portable-artifact readback: the new assertion first failed because `MeanInterval.interpretation` and CSV scenario provenance were absent. JSON intervals now state that Student-t results describe Monte Carlo variability conditional on chosen inputs and exclude actual parameter uncertainty; standalone run tables and scenario-specific experiment tables carry provenance, and aggregate/comparison CSV rows carry the interpretation text.
+
+## Observed checks
+
+- `uv run --frozen --offline pytest tests/test_scenarios.py tests/test_demand.py tests/test_statistics.py tests/test_experiments.py tests/test_exports.py -q` — 37 passed.
+- `uv run --frozen --offline ruff check --no-cache src/boquitas/scenarios.py src/boquitas/demand.py src/boquitas/statistics.py src/boquitas/experiments.py src/boquitas/exports.py tests/test_scenarios.py tests/test_demand.py tests/test_statistics.py tests/test_experiments.py tests/test_exports.py` — all checks passed.
+- `uv run --frozen --offline mypy --no-incremental src/boquitas` — success, no issues in 11 source files.
+- Final readback regressions: `uv run --frozen --offline pytest tests/test_statistics.py::test_student_t_interval_uses_sample_standard_deviation_without_clamping tests/test_exports.py::test_csv_tables_are_rectangular_escape_text_and_keep_negative_numbers tests/test_exports.py::test_scenario_run_and_experiment_json_round_trip_without_regeneration -q` — 3 passed.
+- A full `pytest -q` run reached 103 passed but the output-file test could not create its temporary destination under the current Windows sandbox ACL. The file-writing test has been restored for main-agent verification through the authorized execution route; the serializer-table tests themselves pass in memory. No source tests failed in that full run.
+
+No claim of empirical calibration or business validation is made. At block handoff, full change acceptance remained pending main-agent review and task 4.1. The subsequent [independent review](verification-report.md) passed all 109 tests including actual file writing, plus Ruff, mypy and lockfile checks, and completed task 4.1. The earlier ACL failure is resolved; user approval before spec04 remains pending.

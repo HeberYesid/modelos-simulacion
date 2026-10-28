@@ -1,0 +1,31 @@
+{
+  "checks": [
+    "incompatible mode/capacity and incomplete rows retain scripts; explicit resolution and numeric V2 scenario download",
+    "core A/B 14/17, active/paused/count/elapsed 10/2/1/12, real graphics, repeated 6/8 seeks, speed controls, exact server-byte download",
+    "edited scenario keeps script and immutable completed bytes; actual CSV download",
+    "reopen without simulation POST, exact bytes and retained result after mismatched-version rejection"
+  ],
+  "requests": [
+    "GET /",
+    "GET /assets/index-U8QDHLar.js",
+    "GET /assets/index-DuO-lDds.css",
+    "GET /api/v1/health",
+    "GET /api/v1/demo",
+    "POST /api/v1/files/validate",
+    "POST /api/v1/files/validate",
+    "POST /api/v1/runs",
+    "POST /api/v1/files/validate",
+    "POST /api/v1/exports/csv",
+    "GET /",
+    "GET /assets/index-U8QDHLar.js",
+    "GET /assets/index-DuO-lDds.css",
+    "GET /api/v1/health",
+    "GET /api/v1/demo",
+    "POST /api/v1/files/validate",
+    "POST /api/v1/files/validate"
+  ],
+  "external": [],
+  "errors": [],
+  "passed": false,
+  "failure": "Error: expect(locator).toHaveAttribute(expected) failed\n\nLocator:  locator('#replay-stage')\nExpected: \"lost\"\nReceived: \"unavailable\"\nTimeout:  5000ms\n\nCall log:\n  - Expect \"toHaveAttribute\" locator('#replay-stage') with timeout 5000ms\n  - waiting for locator('#replay-stage')\n    14 × locator resolved to <div id=\"replay-stage\" class=\"replay-stage\" data-state=\"unavailable\">…</div>\n       - unexpected value \"unavailable\"\n\n    at captureRawStack (C:\\Users\\HeberYesid\\Desktop\\Universidad Trabajos\\Modelos-simulación\\web\\node_modules\\.pnpm\\playwright-core@1.64.1\\node_modules\\playwright-core\\lib\\coreBundle.js:9282:17)\n    at callMatcherAsStep (C:\\Users\\HeberYesid\\Desktop\\Universidad Trabajos\\Modelos-simulación\\web\\node_modules\\.pnpm\\playwright@1.64.1\\node_modules\\playwright\\lib\\matchers\\expect.js:13316:57)\n    at Object.toHaveAttribute (C:\\Users\\HeberYesid\\Desktop\\Universidad Trabajos\\Modelos-simulación\\web\\node_modules\\.pnpm\\playwright@1.64.1\\node_modules\\playwright\\lib\\matchers\\expect.js:13308:23)\n    at C:\\Users\\HeberYesid\\Desktop\\Universidad Trabajos\\Modelos-simulación\\openspec\\changes\\boquitas-07-preparation-interruptions\\review\\browser-acceptance.mjs:147:47"
+}

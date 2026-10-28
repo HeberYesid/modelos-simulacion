@@ -1,0 +1,222 @@
+[
+  {
+    "Path": "C:\\Users\\HeberYesid\\Desktop\\Universidad Trabajos\\Modelos-simulación\\src\\boquitas\\__init__.py",
+    "Hash": "C4366B54F504E2F6A2D97AA45B1C287741153904C426F28885F6F0C06D1E3C71"
+  },
+  {
+    "Path": "C:\\Users\\HeberYesid\\Desktop\\Universidad Trabajos\\Modelos-simulación\\src\\boquitas\\api_models.py",
+    "Hash": "5A54A53E78DEF9E0F9B5C22D82EF8F3B94FAD0180C8395526FA676B01CAB5383"
+  },
+  {
+    "Path": "C:\\Users\\HeberYesid\\Desktop\\Universidad Trabajos\\Modelos-simulación\\src\\boquitas\\api.py",
+    "Hash": "41634EF43CF04DA139E08F13F5C001ADDE7CDF99A22BC19D81E67FDEB9A2A5F0"
+  },
+  {
+    "Path": "C:\\Users\\HeberYesid\\Desktop\\Universidad Trabajos\\Modelos-simulación\\src\\boquitas\\demand.py",
+    "Hash": "936C16FE2ABA855419929AA8216B9D864A814171284B800B04A517306076352D"
+  },
+  {
+    "Path": "C:\\Users\\HeberYesid\\Desktop\\Universidad Trabajos\\Modelos-simulación\\src\\boquitas\\engine.py",
+    "Hash": "8095B068866F06B367BFED422C8BAF4D7D6ED188BED67C358A205AE89F2E15A8"
+  },
+  {
+    "Path": "C:\\Users\\HeberYesid\\Desktop\\Universidad Trabajos\\Modelos-simulación\\src\\boquitas\\experiments.py",
+    "Hash": "A798E015DD0C3936E68923295544F8782F9EC499ADC960BC6F95E9DDB9EF79B9"
+  },
+  {
+    "Path": "C:\\Users\\HeberYesid\\Desktop\\Universidad Trabajos\\Modelos-simulación\\src\\boquitas\\exports.py",
+    "Hash": "13EFE7FD13462819BC771BF3F34950C23D7828DA53304BAAC67B2F068C49619A"
+  },
+  {
+    "Path": "C:\\Users\\HeberYesid\\Desktop\\Universidad Trabajos\\Modelos-simulación\\src\\boquitas\\metrics_models.py",
+    "Hash": "A197E349C74B45169B9699C42FA0B882518880DA9773EF2D5B8E5EFA456DD4B6"
+  },
+  {
+    "Path": "C:\\Users\\HeberYesid\\Desktop\\Universidad Trabajos\\Modelos-simulación\\src\\boquitas\\metrics.py",
+    "Hash": "72C9F975D4254DAB66FB62A2A524DC54043DBB9CD9A1764B70AC8EF30797D387"
+  },
+  {
+    "Path": "C:\\Users\\HeberYesid\\Desktop\\Universidad Trabajos\\Modelos-simulación\\src\\boquitas\\models.py",
+    "Hash": "8455150E53844F14FAC9B9CE7449C563C5B8109A1E186CCE378316B11EE1C715"
+  },
+  {
+    "Path": "C:\\Users\\HeberYesid\\Desktop\\Universidad Trabajos\\Modelos-simulación\\src\\boquitas\\observation_import.py",
+    "Hash": "882D137DD7A8D67E12242735C95AD19D648308B43D0A27ADA08364DBE35CB6EF"
+  },
+  {
+    "Path": "C:\\Users\\HeberYesid\\Desktop\\Universidad Trabajos\\Modelos-simulación\\src\\boquitas\\scenarios.py",
+    "Hash": "5D5BBD6ED9CAB0AD0CCD38B0F535DDBC266B4FE1F510FD05F71A889BE4062795"
+  },
+  {
+    "Path": "C:\\Users\\HeberYesid\\Desktop\\Universidad Trabajos\\Modelos-simulación\\src\\boquitas\\statistics.py",
+    "Hash": "13443019D690ED5807E6C64DA7EBD0B79FC99B3984B5A3700D9C16380AC14DA6"
+  },
+  {
+    "Path": "C:\\Users\\HeberYesid\\Desktop\\Universidad Trabajos\\Modelos-simulación\\tests\\test_api.py",
+    "Hash": "B2A6C528093A6344A7A9FC15E1EB0A1C9E34DBDA5BC359FE92C8F6C4FED09175"
+  },
+  {
+    "Path": "C:\\Users\\HeberYesid\\Desktop\\Universidad Trabajos\\Modelos-simulación\\tests\\test_demand.py",
+    "Hash": "8C9ADFF8AA189AF989869139E5EAEE3B89165C990763CE8C11F76936C04D811C"
+  },
+  {
+    "Path": "C:\\Users\\HeberYesid\\Desktop\\Universidad Trabajos\\Modelos-simulación\\tests\\test_experiments.py",
+    "Hash": "D97D431B30A242C90EE0AE73AFD2C27BAB027782DAE90BD4AA0094CC53ED3E12"
+  },
+  {
+    "Path": "C:\\Users\\HeberYesid\\Desktop\\Universidad Trabajos\\Modelos-simulación\\tests\\test_exports.py",
+    "Hash": "0147CFF66D16B8AB02439FF3942695BE7F8FB486828B6E75067FC6D8D726118A"
+  },
+  {
+    "Path": "C:\\Users\\HeberYesid\\Desktop\\Universidad Trabajos\\Modelos-simulación\\tests\\test_metrics.py",
+    "Hash": "7C4B33A06421451DE00607BAC9D54FC5946AACA36EDF5986A0B0D7A0F0BDF6DC"
+  },
+  {
+    "Path": "C:\\Users\\HeberYesid\\Desktop\\Universidad Trabajos\\Modelos-simulación\\tests\\test_observation_import.py",
+    "Hash": "FAE450F11F621EE2733F1E2F451945BE3BB99381F160AA4A889CC8DEE4F01A79"
+  },
+  {
+    "Path": "C:\\Users\\HeberYesid\\Desktop\\Universidad Trabajos\\Modelos-simulación\\tests\\test_scenarios.py",
+    "Hash": "1EF4078E280761D61327DCEDBC1BB87E4EE5A98C428404102F25165FC6BB16E3"
+  },
+  {
+    "Path": "C:\\Users\\HeberYesid\\Desktop\\Universidad Trabajos\\Modelos-simulación\\tests\\test_simulation_engine.py",
+    "Hash": "15D545341C903D9F50939B6308C6AA4422407B655A4C67E6D1365268BA0A160F"
+  },
+  {
+    "Path": "C:\\Users\\HeberYesid\\Desktop\\Universidad Trabajos\\Modelos-simulación\\tests\\test_statistics.py",
+    "Hash": "30BBF02C347506B631FA896322AB0E3D60925A2AFAB3E23B50F20BD1EDE2457C"
+  },
+  {
+    "Path": "C:\\Users\\HeberYesid\\Desktop\\Universidad Trabajos\\Modelos-simulación\\tests\\fixtures\\api-static\\index.html",
+    "Hash": "3FA2A238D6D6437C2F210D5E17D8D06CD3EF41438DA3876D7E445D1C74154B25"
+  },
+  {
+    "Path": "C:\\Users\\HeberYesid\\Desktop\\Universidad Trabajos\\Modelos-simulación\\tests\\fixtures\\observation-import\\corrected-reference.txt",
+    "Hash": "480ADE881FD14BC88D8C94F037CEA9EF4C2869B7BA400CBFFDA772F6F470CAEA"
+  },
+  {
+    "Path": "C:\\Users\\HeberYesid\\Desktop\\Universidad Trabajos\\Modelos-simulación\\tests\\fixtures\\observation-import\\original.txt",
+    "Hash": "845F8C6E56A7AF120754AB0A5A789F318B65214E11F91737FD25032B7E51573D"
+  },
+  {
+    "Path": "C:\\Users\\HeberYesid\\Desktop\\Universidad Trabajos\\Modelos-simulación\\tests\\fixtures\\observation-import\\source-manifest.json",
+    "Hash": "82DBB4F5C56E08B2149497510206897C26D958A24C99A939C21C3C54162D68DA"
+  },
+  {
+    "Path": "C:\\Users\\HeberYesid\\Desktop\\Universidad Trabajos\\Modelos-simulación\\web\\src\\main.ts",
+    "Hash": "E0AF857EA1CC0E3D44A8B737DBDA25ECB44013726617C41678CDF2F3695BB391"
+  },
+  {
+    "Path": "C:\\Users\\HeberYesid\\Desktop\\Universidad Trabajos\\Modelos-simulación\\web\\src\\styles.css",
+    "Hash": "735A645662928AAEE391A103DF1B0C531BD6EEF42E3FDB2CC23021D7D747A933"
+  },
+  {
+    "Path": "C:\\Users\\HeberYesid\\Desktop\\Universidad Trabajos\\Modelos-simulación\\web\\src\\api\\schema.d.ts",
+    "Hash": "B0346978897842BAC5CCABC8FC66FFBD6A66F99F850DC04A7FBD62389A639A95"
+  },
+  {
+    "Path": "C:\\Users\\HeberYesid\\Desktop\\Universidad Trabajos\\Modelos-simulación\\web\\src\\api\\types.ts",
+    "Hash": "EAE349BB1BB9BF67BE08BE6078F1F48C3B5722D5DF325427C7A9931388B4A277"
+  },
+  {
+    "Path": "C:\\Users\\HeberYesid\\Desktop\\Universidad Trabajos\\Modelos-simulación\\web\\src\\components\\observations.ts",
+    "Hash": "1DAEADFCB32DDDE0FA17F92C7C325E36F5621F6A43ABC151663015EF4AE242FB"
+  },
+  {
+    "Path": "C:\\Users\\HeberYesid\\Desktop\\Universidad Trabajos\\Modelos-simulación\\web\\src\\components\\results.ts",
+    "Hash": "CD2C182DAD2F6C95AAD92C300F1E1F81175BF0DE36CA8368F719414E97D8DC17"
+  },
+  {
+    "Path": "C:\\Users\\HeberYesid\\Desktop\\Universidad Trabajos\\Modelos-simulación\\web\\src\\components\\scenario-editor.ts",
+    "Hash": "1E47CA56DC715F8BE507D3358D9F46E2CFE70AFCD6AABD9450BF355383131270"
+  },
+  {
+    "Path": "C:\\Users\\HeberYesid\\Desktop\\Universidad Trabajos\\Modelos-simulación\\web\\src\\components\\shell.ts",
+    "Hash": "F6FF40F7BEFD667BFD10B5CBB012EC9EC9DE7FCE0D4DA0D95149DE943AF151E4"
+  },
+  {
+    "Path": "C:\\Users\\HeberYesid\\Desktop\\Universidad Trabajos\\Modelos-simulación\\web\\src\\domain\\errors.ts",
+    "Hash": "180BA29C7DCC3B0489AC8FA3435BE3BFDCCEED8DB7B6D7AC39AC6A88C4FB4D93"
+  },
+  {
+    "Path": "C:\\Users\\HeberYesid\\Desktop\\Universidad Trabajos\\Modelos-simulación\\web\\src\\domain\\format.ts",
+    "Hash": "4740BE27A344B245C8F3B5BC52D7986FE1F5D10AFC387E2C665C6B1A782DADC7"
+  },
+  {
+    "Path": "C:\\Users\\HeberYesid\\Desktop\\Universidad Trabajos\\Modelos-simulación\\web\\src\\replay\\clock.ts",
+    "Hash": "78E8BABD4D8F5BC4597616355208E282AB0F9363446CC3FA9B17858D20AD6313"
+  },
+  {
+    "Path": "C:\\Users\\HeberYesid\\Desktop\\Universidad Trabajos\\Modelos-simulación\\web\\src\\replay\\host.ts",
+    "Hash": "8974C681705090809D0A6D0825602D6C02D6D2A381DAE8B3923FF5F8307BB6C2"
+  },
+  {
+    "Path": "C:\\Users\\HeberYesid\\Desktop\\Universidad Trabajos\\Modelos-simulación\\web\\src\\replay\\project.ts",
+    "Hash": "2AB8DECE844F7FD421BFBA0BF50FE0046E89EFB6D00B023B1B0CDC9BEF3BACD6"
+  },
+  {
+    "Path": "C:\\Users\\HeberYesid\\Desktop\\Universidad Trabajos\\Modelos-simulación\\web\\src\\replay\\scene.ts",
+    "Hash": "38A58A580A7EC2E71566E68617549AE71CF095D5CBC08E27E769309D399D0199"
+  },
+  {
+    "Path": "C:\\Users\\HeberYesid\\Desktop\\Universidad Trabajos\\Modelos-simulación\\web\\src\\services\\api.ts",
+    "Hash": "55FD74B118303C88649C5D41869AF52DE9B1EC213A72222B02EAB427A8449D3E"
+  },
+  {
+    "Path": "C:\\Users\\HeberYesid\\Desktop\\Universidad Trabajos\\Modelos-simulación\\web\\tests\\domain-errors.test.ts",
+    "Hash": "61EDA9851412E608A8011B53841EB15AB0906779AC2340CBDE0FFD035DDBD5B7"
+  },
+  {
+    "Path": "C:\\Users\\HeberYesid\\Desktop\\Universidad Trabajos\\Modelos-simulación\\web\\tests\\json-precision.test.ts",
+    "Hash": "D19D767CA5E4167EF6A8DE74FC2173DC8A95A6688F57D27C3A0C8AB3064415F4"
+  },
+  {
+    "Path": "C:\\Users\\HeberYesid\\Desktop\\Universidad Trabajos\\Modelos-simulación\\web\\tests\\observations-audit.test.ts",
+    "Hash": "E3F3CD6B077422FFD097D7139242B7852C98CA918B467A0A56F84B644BD531D1"
+  },
+  {
+    "Path": "C:\\Users\\HeberYesid\\Desktop\\Universidad Trabajos\\Modelos-simulación\\web\\tests\\replay-clock.test.ts",
+    "Hash": "4156E7E6CCCB3141D073B578D551EEBA7C2A6F7C6FE8F862752BDA20C7488A59"
+  },
+  {
+    "Path": "C:\\Users\\HeberYesid\\Desktop\\Universidad Trabajos\\Modelos-simulación\\web\\tests\\replay.test.ts",
+    "Hash": "4106E27B199BB6D6C1A86F27BA2AB8F1B38951F45DA9C5DDD56DA2427A62DFC7"
+  },
+  {
+    "Path": "C:\\Users\\HeberYesid\\Desktop\\Universidad Trabajos\\Modelos-simulación\\web\\tests\\results-readback.test.ts",
+    "Hash": "7398325BE7D5ADD6AD8C9796F9CC5518E3D6B09962DCAC3BC4B42B8C9BC3113B"
+  },
+  {
+    "Path": "C:\\Users\\HeberYesid\\Desktop\\Universidad Trabajos\\Modelos-simulación\\web\\tests\\scenario-form.test.ts",
+    "Hash": "BEAC57891821EDEE9685B1DB1EE53DE4EFCB821816951C9CFAC1A3449BE674BC"
+  },
+  {
+    "Path": "C:\\Users\\HeberYesid\\Desktop\\Universidad Trabajos\\Modelos-simulación\\web\\tests\\service-error.test.ts",
+    "Hash": "768108A499C2516C0CE6C6A15B7644AB31171215CE9F8EBD0426C26A66A99817"
+  },
+  {
+    "Path": "C:\\Users\\HeberYesid\\Desktop\\Universidad Trabajos\\Modelos-simulación\\web\\tests\\time-format.test.ts",
+    "Hash": "B768312C51B99EB4DC02C60401E03542F66B9B80F3093196BD7ACB9BE6654E97"
+  },
+  {
+    "Path": "C:\\Users\\HeberYesid\\Desktop\\Universidad Trabajos\\Modelos-simulación\\web\\tests\\fixtures\\replay\\long-timeline.json",
+    "Hash": "676475728C8BF984CEE77F53D3A641CD0D05B206BECE0231786BDE8A835DB94B"
+  },
+  {
+    "Path": "C:\\Users\\HeberYesid\\Desktop\\Universidad Trabajos\\Modelos-simulación\\web\\tests\\fixtures\\replay\\queues.json",
+    "Hash": "EC4861980792FEC8C20259AEB1F1F6E224C27C8B581B0644BCF3851AE63D2E9A"
+  },
+  {
+    "Path": "C:\\Users\\HeberYesid\\Desktop\\Universidad Trabajos\\Modelos-simulación\\web\\tests\\fixtures\\replay\\regular.json",
+    "Hash": "21B0352EB1B0D9A209A4B1C1CB74798F5E0309623A9D79EC3EE6745C73F7805B"
+  },
+  {
+    "Path": "C:\\Users\\HeberYesid\\Desktop\\Universidad Trabajos\\Modelos-simulación\\web\\tests\\fixtures\\replay\\tuesday.json",
+    "Hash": "86D24C22CD58F2FC1AA5D26F99FF55B0E926F4549A248B85C8D270C2F94DF3D4"
+  },
+  {
+    "Path": "C:\\Users\\HeberYesid\\Desktop\\Universidad Trabajos\\Modelos-simulación\\web\\e2e\\local-workflows.spec.ts",
+    "Hash": "F5CA9118739958D82E86937A3769A0461233FE97890230C2DC7AB7B8FFB2F69D"
+  }
+]

@@ -1,0 +1,90 @@
+{
+  "contract_version": 2,
+  "scenario_id": "scripted-pause-demo",
+  "display_name": "Demostración sintética: pausa para cobrar",
+  "engine_config": {
+    "contract_version": 2,
+    "mode": "regular",
+    "opening_time": "15:00:00",
+    "horizon_s": 20,
+    "cashiers": 0,
+    "preparers": 0,
+    "integrated_workers": 1,
+    "preparation_interruption_policy": "scripted_cashier",
+    "cashier_interruptions": [
+      {
+        "at_s": 5,
+        "suspended_order_id": "A",
+        "cashier_order_id": "B"
+      }
+    ]
+  },
+  "initial_state": [
+    {
+      "order_id": "A",
+      "person_ids": [
+        "synthetic-A1"
+      ],
+      "arrival_s": 0,
+      "stage": "waiting_payment",
+      "queue_rank": 0,
+      "worker_id": null,
+      "remaining_s": null,
+      "patience_remaining_s": null,
+      "payment_active_s": 2,
+      "transfer_wait_s": 0,
+      "preparation_s": 10
+    },
+    {
+      "order_id": "B",
+      "person_ids": [
+        "synthetic-B1"
+      ],
+      "arrival_s": 0,
+      "stage": "waiting_payment",
+      "queue_rank": 1,
+      "worker_id": null,
+      "remaining_s": null,
+      "patience_remaining_s": null,
+      "payment_active_s": 2,
+      "transfer_wait_s": 0,
+      "preparation_s": 3
+    }
+  ],
+  "interarrival": {
+    "kind": "constant",
+    "value_s": 1000
+  },
+  "group_sizes": [
+    {
+      "size": 1,
+      "probability": 1
+    }
+  ],
+  "payment_active": {
+    "kind": "constant",
+    "value_s": 2
+  },
+  "preparation": {
+    "kind": "constant",
+    "value_s": 3
+  },
+  "transfer_probability": 0,
+  "transfer_confirmation": {
+    "kind": "constant",
+    "value_s": 0
+  },
+  "patience": null,
+  "provenance": "user_assumptions",
+  "assumptions": [
+    "Synthetic acceptance example only; not measured Boquitas inputs.",
+    "A and B are initial waiting orders with explicit synthetic people and arrival at zero.",
+    "No new arrivals within the 20-second horizon; the script targets stable initial IDs.",
+    "A requires ten preparation seconds; B requires three; both payments require two seconds.",
+    "El modo y la capacidad elegidos son supuestos del usuario; los parámetros de demanda se mantienen sin cambios.",
+    "El usuario resolvió explícitamente la compatibilidad usando el modo normal con una persona integrada.",
+    "El usuario declara explícitamente los tiempos y órdenes de cada pausa programada.",
+    "El usuario editó explícitamente la programación de pausas."
+  ],
+  "default_root_seed": 20261020
+}
