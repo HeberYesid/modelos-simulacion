@@ -1,0 +1,57 @@
+{
+  "contract_version": 1,
+  "scenario_id": "synthetic-demo-tuesday",
+  "display_name": "Synthetic demonstration (not calibrated)",
+  "engine_config": {
+    "contract_version": 1,
+    "mode": "tuesday",
+    "opening_time": "15:00:00",
+    "horizon_s": 23400.0,
+    "cashiers": 1,
+    "preparers": 4,
+    "integrated_workers": 0
+  },
+  "initial_state": [],
+  "interarrival": {
+    "kind": "exponential",
+    "mean_s": 180.0
+  },
+  "group_sizes": [
+    {
+      "size": 1,
+      "probability": 0.6
+    },
+    {
+      "size": 2,
+      "probability": 0.4
+    }
+  ],
+  "payment_active": {
+    "kind": "triangular",
+    "low_s": 15.0,
+    "mode_s": 30.0,
+    "high_s": 45.0
+  },
+  "preparation": {
+    "kind": "triangular",
+    "low_s": 60.0,
+    "mode_s": 120.0,
+    "high_s": 180.0
+  },
+  "transfer_probability": 0.25,
+  "transfer_confirmation": {
+    "kind": "triangular",
+    "low_s": 30.0,
+    "mode_s": 60.0,
+    "high_s": 90.0
+  },
+  "patience": null,
+  "provenance": "synthetic_demo",
+  "assumptions": [
+    "Synthetic teaching inputs only; these values are not estimates from Boquitas data.",
+    "Each shared order has one payment and one preparation regardless of group size.",
+    "The initial state is empty; no unobserved opening work is assumed.",
+    "No warm-up period is applied; observation-window metrics start at opening."
+  ],
+  "default_root_seed": 20261020
+}

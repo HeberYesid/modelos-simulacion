@@ -1,0 +1,12 @@
+{
+  "code": "invalid_request",
+  "message": "La solicitud contiene datos inválidos.",
+  "issues": [
+    {
+      "path": "scenario.engine_config.preparers",
+      "code": "invalid_staffing",
+      "message": "La capacidad del personal debe permitir al menos un trabajador activo."
+    }
+  ],
+  "details": {}
+}
