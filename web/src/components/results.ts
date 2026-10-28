@@ -379,6 +379,7 @@ function renderReplay(run: RunResult): string {
           </select></div>
         </div>
         <div class="replay-camera-controls" role="group" aria-label="Controles de cámara">
+          <button class="secondary-button" type="button" data-replay-view-toggle>Ver fachada</button>
           <button class="quiet-button" type="button" data-replay-zoom="out" aria-label="Alejar cámara">−</button>
           <button class="quiet-button" type="button" data-replay-zoom="in" aria-label="Acercar cámara">+</button>
           <button class="secondary-button" type="button" data-replay-camera-reset>Restablecer cámara</button>

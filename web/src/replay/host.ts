@@ -15,7 +15,7 @@ import {
   type PlaybackSpeed,
 } from "./clock";
 import { create_replay_projector, type ReplayPersonState, type ReplayProjector, type ReplayState, type ReplayTrace } from "./project";
-import { createShopScene, type ShopScene } from "./scene";
+import { createShopScene, type ShopScene, type ShopView } from "./scene";
 
 export interface ReplayHostOptions {
   initialTimeS?: number;
@@ -31,6 +31,7 @@ export interface ReplayHostHandle {
   setSpeed(speed: number): void;
   selectEntity(selection: string): void;
   resetCamera(): void;
+  toggleShopView(): void;
   zoom(direction: "in" | "out"): void;
   retryScene(): void;
   dispose(): void;
@@ -217,7 +218,8 @@ export function mountReplayHost(
   const summary = document.querySelector<HTMLElement>("#replay-scene-summary");
   const renderStatus = document.querySelector<HTMLElement>("#replay-render-status");
   const retryButton = document.querySelector<HTMLButtonElement>("[data-replay-retry]");
-  const cameraButtons = document.querySelectorAll<HTMLButtonElement>("[data-replay-zoom], [data-replay-camera-reset]");
+  const viewButton = document.querySelector<HTMLButtonElement>("[data-replay-view-toggle]");
+  const cameraButtons = document.querySelectorAll<HTMLButtonElement>("[data-replay-zoom], [data-replay-camera-reset], [data-replay-view-toggle]");
   if (!stage || !slider || !playButton || !restartButton || !speedSelect || !entitySelect || !inspector || !summary || !renderStatus || !retryButton) {
     throw new Error("Falta el contenedor de reproducción o alguno de sus controles.");
   }
@@ -231,6 +233,7 @@ export function mountReplayHost(
   let eventIndex = eventCountAt(trace, clock.time_s);
   let selectedEntity = options.initialSelection ?? "";
   let scene: ShopScene | null = null;
+  let shopView: ShopView = "interior";
   let canvas = stage.querySelector<HTMLCanvasElement>("#replay-canvas");
   let fallbackAnimationFrame: number | null = null;
   let loopTarget: "renderer" | "fallback" | null = null;
@@ -354,9 +357,12 @@ export function mountReplayHost(
     for (const button of cameraButtons) button.disabled = state !== "available";
   };
 
-  const availableStatus = (): string => reducedMotion()
-    ? "Escena ilustrativa · movimiento decorativo reducido según la preferencia del dispositivo."
-    : "Escena ilustrativa · arrastra para orbitar y usa la rueda para acercar o alejar.";
+  const availableStatus = (): string => {
+    const view = shopView === "interior" ? "Vista interior en corte · planta superior oculta" : "Vista de fachada";
+    return reducedMotion()
+      ? `${view} · movimiento decorativo reducido según la preferencia del dispositivo.`
+      : `${view} · arrastra para orbitar y usa la rueda para acercar o alejar.`;
+  };
 
   const stopLoop = (): void => {
     if (loopTarget === "renderer") scene?.setAnimationLoop(null);
@@ -487,6 +493,7 @@ export function mountReplayHost(
         },
         onContextLost: handleContextLost,
       });
+      scene.setView(shopView);
       scene.setState(projected, null, false);
       scene.setSimulationTime(clock.time_s);
       const personId = selectedEntity.startsWith("person:") ? selectedEntity.slice("person:".length) : null;
@@ -572,6 +579,13 @@ export function mountReplayHost(
     },
     resetCamera() {
       scene?.resetCamera();
+    },
+    toggleShopView() {
+      if (!scene || disposed) return;
+      shopView = shopView === "interior" ? "facade" : "interior";
+      scene.setView(shopView);
+      if (viewButton) viewButton.textContent = shopView === "interior" ? "Ver fachada" : "Ver interior";
+      setRenderStatus("available", availableStatus());
     },
     zoom(direction) {
       scene?.zoom(direction);

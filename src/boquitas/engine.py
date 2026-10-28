@@ -6,7 +6,7 @@ import math
 import re
 from collections.abc import Generator, Sequence
 from dataclasses import dataclass
-from typing import Literal, NoReturn, overload
+from typing import NoReturn, overload
 
 import simpy
 
@@ -42,7 +42,6 @@ class _Order:
     transfer_wait_s: float
     preparation_s: float
     patience_s: float | None
-    payment_method: Literal["cash", "transfer"] | None = None
     queue_rank: int | None = None
     patience_deadline_s: float | None = None
     status: str = "waiting_payment"
@@ -163,7 +162,6 @@ class _Coordinator:
                     if initial.stage == "waiting_payment"
                     else None
                 ),
-                payment_method=initial.payment_method,
                 queue_rank=initial.queue_rank,
                 patience_deadline_s=(
                     initial.patience_remaining_s
@@ -208,7 +206,6 @@ class _Coordinator:
                     worker_active=worker_active,
                     remaining_s=initial.remaining_s,
                     arrival_s=initial.arrival_s,
-                    payment_method=initial.payment_method,
                 ),
             )
             order.stage_start_seq = len(self.events) - 1
@@ -529,7 +526,6 @@ class _Coordinator:
                 transfer_wait_s=order_input.transfer_wait_s,
                 preparation_s=order_input.preparation_s,
                 patience_s=order_input.patience_s,
-                payment_method=order_input.payment_method,
                 patience_deadline_s=(
                     order_input.arrival_s + order_input.patience_s
                     if order_input.patience_s is not None
@@ -545,7 +541,6 @@ class _Coordinator:
                     queue="payment",
                     worker_reserved=False,
                     worker_active=False,
-                    payment_method=order.payment_method,
                 ),
             )
 
@@ -660,7 +655,6 @@ class _Coordinator:
                 stage="payment_active",
                 worker_reserved=True,
                 worker_active=True,
-                payment_method=order.payment_method,
             ),
         )
         order.stage_start_seq = event.seq

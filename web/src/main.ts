@@ -245,7 +245,7 @@ function renderCurrentView(focusRoot = false): void {
         if (status) status.textContent = apiErrorMessage(error);
         const retry = stage.querySelector<HTMLButtonElement>("[data-replay-retry]");
         if (retry) retry.hidden = true;
-        stage.querySelectorAll<HTMLButtonElement>("[data-replay-zoom], [data-replay-camera-reset]")
+        root.querySelectorAll<HTMLButtonElement>("[data-replay-zoom], [data-replay-camera-reset], [data-replay-view-toggle]")
           .forEach((button) => { button.disabled = true; });
       }
     }
@@ -1176,6 +1176,8 @@ function handleClick(event: MouseEvent): void {
     activeReplayHost?.restartPlayback();
   } else if (button.matches("[data-replay-camera-reset]")) {
     activeReplayHost?.resetCamera();
+  } else if (button.matches("[data-replay-view-toggle]")) {
+    activeReplayHost?.toggleShopView();
   } else if (button.matches("[data-replay-zoom]")) {
     const direction = button.dataset.replayZoom;
     if (direction === "in" || direction === "out") activeReplayHost?.zoom(direction);

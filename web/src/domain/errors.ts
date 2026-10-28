@@ -82,6 +82,7 @@ const CORRECTION_REASONS: Record<string, string> = {
 };
 
 const SYSTEM_ASSUMPTIONS: Record<string, string> = {
+  "External transfer confirmation time is excluded from app executions.": "Los pagos por transferencia no añaden espera de confirmación.",
   "Synthetic teaching inputs only; these values are not estimates from Boquitas data.": "Los valores de enseñanza son sintéticos y no son estimaciones de datos de Boquitas.",
   "Each shared order has one payment and one preparation regardless of group size.": "Cada orden compartida tiene un pago y una preparación, sin importar el tamaño del grupo.",
   "The initial state is empty; no unobserved opening work is assumed.": "El estado inicial está vacío; no se supone trabajo previo que no haya sido observado.",

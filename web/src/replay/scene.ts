@@ -8,6 +8,8 @@ export interface ShopSceneOptions {
   onContextLost: () => void;
 }
 
+export type ShopView = "interior" | "facade";
+
 export interface ShopScene {
   setAnimationLoop(callback: ((timeMs: number) => void) | null): void;
   render(): void;
@@ -15,6 +17,7 @@ export interface ShopScene {
   setSimulationTime(timeS: number): void;
   setSelection(personId: string | null): void;
   setReducedMotion(reduced: boolean): void;
+  setView(view: ShopView): void;
   resetCamera(): void;
   zoom(direction: "in" | "out"): void;
   finishCosmeticMotion(): void;
@@ -140,7 +143,7 @@ function makeSpriteLabel(
   const sprite = new THREE.Sprite(new THREE.SpriteMaterial({
     map: texture,
     transparent: true,
-    depthTest: false,
+    depthTest: true,
     sizeAttenuation: true,
   }));
   sprite.scale.set(Math.min(6.4, Math.max(1.85, canvas.width / 125)), 0.64, 1);
@@ -256,9 +259,19 @@ export function createShopScene(
 
   const scene = new THREE.Scene();
   scene.background = new THREE.Color(COLORS.sky);
-  const camera = new THREE.PerspectiveCamera(37, Math.max(1, stage.clientWidth) / Math.max(1, stage.clientHeight), 0.1, 110);
-  const cameraHome = new THREE.Vector3(19, 17, 23);
-  const cameraTarget = new THREE.Vector3(0, 0.5, 0);
+  // Preserve the facade's horizontal framing on narrow screens without moving
+  // the user's orbit target or altering any simulation coordinates.
+  const framingFov = (aspect: number): number => THREE.MathUtils.radToDeg(
+    2 * Math.atan(Math.tan(THREE.MathUtils.degToRad(37) / 2) * Math.max(1, 1.5 / aspect)),
+  );
+  const initialAspect = Math.max(1, stage.clientWidth) / Math.max(1, stage.clientHeight);
+  const camera = new THREE.PerspectiveCamera(framingFov(initialAspect), initialAspect, 0.1, 110);
+  const cameraPresets: Record<ShopView, { position: THREE.Vector3; target: THREE.Vector3 }> = {
+    interior: { position: new THREE.Vector3(18, 20, 25), target: new THREE.Vector3(0, 1.8, -1.5) },
+    facade: { position: new THREE.Vector3(13, 12, 31), target: new THREE.Vector3(0, 4.5, 4.5) },
+  };
+  const cameraHome = cameraPresets.interior.position.clone();
+  const cameraTarget = cameraPresets.interior.target.clone();
   camera.position.copy(cameraHome);
   camera.lookAt(cameraTarget);
   const controls = new OrbitControls(camera, renderer.domElement);
@@ -357,6 +370,49 @@ export function createShopScene(
     parent.add(mesh);
     return mesh;
   };
+  const makeCanvasTexture = (
+    width: number,
+    height: number,
+    paint: (context: CanvasRenderingContext2D) => void,
+  ): THREE.CanvasTexture => {
+    const canvas = document.createElement("canvas");
+    canvas.width = width;
+    canvas.height = height;
+    const context = canvas.getContext("2d");
+    if (!context) throw new Error("No se pudo preparar una textura de la escena.");
+    paint(context);
+    const texture = new THREE.CanvasTexture(canvas);
+    texture.colorSpace = THREE.SRGBColorSpace;
+    textures.add(texture);
+    return texture;
+  };
+  const mappedMaterial = (key: string, map: THREE.Texture, roughness = 0.86): THREE.MeshStandardMaterial => {
+    let existing = materials.get(`map:${key}`);
+    if (!existing) {
+      existing = new THREE.MeshStandardMaterial({ map, roughness });
+      materials.set(`map:${key}`, existing);
+      disposableMaterials.add(existing);
+    }
+    return existing as THREE.MeshStandardMaterial;
+  };
+  const makePlane = (
+    parent: THREE.Object3D,
+    name: string,
+    size: readonly [number, number],
+    position: readonly [number, number, number],
+    surface: THREE.Material,
+  ): THREE.Mesh => {
+    const [width, height] = size;
+    const mesh = new THREE.Mesh(
+      cachedGeometry(`plane:${width}:${height}`, () => new THREE.PlaneGeometry(width, height)),
+      surface,
+    );
+    mesh.name = name;
+    mesh.position.set(...position);
+    mesh.receiveShadow = true;
+    parent.add(mesh);
+    return mesh;
+  };
   const addLabel = (
     parent: THREE.Object3D,
     text: string,
@@ -396,38 +452,174 @@ export function createShopScene(
   platform.receiveShadow = true;
   platform.castShadow = true;
   shop.add(platform);
-  const floor = new THREE.Mesh(cachedGeometry("plane:24:18", () => new THREE.PlaneGeometry(24, 18)), material(COLORS.floor));
+  const floor = new THREE.Mesh(cachedGeometry("plane:24:13.5", () => new THREE.PlaneGeometry(24, 13.5)), material(COLORS.floor));
   floor.rotation.x = -Math.PI / 2;
-  floor.position.y = -0.015;
+  floor.position.set(0, -0.015, -2.25);
   floor.receiveShadow = true;
   shop.add(floor);
 
-  makeBox(shop, "Muro posterior", [22.6, 6.2, 0.38], [0, 3.05, -8.95], COLORS.wall, false, true);
-  makeBox(shop, "Muro lateral izquierdo", [0.38, 5.3, 14.5], [-11.05, 2.6, -0.9], COLORS.paleTeal, false, true);
-  makeBox(shop, "Muro lateral derecho", [0.38, 5.3, 14.5], [11.05, 2.6, -0.9], COLORS.wallShadow, false, true);
-  makeBox(shop, "Zócalo posterior", [22.7, 0.35, 0.48], [0, 0.2, -8.75], COLORS.teal);
-  makeBox(shop, "Marco superior posterior", [22.7, 0.28, 0.5], [0, 5.95, -8.75], COLORS.strawberry);
+  const facadeRoot = new THREE.Group();
+  facadeRoot.name = "Fachada frontal";
+  facadeRoot.position.z = 13.67;
+  shop.add(facadeRoot);
+  const upperFacade = new THREE.Group();
+  upperFacade.name = "Volumen superior de fachada";
+  upperFacade.visible = false;
+  facadeRoot.add(upperFacade);
+  const openStorefront = new THREE.Group();
+  openStorefront.name = "Aberturas de atención";
+  facadeRoot.add(openStorefront);
+  const canopyAndSign = new THREE.Group();
+  canopyAndSign.name = "Toldo y letrero exterior";
+  facadeRoot.add(canopyAndSign);
 
-  // A striped awning, bright counter fronts and window panels give the room its shop identity.
-  makeBox(shop, "Vitrina izquierda", [4.2, 2.25, 0.16], [-6.15, 3.15, -8.68], COLORS.paleTeal);
-  makeBox(shop, "Vitrina central", [4.2, 2.25, 0.16], [-1.2, 3.15, -8.68], COLORS.paleTeal);
-  makeBox(shop, "Vitrina right", [4.2, 2.25, 0.16], [4.25, 3.15, -8.68], COLORS.paleTeal);
-  for (const x of [-8.25, -4.05, -3.3, 0.9, 2.15, 6.35, 7.1, 9.2]) {
-    makeBox(shop, "Divisor de vitrina", [0.12, 2.45, 0.18], [x, 3.1, -8.55], COLORS.paper);
+  // A roofless room, with the front service openings left clear in the default view.
+  makeBox(shop, "Muro posterior interior", [22.2, 3.2, 0.34], [0, 1.6, -9.18], 0xfff1d8, false, true);
+  makeBox(shop, "Muro lateral izquierdo interior", [0.34, 3.2, 13.5], [-11.15, 1.6, -2.25], 0xe8dfcc, false, true);
+  makeBox(shop, "Muro lateral derecho interior", [0.34, 3.2, 13.5], [11.15, 1.6, -2.25], 0xe8dfcc, false, true);
+
+  // The front elevation borrows the shop's real facade materials and proportions;
+  // the shop floor and service stations remain an illustrative operating layout.
+  makeBox(upperFacade, "Volumen de fachada", [22.6, 6.05, 0.42], [0, 6.12, -9.17], 0xd8c5a7, false, true);
+  const brickTexture = makeCanvasTexture(256, 128, (context) => {
+    context.fillStyle = "#b99984";
+    context.fillRect(0, 0, 256, 128);
+    const brickColors = ["#b96650", "#bd7058", "#b35e49", "#c2765e", "#b8614d"];
+    for (let row = 0; row < 4; row += 1) {
+      const offset = row % 2 === 0 ? 0 : 32;
+      for (let column = -1; column < 5; column += 1) {
+        const x = column * 64 + offset;
+        const y = row * 32;
+        context.fillStyle = brickColors[(row * 3 + column + 12) % brickColors.length];
+        context.fillRect(x + 2, y + 2, 60, 28);
+        context.strokeStyle = "rgba(111, 61, 49, 0.24)";
+        context.lineWidth = 1;
+        context.strokeRect(x + 2.5, y + 2.5, 59, 27);
+      }
+    }
+  });
+  brickTexture.wrapS = THREE.RepeatWrapping;
+  brickTexture.wrapT = THREE.RepeatWrapping;
+  brickTexture.repeat.set(4.5, 4.8);
+  brickTexture.needsUpdate = true;
+  const brickMaterial = mappedMaterial("facade-brick", brickTexture, 0.93);
+  makePlane(upperFacade, "Paño superior de ladrillo", [11.65, 6.05], [4.79, 6.12, -8.935], brickMaterial);
+  makePlane(upperFacade, "Paño superior beige", [9.65, 6.05], [-5.855, 6.12, -8.935], material(0xd3bd9d));
+
+  const shutterTexture = makeCanvasTexture(256, 512, (context) => {
+    context.fillStyle = "#d6d1c7";
+    context.fillRect(0, 0, 256, 512);
+    for (let y = 0; y < 512; y += 20) {
+      context.fillStyle = "rgba(255, 255, 255, 0.43)";
+      context.fillRect(0, y, 256, 3);
+      context.fillStyle = "rgba(94, 91, 84, 0.27)";
+      context.fillRect(0, y + 16, 256, 3);
+      context.fillStyle = "rgba(191, 186, 177, 0.35)";
+      context.fillRect(0, y + 4, 256, 12);
+    }
+  });
+  const shutterMaterial = mappedMaterial("roller-shutter", shutterTexture, 0.82);
+
+  const addWindow = (parent: THREE.Object3D, centerX: number, width: number, y: number, height: number): void => {
+    const backZ = -8.79;
+    makeBox(parent, "Marco blanco de ventana", [width + 0.2, height + 0.2, 0.13], [centerX, y, backZ], 0xf0eadb);
+    makeBox(parent, "Vidrio azul pálido", [width, height, 0.06], [centerX, y, backZ + 0.085], 0xb6d3d5);
+    makeBox(parent, "Montante de ventana", [0.075, height, 0.055], [centerX, y, backZ + 0.14], 0xf7f3e8);
+    makeBox(parent, "Travesaño de ventana", [width, 0.075, 0.055], [centerX, y, backZ + 0.14], 0xf7f3e8);
+  };
+  for (const centerX of [-9.05, -6.55, -4.05]) addWindow(upperFacade, centerX, 2.05, 6.28, 1.65);
+  addWindow(upperFacade, 5.0, 5.6, 6.3, 1.7);
+
+  // Ground floor remains open during operation in both camera views.
+  makeBox(openStorefront, "Marco de puerta exterior", [2.05, 3.0, 0.16], [-9.15, 1.48, -8.81], 0xf3ecdd);
+  makeBox(openStorefront, "Puerta exterior clara", [1.76, 2.76, 0.08], [-9.15, 1.42, -8.7], 0xe9e5d8);
+  makeBox(openStorefront, "Panel superior de puerta", [1.28, 0.78, 0.045], [-9.15, 2.12, -8.64], 0xf5f1e7);
+  makeBox(openStorefront, "Panel inferior de puerta", [1.28, 1.02, 0.045], [-9.15, 0.88, -8.64], 0xf1ede2);
+  makeSphere(openStorefront, "Pomo de puerta exterior", 0.07, [-8.56, 1.44, -8.57], 0xb9924f, 8);
+
+  for (const [centerX, width] of [[-5.55, 5.15], [0.05, 5.55], [6.65, 6.05]] as const) {
+    const shutter = makePlane(openStorefront, "Persiana metálica", [width, 0.34], [centerX, 2.7, -8.71], shutterMaterial);
+    shutter.receiveShadow = false;
+    makeBox(openStorefront, "Cajón superior de persiana", [width + 0.05, 0.18, 0.2], [centerX, 2.88, -8.67], 0xbab5aa);
+    const rolledShutter = makeCylinder(openStorefront, "Persiana enrollada", 0.12, 0.12, width, [centerX, 2.83, -8.7], 0xc8c2b6, 16);
+    rolledShutter.rotation.z = Math.PI / 2;
   }
-  makeBox(shop, "Letrero de heladería", [5.1, 0.92, 0.34], [0, 5.02, -8.48], COLORS.strawberryDark, true);
-  addLabel(shop, "HELADERÍA", [0, 5.02, -8.24], "#fff9e9", "rgba(182, 46, 90, 0.97)", 1.18);
-  addLabel(shop, "VISTA ILUSTRATIVA", [0, 4.35, -8.28], "#3e645f", "rgba(255, 255, 255, 0.94)", 0.74);
+  makeBox(openStorefront, "Dintel corrido", [22.2, 0.16, 0.22], [0, 3.0, -8.72], 0xe7dac4);
+  for (const x of [-10.15, -8.1, -2.95, 2.85, 3.6, 9.7, 10.15]) {
+    makeBox(openStorefront, "Columna de abertura frontal", [0.12, 2.85, 0.18], [x, 1.48, -8.75], 0xf0eadb);
+  }
 
-  // Entrance, door frame and four scalloped awning stripes at the front edge.
-  makeBox(shop, "Marco de entrada", [2.8, 4.3, 0.38], [-8.15, 2.15, 6.2], COLORS.wood);
-  makeBox(shop, "Puerta de vidrio", [2.26, 3.8, 0.16], [-8.15, 2.04, 6.14], COLORS.tealDark);
-  makeBox(shop, "Panel de puerta", [1.77, 3.25, 0.12], [-8.16, 1.82, 6.03], COLORS.paleTeal);
-  makeSphere(shop, "Manija de puerta", 0.09, [-7.55, 1.75, 5.9], COLORS.mango, 8);
-  makeBox(shop, "Alero de entrada", [4.6, 0.28, 2.05], [-8.15, 4.5, 7.0], COLORS.paper, true);
-  for (let stripe = 0; stripe < 8; stripe += 1) {
-    const stripeX = -10.25 + stripe * 0.6;
-    makeBox(shop, "Franja del alero", [0.48, 0.08, 1.72], [stripeX, 4.33, 7.04], stripe % 2 === 0 ? COLORS.strawberry : COLORS.cream);
+  // Beige sloping canopy, green steel edge and two yellow support posts.
+  const canopy = makeBox(canopyAndSign, "Toldo beige de fachada", [22.0, 0.17, 1.92], [0, 3.17, -8.05], 0xd9c49d, true);
+  canopy.rotation.x = 0.14;
+  makeBox(canopyAndSign, "Viga frontal verde", [22.0, 0.13, 0.14], [0, 3.02, -7.1], 0x397a4c, true);
+  makeBox(canopyAndSign, "Viga posterior verde", [22.0, 0.1, 0.11], [0, 3.32, -8.94], 0x397a4c);
+  for (const x of [-10.25, 10.25]) {
+    makeBox(canopyAndSign, "Poste amarillo del toldo", [0.14, 3.05, 0.14], [x, 1.53, -7.08], 0xd6ad42, true);
+  }
+  for (const x of [-8.6, -5.0, -1.4, 2.2, 5.8, 9.4]) {
+    const brace = makeBox(canopyAndSign, "Brazo verde del toldo", [0.08, 0.08, 1.84], [x, 3.3, -8.03], 0x397a4c);
+    brace.rotation.x = 0.14;
+  }
+
+  const signTexture = makeCanvasTexture(1200, 300, (context) => {
+    context.clearRect(0, 0, 1200, 300);
+    context.font = 'italic 700 206px Georgia, "Palatino Linotype", serif';
+    context.textAlign = "center";
+    context.textBaseline = "middle";
+    context.lineJoin = "round";
+    context.shadowColor = "rgba(91, 37, 51, 0.28)";
+    context.shadowBlur = 8;
+    context.shadowOffsetY = 5;
+    context.lineWidth = 34;
+    context.strokeStyle = "#a82d50";
+    context.strokeText("Boquitas", 600, 154, 1060);
+    context.lineWidth = 18;
+    context.strokeStyle = "#fff0c8";
+    context.strokeText("Boquitas", 600, 154, 1060);
+    context.fillStyle = "#f1d58e";
+    context.fillText("Boquitas", 600, 154, 1060);
+  });
+  const signMaterial = new THREE.MeshBasicMaterial({ map: signTexture, transparent: true, depthWrite: false, side: THREE.DoubleSide, toneMapped: false });
+  disposableMaterials.add(signMaterial);
+  for (const x of [0, 2.4, 4.8]) {
+    makeBox(canopyAndSign, "Montante verde del letrero", [0.09, 0.8, 0.09], [x, 3.73, -7.14], 0x397a4c);
+  }
+  const sign = makePlane(canopyAndSign, "Letrero principal Boquitas", [8.8, 2.2], [2.4, 4.5, -7.02], signMaterial);
+  sign.castShadow = false;
+
+  // A red-brick apron recalls the sidewalk, while a clear lane stays open to arrivals and service.
+  const sidewalkTexture = makeCanvasTexture(256, 128, (context) => {
+    context.fillStyle = "#b87f69";
+    context.fillRect(0, 0, 256, 128);
+    const tileColors = ["#aa5c47", "#b7654d", "#b86c54", "#a95443", "#c1775d"];
+    for (let row = 0; row < 4; row += 1) {
+      const offset = row % 2 === 0 ? 0 : 32;
+      for (let column = -1; column < 5; column += 1) {
+        const x = column * 64 + offset;
+        const y = row * 32;
+        context.fillStyle = tileColors[(row * 2 + column + 12) % tileColors.length];
+        context.fillRect(x + 2, y + 2, 60, 28);
+      }
+    }
+  });
+  sidewalkTexture.wrapS = THREE.RepeatWrapping;
+  sidewalkTexture.wrapT = THREE.RepeatWrapping;
+  sidewalkTexture.repeat.set(12, 5);
+  sidewalkTexture.needsUpdate = true;
+  const sidewalk = makePlane(shop, "Andén de ladrillo rojo", [22, 5], [0, 0.012, 7], mappedMaterial("sidewalk-brick", sidewalkTexture, 0.95));
+  sidewalk.rotation.x = -Math.PI / 2;
+
+  const planterCenters: ReadonlyArray<readonly [number, number]> = [
+    [-6.6, 6.8], [-5.4, 6.8], [-4.2, 6.8], [-3, 6.8],
+    [5.2, 6.8], [6.4, 6.8], [7.6, 6.8], [8.8, 6.8],
+  ];
+  for (const [index, [x, z]] of planterCenters.entries()) {
+    makeCylinder(shop, "Matera terracota", 0.38, 0.29, 0.54, [x, 0.29, z], 0xb66b4f, 12);
+    makeCylinder(shop, "Borde de matera", 0.39, 0.38, 0.07, [x, 0.55, z], 0xc07b5c, 12);
+    const foliage = [0x598a55, 0x6b965c, 0x4d7e4e][index % 3];
+    makeSphere(shop, "Planta de matera", 0.43, [x, 0.92, z], foliage, 9);
+    makeSphere(shop, "Brotes de matera", 0.26, [x + (index % 2 === 0 ? 0.22 : -0.22), 1.12, z], foliage, 8);
   }
 
   // Cashier and preparation counters are separate model zones even when a regular worker serves both.
@@ -451,26 +643,9 @@ export function createShopScene(
   addLabel(shop, "PREPARACIÓN", [preparationX, 2.32, preparationZ], "#b62e5a", "rgba(255, 249, 233, 0.97)", 0.9);
   addLabel(shop, "ENTREGA", [7.7, 1.85, -0.95], "#0f7166", "rgba(255, 249, 233, 0.97)", 0.75);
 
-  // Paid waiting area: benches and a warm tile cue sit between payment and pickup.
-  makeBox(shop, "Alfombra espera pagada", [6.6, 0.04, 4.6], [-0.05, 0.02, 2.15], COLORS.palePink);
+  // The paid-waiting marker stays visible without the former bench clutter.
+  makeBox(shop, "Alfombra espera pagada", [6.6, 0.025, 4.6], [-0.05, 0.012, 2.15], 0xeadbc6);
   addLabel(shop, "ESPERA PAGADA", [-0.05, 2.25, 2.05], "#89556a", "rgba(255, 255, 255, 0.96)", 0.78);
-  for (const benchX of [-1.6, 1.65]) {
-    makeBox(shop, "Asiento", [2.55, 0.22, 0.64], [benchX, 0.72, 2.65], COLORS.wood, true);
-    makeBox(shop, "Respaldo del asiento", [2.55, 0.88, 0.16], [benchX, 1.22, 2.97], COLORS.strawberry, true);
-    for (const legX of [benchX - 0.9, benchX + 0.9]) {
-      makeBox(shop, "Pata de asiento", [0.12, 0.72, 0.12], [legX, 0.36, 2.65], COLORS.cocoa);
-    }
-  }
-  for (const x of [-10, 9.85]) {
-    const pot = makeCylinder(shop, "Maceta", 0.48, 0.38, 0.62, [x, 0.31, 4.15], COLORS.wood);
-    pot.castShadow = true;
-    makeCylinder(shop, "Planta", 0.28, 0.42, 1.18, [x, 1.16, 4.15], COLORS.green, 10);
-    makeSphere(shop, "Copa de planta", 0.58, [x, 1.82, 4.15], COLORS.green, 9);
-  }
-  for (const [lampX, lampZ] of [[-2.2, -6.0], [3.5, -6.0], [8.3, -6.0]] as const) {
-    makeCylinder(shop, "Cable de lámpara", 0.025, 0.025, 1.05, [lampX, 5.35, lampZ], COLORS.cocoa, 6);
-    makeSphere(shop, "Lámpara cálida", 0.32, [lampX, 4.72, lampZ], COLORS.mango, 10);
-  }
 
   const personOrder = Object.values(trace.final_orders).flatMap((order) => order.person_ids.map((personId) => [personId, order.order_id] as const));
   const personIds = personOrder.map(([personId]) => personId);
@@ -805,6 +980,7 @@ export function createShopScene(
     renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 1.5));
     renderer.setSize(width, height, false);
     camera.aspect = width / height;
+    camera.fov = framingFov(camera.aspect);
     camera.updateProjectionMatrix();
     render();
   };
@@ -939,6 +1115,18 @@ export function createShopScene(
     setReducedMotion(reduced) {
       reducedMotion = reduced;
       if (reduced) this.finishCosmeticMotion();
+    },
+    setView(view) {
+      upperFacade.visible = view === "facade";
+
+      openStorefront.visible = true;
+      const preset = cameraPresets[view];
+      cameraHome.copy(preset.position);
+      cameraTarget.copy(preset.target);
+      camera.position.copy(cameraHome);
+      controls.target.copy(cameraTarget);
+      controls.update();
+      render();
     },
     resetCamera() {
       camera.position.copy(cameraHome);

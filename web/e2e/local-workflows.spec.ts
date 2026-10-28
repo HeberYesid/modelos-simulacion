@@ -608,9 +608,28 @@ test("camera zoom, orbit, and reset change the rendered view without browser err
   expect(pageErrors).toEqual([]);
 });
 
-test("distinguishes released and reserved transfer workers and survives real WebGL context loss", async ({ page }) => {
+test("new transfers show only their method and add no confirmation wait", async ({ page }) => {
+  await page.goto("/");
+  await page.getByRole("tab", { name: "Escenarios" }).click();
+  await expect(page.locator('[data-distribution-row="transfer_confirmation"]')).toHaveCount(0);
+  for (const mode of ["tuesday", "regular"] as const) {
+    const run = await runThroughLocalApi(page, transferScenario(mode), 20261020);
+    expect(run.demand_tape[0]?.payment_method).toBe("transfer");
+    expect(run.demand_tape[0]?.transfer_wait_s).toBe(0);
+    expect(run.metrics.orders[0]?.payment_completed_s).toBe(1.25);
+    expect(run.metrics.orders[0]?.preparation_started_s).toBe(1.25);
+    await openSavedRun(page, run);
+    await seekReplay(page, 1.3);
+    await expect(page.locator("#replay-scene-summary")).not.toContainText("confirmación pendiente");
+    await expect(page.locator(".result-orders")).toContainText("Transferencia");
+    await page.locator("[data-replay-entity]").selectOption(`order:${run.demand_tape[0]!.order_id}`);
+    await expect(page.locator("#replay-inspector-detail")).toContainText("Transferencia");
+  }
+});
+
+test("reopens legacy released and reserved transfer workers and survives real WebGL context loss", async ({ page }) => {
   await page.setViewportSize({ width: 1440, height: 900 });
-  const tuesday = await runThroughLocalApi(page, transferScenario("tuesday"), 20261020);
+  const tuesday = JSON.parse(readFileSync(fileURLToPath(new URL("../tests/fixtures/replay/legacy-transfer-tuesday-run.json", import.meta.url)), "utf8")) as RunResult;
   await page.goto("/");
   await openSavedRun(page, tuesday);
   await seekReplay(page, 1.3);
@@ -619,7 +638,7 @@ test("distinguishes released and reserved transfer workers and survives real Web
   await expect(page.locator("#replay-scene-summary")).toContainText("0 reservados");
   await expect(page.locator("#replay-scene-summary")).toContainText("2 disponibles");
 
-  const regular = await runThroughLocalApi(page, transferScenario("regular"), 20261021);
+  const regular = JSON.parse(readFileSync(fileURLToPath(new URL("../tests/fixtures/replay/legacy-transfer-regular-run.json", import.meta.url)), "utf8")) as RunResult;
   await openSavedRun(page, regular);
   await seekReplay(page, 1.3);
   await expect(page.locator("#replay-scene-summary")).toContainText("1 órdenes con confirmación pendiente");

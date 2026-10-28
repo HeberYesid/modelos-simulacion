@@ -21,7 +21,6 @@ from urllib.error import URLError
 from urllib.request import ProxyHandler, Request, build_opener
 
 REFERENCE_SHA256 = "8bbe6b117f59dde367816d8ed63bb013b0ad624d916a57159c084fcff4051dd7"
-REFERENCE_API_SHA256 = "f854666a3bec3133f772a01292f514dfa6ab6b8716d65f654c9830f3b784053c"
 HTTP = build_opener(ProxyHandler({}))
 
 
@@ -97,16 +96,21 @@ def verify_http(base: str, bundle: Path) -> dict:
     payload = {"scenario": demo["scenario"], "root_seed": 20261020, "replication_index": 0}
     run_bytes = request(base + "/api/v1/runs", payload)
     digest = hashlib.sha256(run_bytes).hexdigest()
-    # The HTTP adapter uses compact JSON; the historical export is indented.
-    # Verify both the API bytes and equality with the preserved export's values.
-    assert digest == REFERENCE_API_SHA256, "Frozen V1 HTTP bytes changed"
     run = json.loads(run_bytes)
     reference = (
         Path(__file__).resolve().parents[1] / "openspec" / "changes"
         / "boquitas-06-validation-and-delivery" / "reference-demo-run.json"
     ).read_bytes()
     assert hashlib.sha256(reference).hexdigest() == REFERENCE_SHA256
-    assert run == json.loads(reference), "Frozen V1 run changed the scientific reference"
+    historical = upload(base + "/api/v1/files/validate", "historical-v1.json", reference)
+    assert historical["value"] == json.loads(reference), "Historical result was changed on reopen"
+    assert run["scenario"]["transfer_confirmation"] == {"kind": "constant", "value_s": 0}
+    assert all(order["transfer_wait_s"] == 0 for order in run["demand_tape"])
+    assert {order["payment_method"] for order in run["demand_tape"]} == {"cash", "transfer"}
+    assert all(
+        order["payment_completed_s"] == order["payment_active_ended_s"]
+        for order in run["metrics"]["orders"] if order["payment_completed_s"] is not None
+    )
     reopened = upload(base + "/api/v1/files/validate", "synthetic-run.json", run_bytes)
     assert reopened["kind"] == "run" and reopened["value"] == run
     tables = json.loads(request(base + "/api/v1/exports/csv", {"result": run}))["tables"]
@@ -151,6 +155,7 @@ def verify_http(base: str, bundle: Path) -> dict:
     return {
         "local_assets": len(assets), "v1_api_sha256": digest,
         "v1_reference_sha256": REFERENCE_SHA256,
+        "payment_methods_without_confirmation_wait": "passed",
         "v1_v2_save_reopen": "passed", "regular_run": "passed",
         "experiment_replications": 60, "csv_export": "passed",
         "synthetic_observation_import": "passed",

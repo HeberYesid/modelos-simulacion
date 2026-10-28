@@ -266,9 +266,6 @@ class EventData(PublicModel):
     initial_stage: str | None = None
     remaining_s: float | None = None
     arrival_s: float | None = None
-    payment_method: Literal["cash", "transfer"] | None = Field(
-        default=None, exclude_if=lambda value: value is None
-    )
 
 
 class EventDataV2(PublicModel):
@@ -284,9 +281,6 @@ class EventDataV2(PublicModel):
     arrival_s: float | None = None
     related_cashier_order_id: str | None = None
     assigned_order_id: str | None = None
-    payment_method: Literal["cash", "transfer"] | None = Field(
-        default=None, exclude_if=lambda value: value is None
-    )
 
 
 class SimulationEvent(PublicModel):

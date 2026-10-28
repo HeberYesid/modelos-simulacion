@@ -12,7 +12,7 @@ from boquitas.exports import (
     load_run_json,
     load_scenario_json,
 )
-from boquitas.scenarios import ScenarioV2
+from boquitas.scenarios import ScenarioV2, method_only_scenario
 
 
 def _review_dir() -> Path:
@@ -38,7 +38,7 @@ def _scripted_payload() -> dict[str, object]:
 def test_api_run_route_accepts_v2_and_keeps_the_compact_result_bytes() -> None:
     payload = _scripted_payload()
     scenario = ScenarioV2(**payload)
-    expected = run_scenario(scenario, root_seed=47, replication_index=0)
+    expected = run_scenario(method_only_scenario(scenario), root_seed=47, replication_index=0)
     assert isinstance(expected, RunResultV2)
     client = TestClient(create_app())
 

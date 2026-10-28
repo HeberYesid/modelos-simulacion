@@ -773,6 +773,8 @@ export interface components {
             patience_remaining_s?: number | null;
             /** Payment Active S */
             payment_active_s?: number | null;
+            /** Payment Method */
+            payment_method?: ("cash" | "transfer") | null;
             /** Person Ids */
             person_ids: string[];
             /** Preparation S */
@@ -955,6 +957,8 @@ export interface components {
             patience_s?: number | null;
             /** Payment Active S */
             payment_active_s: number;
+            /** Payment Method */
+            payment_method?: ("cash" | "transfer") | null;
             /** Person Ids */
             person_ids: string[];
             /** Preparation S */

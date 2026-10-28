@@ -1555,6 +1555,21 @@
             ],
             "title": "Payment Active S"
           },
+          "payment_method": {
+            "anyOf": [
+              {
+                "enum": [
+                  "cash",
+                  "transfer"
+                ],
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Payment Method"
+          },
           "person_ids": {
             "items": {
               "type": "string"
@@ -2170,6 +2185,21 @@
             "minimum": 0.0,
             "title": "Payment Active S",
             "type": "number"
+          },
+          "payment_method": {
+            "anyOf": [
+              {
+                "enum": [
+                  "cash",
+                  "transfer"
+                ],
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Payment Method"
           },
           "person_ids": {
             "items": {
