@@ -1,0 +1,78 @@
+{
+  "contract_version": 1,
+  "scenario_id": "legacy-pause-reference",
+  "display_name": "Referencia sintética: terminar antes de cobrar",
+  "engine_config": {
+    "contract_version": 1,
+    "mode": "regular",
+    "opening_time": "15:00:00",
+    "horizon_s": 20.0,
+    "cashiers": 0,
+    "preparers": 0,
+    "integrated_workers": 1
+  },
+  "initial_state": [
+    {
+      "order_id": "A",
+      "person_ids": [
+        "synthetic-A1"
+      ],
+      "arrival_s": 0.0,
+      "stage": "waiting_payment",
+      "queue_rank": 0,
+      "worker_id": null,
+      "remaining_s": null,
+      "patience_remaining_s": null,
+      "payment_active_s": 2.0,
+      "transfer_wait_s": 0.0,
+      "preparation_s": 10.0
+    },
+    {
+      "order_id": "B",
+      "person_ids": [
+        "synthetic-B1"
+      ],
+      "arrival_s": 0.0,
+      "stage": "waiting_payment",
+      "queue_rank": 1,
+      "worker_id": null,
+      "remaining_s": null,
+      "patience_remaining_s": null,
+      "payment_active_s": 2.0,
+      "transfer_wait_s": 0.0,
+      "preparation_s": 3.0
+    }
+  ],
+  "interarrival": {
+    "kind": "constant",
+    "value_s": 1000.0
+  },
+  "group_sizes": [
+    {
+      "size": 1,
+      "probability": 1.0
+    }
+  ],
+  "payment_active": {
+    "kind": "constant",
+    "value_s": 2.0
+  },
+  "preparation": {
+    "kind": "constant",
+    "value_s": 3.0
+  },
+  "transfer_probability": 0.0,
+  "transfer_confirmation": {
+    "kind": "constant",
+    "value_s": 0.0
+  },
+  "patience": null,
+  "provenance": "user_assumptions",
+  "assumptions": [
+    "Synthetic acceptance example only; not measured Boquitas inputs.",
+    "A and B are initial waiting orders with explicit synthetic people and arrival at zero.",
+    "No new arrivals within the 20-second horizon; the script targets stable initial IDs.",
+    "A requires ten preparation seconds; B requires three; both payments require two seconds."
+  ],
+  "default_root_seed": 20261020
+}

@@ -1,0 +1,27 @@
+{
+  "manifest_version": 1,
+  "canonicalization": "Ordered parsed CSV fields; ignores UTF-8 BOM, blank lines, exact repeated headers, and a bracketed chat label attached to the exact required header.",
+  "correction_profile": "boquitas-2026-10-20-v1",
+  "sources": {
+    "original": {
+      "fixture": "original.txt",
+      "sha256": "845f8c6e56a7af120754ab0a5a789f318b65214e11f91737fd25032b7e51573d",
+      "canonical_row_fingerprint": "a8ab765ce6f610c085b803adc2e394ec0e42b26626a80749911c4ed84f49462b",
+      "observation_rows": 120,
+      "station_rows": {
+        "caja": 61,
+        "entrega": 59
+      }
+    },
+    "corrected_reference": {
+      "fixture": "corrected-reference.txt",
+      "sha256": "480ade881fd14bc88d8c94f037cea9ef4c2869b7ba400cbffda772f6f470caea",
+      "canonical_row_fingerprint": "95095d0e869fdc4b9c294245416a872dd84359a6bc0dda89c15fd10d25077128",
+      "observation_rows": 119,
+      "station_rows": {
+        "caja": 61,
+        "entrega": 58
+      }
+    }
+  }
+}

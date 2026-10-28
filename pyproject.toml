@@ -1,0 +1,45 @@
+[project]
+name = "boquitas"
+version = "0.1.0"
+description = "Deterministic discrete-event simulation engine for the Boquitas study."
+requires-python = ">=3.13,<3.14"
+dependencies = [
+    "fastapi>=0.115,<1",
+    "numpy>=2.3,<3",
+    "pydantic>=2.14.1",
+    "python-multipart>=0.0.32",
+    "scipy>=1.16,<2",
+    "simpy>=4.1.2",
+    "uvicorn>=0.30,<1",
+]
+
+[build-system]
+requires = ["uv_build>=0.9.26,<0.10.0"]
+build-backend = "uv_build"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-ra -p no:cacheprovider"
+
+[tool.ruff]
+line-length = 100
+target-version = "py313"
+src = ["src", "tests"]
+extend-exclude = [".codex", ".opencode", ".uv-cache", ".venv", "openspec", "pytest-cache-files-*"]
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B"]
+
+[tool.mypy]
+python_version = "3.13"
+mypy_path = "src"
+strict = true
+ignore_missing_imports = true
+
+[dependency-groups]
+dev = [
+    "httpx>=0.28.1",
+    "mypy>=2.4.0",
+    "pytest>=9.1.1",
+    "ruff>=0.17.1",
+]
