@@ -1,0 +1,637 @@
+{
+  "contract_version": 1,
+  "config": {
+    "contract_version": 1,
+    "mode": "tuesday",
+    "opening_time": "15:00:00",
+    "horizon_s": 6.0,
+    "cashiers": 1,
+    "preparers": 1,
+    "integrated_workers": 0
+  },
+  "declared_resource_ids": [
+    "cashier-1",
+    "preparer-1"
+  ],
+  "initialized_order_ids": [
+    "initial-payment-rank-1",
+    "initial-preparation-rank-1",
+    "initial-payment-rank-0",
+    "initial-preparation-rank-0"
+  ],
+  "new_order_ids": [
+    "new-arrival"
+  ],
+  "events": [
+    {
+      "seq": 0,
+      "time_s": 0.0,
+      "type": "order_initialized",
+      "order_id": "initial-payment-rank-1",
+      "person_ids": [
+        "initial-payment-person-1"
+      ],
+      "worker_id": null,
+      "data": {
+        "stage": "waiting_payment",
+        "queue": "payment",
+        "queue_rank": 1,
+        "worker_reserved": false,
+        "worker_active": false,
+        "initial_stage": "waiting_payment",
+        "remaining_s": null,
+        "arrival_s": null
+      }
+    },
+    {
+      "seq": 1,
+      "time_s": 0.0,
+      "type": "order_initialized",
+      "order_id": "initial-preparation-rank-1",
+      "person_ids": [
+        "initial-preparation-person-1"
+      ],
+      "worker_id": null,
+      "data": {
+        "stage": "waiting_preparation",
+        "queue": "preparation",
+        "queue_rank": 1,
+        "worker_reserved": false,
+        "worker_active": false,
+        "initial_stage": "waiting_preparation",
+        "remaining_s": null,
+        "arrival_s": null
+      }
+    },
+    {
+      "seq": 2,
+      "time_s": 0.0,
+      "type": "order_initialized",
+      "order_id": "initial-payment-rank-0",
+      "person_ids": [
+        "initial-payment-person-0"
+      ],
+      "worker_id": null,
+      "data": {
+        "stage": "waiting_payment",
+        "queue": "payment",
+        "queue_rank": 0,
+        "worker_reserved": false,
+        "worker_active": false,
+        "initial_stage": "waiting_payment",
+        "remaining_s": null,
+        "arrival_s": null
+      }
+    },
+    {
+      "seq": 3,
+      "time_s": 0.0,
+      "type": "order_initialized",
+      "order_id": "initial-preparation-rank-0",
+      "person_ids": [
+        "initial-preparation-person-0"
+      ],
+      "worker_id": null,
+      "data": {
+        "stage": "waiting_preparation",
+        "queue": "preparation",
+        "queue_rank": 0,
+        "worker_reserved": false,
+        "worker_active": false,
+        "initial_stage": "waiting_preparation",
+        "remaining_s": null,
+        "arrival_s": -5.0
+      }
+    },
+    {
+      "seq": 4,
+      "time_s": 0.0,
+      "type": "payment_started",
+      "order_id": "initial-payment-rank-0",
+      "person_ids": [
+        "initial-payment-person-0"
+      ],
+      "worker_id": "cashier-1",
+      "data": {
+        "stage": "payment_active",
+        "queue": null,
+        "queue_rank": null,
+        "worker_reserved": true,
+        "worker_active": true,
+        "initial_stage": null,
+        "remaining_s": null,
+        "arrival_s": null
+      }
+    },
+    {
+      "seq": 5,
+      "time_s": 0.0,
+      "type": "preparation_started",
+      "order_id": "initial-preparation-rank-0",
+      "person_ids": [
+        "initial-preparation-person-0"
+      ],
+      "worker_id": "preparer-1",
+      "data": {
+        "stage": "preparation",
+        "queue": null,
+        "queue_rank": null,
+        "worker_reserved": true,
+        "worker_active": true,
+        "initial_stage": null,
+        "remaining_s": null,
+        "arrival_s": null
+      }
+    },
+    {
+      "seq": 6,
+      "time_s": 0.1,
+      "type": "order_arrived",
+      "order_id": "new-arrival",
+      "person_ids": [
+        "new-person"
+      ],
+      "worker_id": null,
+      "data": {
+        "stage": "waiting_payment",
+        "queue": "payment",
+        "queue_rank": null,
+        "worker_reserved": false,
+        "worker_active": false,
+        "initial_stage": null,
+        "remaining_s": null,
+        "arrival_s": null
+      }
+    },
+    {
+      "seq": 7,
+      "time_s": 2.0,
+      "type": "payment_active_ended",
+      "order_id": "initial-payment-rank-0",
+      "person_ids": [
+        "initial-payment-person-0"
+      ],
+      "worker_id": "cashier-1",
+      "data": {
+        "stage": "waiting_preparation",
+        "queue": null,
+        "queue_rank": null,
+        "worker_reserved": false,
+        "worker_active": false,
+        "initial_stage": null,
+        "remaining_s": null,
+        "arrival_s": null
+      }
+    },
+    {
+      "seq": 8,
+      "time_s": 2.0,
+      "type": "payment_completed",
+      "order_id": "initial-payment-rank-0",
+      "person_ids": [
+        "initial-payment-person-0"
+      ],
+      "worker_id": null,
+      "data": {
+        "stage": "waiting_preparation",
+        "queue": "preparation",
+        "queue_rank": null,
+        "worker_reserved": false,
+        "worker_active": false,
+        "initial_stage": null,
+        "remaining_s": null,
+        "arrival_s": null
+      }
+    },
+    {
+      "seq": 9,
+      "time_s": 2.0,
+      "type": "payment_started",
+      "order_id": "initial-payment-rank-1",
+      "person_ids": [
+        "initial-payment-person-1"
+      ],
+      "worker_id": "cashier-1",
+      "data": {
+        "stage": "payment_active",
+        "queue": null,
+        "queue_rank": null,
+        "worker_reserved": true,
+        "worker_active": true,
+        "initial_stage": null,
+        "remaining_s": null,
+        "arrival_s": null
+      }
+    },
+    {
+      "seq": 10,
+      "time_s": 3.0,
+      "type": "order_delivered",
+      "order_id": "initial-preparation-rank-0",
+      "person_ids": [
+        "initial-preparation-person-0"
+      ],
+      "worker_id": "preparer-1",
+      "data": {
+        "stage": "completed",
+        "queue": null,
+        "queue_rank": null,
+        "worker_reserved": false,
+        "worker_active": false,
+        "initial_stage": null,
+        "remaining_s": null,
+        "arrival_s": null
+      }
+    },
+    {
+      "seq": 11,
+      "time_s": 3.0,
+      "type": "preparation_started",
+      "order_id": "initial-preparation-rank-1",
+      "person_ids": [
+        "initial-preparation-person-1"
+      ],
+      "worker_id": "preparer-1",
+      "data": {
+        "stage": "preparation",
+        "queue": null,
+        "queue_rank": null,
+        "worker_reserved": true,
+        "worker_active": true,
+        "initial_stage": null,
+        "remaining_s": null,
+        "arrival_s": null
+      }
+    },
+    {
+      "seq": 12,
+      "time_s": 4.0,
+      "type": "payment_active_ended",
+      "order_id": "initial-payment-rank-1",
+      "person_ids": [
+        "initial-payment-person-1"
+      ],
+      "worker_id": "cashier-1",
+      "data": {
+        "stage": "waiting_preparation",
+        "queue": null,
+        "queue_rank": null,
+        "worker_reserved": false,
+        "worker_active": false,
+        "initial_stage": null,
+        "remaining_s": null,
+        "arrival_s": null
+      }
+    },
+    {
+      "seq": 13,
+      "time_s": 4.0,
+      "type": "payment_completed",
+      "order_id": "initial-payment-rank-1",
+      "person_ids": [
+        "initial-payment-person-1"
+      ],
+      "worker_id": null,
+      "data": {
+        "stage": "waiting_preparation",
+        "queue": "preparation",
+        "queue_rank": null,
+        "worker_reserved": false,
+        "worker_active": false,
+        "initial_stage": null,
+        "remaining_s": null,
+        "arrival_s": null
+      }
+    },
+    {
+      "seq": 14,
+      "time_s": 4.0,
+      "type": "payment_started",
+      "order_id": "new-arrival",
+      "person_ids": [
+        "new-person"
+      ],
+      "worker_id": "cashier-1",
+      "data": {
+        "stage": "payment_active",
+        "queue": null,
+        "queue_rank": null,
+        "worker_reserved": true,
+        "worker_active": true,
+        "initial_stage": null,
+        "remaining_s": null,
+        "arrival_s": null
+      }
+    },
+    {
+      "seq": 15,
+      "time_s": 5.0,
+      "type": "payment_active_ended",
+      "order_id": "new-arrival",
+      "person_ids": [
+        "new-person"
+      ],
+      "worker_id": "cashier-1",
+      "data": {
+        "stage": "waiting_preparation",
+        "queue": null,
+        "queue_rank": null,
+        "worker_reserved": false,
+        "worker_active": false,
+        "initial_stage": null,
+        "remaining_s": null,
+        "arrival_s": null
+      }
+    },
+    {
+      "seq": 16,
+      "time_s": 5.0,
+      "type": "payment_completed",
+      "order_id": "new-arrival",
+      "person_ids": [
+        "new-person"
+      ],
+      "worker_id": null,
+      "data": {
+        "stage": "waiting_preparation",
+        "queue": "preparation",
+        "queue_rank": null,
+        "worker_reserved": false,
+        "worker_active": false,
+        "initial_stage": null,
+        "remaining_s": null,
+        "arrival_s": null
+      }
+    },
+    {
+      "seq": 17,
+      "time_s": 6.0,
+      "type": "order_delivered",
+      "order_id": "initial-preparation-rank-1",
+      "person_ids": [
+        "initial-preparation-person-1"
+      ],
+      "worker_id": "preparer-1",
+      "data": {
+        "stage": "completed",
+        "queue": null,
+        "queue_rank": null,
+        "worker_reserved": false,
+        "worker_active": false,
+        "initial_stage": null,
+        "remaining_s": null,
+        "arrival_s": null
+      }
+    },
+    {
+      "seq": 18,
+      "time_s": 6.0,
+      "type": "admissions_closed",
+      "order_id": null,
+      "person_ids": [],
+      "worker_id": null,
+      "data": {
+        "stage": null,
+        "queue": null,
+        "queue_rank": null,
+        "worker_reserved": null,
+        "worker_active": null,
+        "initial_stage": null,
+        "remaining_s": null,
+        "arrival_s": null
+      }
+    },
+    {
+      "seq": 19,
+      "time_s": 6.0,
+      "type": "preparation_started",
+      "order_id": "initial-payment-rank-0",
+      "person_ids": [
+        "initial-payment-person-0"
+      ],
+      "worker_id": "preparer-1",
+      "data": {
+        "stage": "preparation",
+        "queue": null,
+        "queue_rank": null,
+        "worker_reserved": true,
+        "worker_active": true,
+        "initial_stage": null,
+        "remaining_s": null,
+        "arrival_s": null
+      }
+    },
+    {
+      "seq": 20,
+      "time_s": 7.0,
+      "type": "order_delivered",
+      "order_id": "initial-payment-rank-0",
+      "person_ids": [
+        "initial-payment-person-0"
+      ],
+      "worker_id": "preparer-1",
+      "data": {
+        "stage": "completed",
+        "queue": null,
+        "queue_rank": null,
+        "worker_reserved": false,
+        "worker_active": false,
+        "initial_stage": null,
+        "remaining_s": null,
+        "arrival_s": null
+      }
+    },
+    {
+      "seq": 21,
+      "time_s": 7.0,
+      "type": "preparation_started",
+      "order_id": "initial-payment-rank-1",
+      "person_ids": [
+        "initial-payment-person-1"
+      ],
+      "worker_id": "preparer-1",
+      "data": {
+        "stage": "preparation",
+        "queue": null,
+        "queue_rank": null,
+        "worker_reserved": true,
+        "worker_active": true,
+        "initial_stage": null,
+        "remaining_s": null,
+        "arrival_s": null
+      }
+    },
+    {
+      "seq": 22,
+      "time_s": 8.0,
+      "type": "order_delivered",
+      "order_id": "initial-payment-rank-1",
+      "person_ids": [
+        "initial-payment-person-1"
+      ],
+      "worker_id": "preparer-1",
+      "data": {
+        "stage": "completed",
+        "queue": null,
+        "queue_rank": null,
+        "worker_reserved": false,
+        "worker_active": false,
+        "initial_stage": null,
+        "remaining_s": null,
+        "arrival_s": null
+      }
+    },
+    {
+      "seq": 23,
+      "time_s": 8.0,
+      "type": "preparation_started",
+      "order_id": "new-arrival",
+      "person_ids": [
+        "new-person"
+      ],
+      "worker_id": "preparer-1",
+      "data": {
+        "stage": "preparation",
+        "queue": null,
+        "queue_rank": null,
+        "worker_reserved": true,
+        "worker_active": true,
+        "initial_stage": null,
+        "remaining_s": null,
+        "arrival_s": null
+      }
+    },
+    {
+      "seq": 24,
+      "time_s": 9.0,
+      "type": "order_delivered",
+      "order_id": "new-arrival",
+      "person_ids": [
+        "new-person"
+      ],
+      "worker_id": "preparer-1",
+      "data": {
+        "stage": "completed",
+        "queue": null,
+        "queue_rank": null,
+        "worker_reserved": false,
+        "worker_active": false,
+        "initial_stage": null,
+        "remaining_s": null,
+        "arrival_s": null
+      }
+    },
+    {
+      "seq": 25,
+      "time_s": 9.0,
+      "type": "run_finished",
+      "order_id": null,
+      "person_ids": [],
+      "worker_id": null,
+      "data": {
+        "stage": null,
+        "queue": null,
+        "queue_rank": null,
+        "worker_reserved": null,
+        "worker_active": null,
+        "initial_stage": null,
+        "remaining_s": null,
+        "arrival_s": null
+      }
+    }
+  ],
+  "window_end_s": 6.0,
+  "drain_end_s": 9.0,
+  "final_orders": [
+    {
+      "order_id": "initial-payment-rank-1",
+      "person_ids": [
+        "initial-payment-person-1"
+      ],
+      "state": "completed",
+      "arrival_s": null,
+      "worker_id": null
+    },
+    {
+      "order_id": "initial-preparation-rank-1",
+      "person_ids": [
+        "initial-preparation-person-1"
+      ],
+      "state": "completed",
+      "arrival_s": null,
+      "worker_id": null
+    },
+    {
+      "order_id": "initial-payment-rank-0",
+      "person_ids": [
+        "initial-payment-person-0"
+      ],
+      "state": "completed",
+      "arrival_s": null,
+      "worker_id": null
+    },
+    {
+      "order_id": "initial-preparation-rank-0",
+      "person_ids": [
+        "initial-preparation-person-0"
+      ],
+      "state": "completed",
+      "arrival_s": -5.0,
+      "worker_id": null
+    },
+    {
+      "order_id": "new-arrival",
+      "person_ids": [
+        "new-person"
+      ],
+      "state": "completed",
+      "arrival_s": 0.1,
+      "worker_id": null
+    }
+  ],
+  "final_people": [
+    {
+      "person_id": "initial-payment-person-1",
+      "order_id": "initial-payment-rank-1",
+      "state": "completed"
+    },
+    {
+      "person_id": "initial-preparation-person-1",
+      "order_id": "initial-preparation-rank-1",
+      "state": "completed"
+    },
+    {
+      "person_id": "initial-payment-person-0",
+      "order_id": "initial-payment-rank-0",
+      "state": "completed"
+    },
+    {
+      "person_id": "initial-preparation-person-0",
+      "order_id": "initial-preparation-rank-0",
+      "state": "completed"
+    },
+    {
+      "person_id": "new-person",
+      "order_id": "new-arrival",
+      "state": "completed"
+    }
+  ],
+  "final_workers": [
+    {
+      "worker_id": "cashier-1",
+      "pool": "cashier",
+      "assigned_order_id": null,
+      "reserved": false,
+      "active": false,
+      "stage": null
+    },
+    {
+      "worker_id": "preparer-1",
+      "pool": "preparer",
+      "assigned_order_id": null,
+      "reserved": false,
+      "active": false,
+      "stage": null
+    }
+  ]
+}

@@ -1,0 +1,422 @@
+{
+  "contract_version": 2,
+  "config": {
+    "contract_version": 2,
+    "mode": "regular",
+    "opening_time": "15:00:00",
+    "horizon_s": 20,
+    "cashiers": 0,
+    "preparers": 0,
+    "integrated_workers": 1,
+    "preparation_interruption_policy": "scripted_cashier",
+    "cashier_interruptions": [
+      {
+        "at_s": 5,
+        "suspended_order_id": "A",
+        "cashier_order_id": "B"
+      }
+    ]
+  },
+  "declared_resource_ids": [
+    "integrated-1"
+  ],
+  "initialized_order_ids": [
+    "A",
+    "B"
+  ],
+  "new_order_ids": [],
+  "events": [
+    {
+      "seq": 0,
+      "time_s": 0,
+      "type": "order_initialized",
+      "order_id": "A",
+      "person_ids": [
+        "synthetic-A1"
+      ],
+      "worker_id": null,
+      "data": {
+        "stage": "waiting_payment",
+        "queue": "payment",
+        "queue_rank": 0,
+        "worker_reserved": false,
+        "worker_active": false,
+        "initial_stage": "waiting_payment",
+        "remaining_s": null,
+        "arrival_s": 0,
+        "related_cashier_order_id": null,
+        "assigned_order_id": null
+      }
+    },
+    {
+      "seq": 1,
+      "time_s": 0,
+      "type": "order_initialized",
+      "order_id": "B",
+      "person_ids": [
+        "synthetic-B1"
+      ],
+      "worker_id": null,
+      "data": {
+        "stage": "waiting_payment",
+        "queue": "payment",
+        "queue_rank": 1,
+        "worker_reserved": false,
+        "worker_active": false,
+        "initial_stage": "waiting_payment",
+        "remaining_s": null,
+        "arrival_s": 0,
+        "related_cashier_order_id": null,
+        "assigned_order_id": null
+      }
+    },
+    {
+      "seq": 2,
+      "time_s": 0,
+      "type": "payment_started",
+      "order_id": "A",
+      "person_ids": [
+        "synthetic-A1"
+      ],
+      "worker_id": "integrated-1",
+      "data": {
+        "stage": "payment_active",
+        "queue": null,
+        "queue_rank": null,
+        "worker_reserved": true,
+        "worker_active": true,
+        "initial_stage": null,
+        "remaining_s": null,
+        "arrival_s": null,
+        "related_cashier_order_id": null,
+        "assigned_order_id": "A"
+      }
+    },
+    {
+      "seq": 3,
+      "time_s": 2,
+      "type": "payment_active_ended",
+      "order_id": "A",
+      "person_ids": [
+        "synthetic-A1"
+      ],
+      "worker_id": "integrated-1",
+      "data": {
+        "stage": "waiting_preparation",
+        "queue": null,
+        "queue_rank": null,
+        "worker_reserved": true,
+        "worker_active": false,
+        "initial_stage": null,
+        "remaining_s": null,
+        "arrival_s": null,
+        "related_cashier_order_id": null,
+        "assigned_order_id": "A"
+      }
+    },
+    {
+      "seq": 4,
+      "time_s": 2,
+      "type": "payment_completed",
+      "order_id": "A",
+      "person_ids": [
+        "synthetic-A1"
+      ],
+      "worker_id": "integrated-1",
+      "data": {
+        "stage": "waiting_preparation",
+        "queue": null,
+        "queue_rank": null,
+        "worker_reserved": true,
+        "worker_active": false,
+        "initial_stage": null,
+        "remaining_s": null,
+        "arrival_s": null,
+        "related_cashier_order_id": null,
+        "assigned_order_id": "A"
+      }
+    },
+    {
+      "seq": 5,
+      "time_s": 2,
+      "type": "preparation_started",
+      "order_id": "A",
+      "person_ids": [
+        "synthetic-A1"
+      ],
+      "worker_id": "integrated-1",
+      "data": {
+        "stage": "preparation",
+        "queue": null,
+        "queue_rank": null,
+        "worker_reserved": true,
+        "worker_active": true,
+        "initial_stage": null,
+        "remaining_s": null,
+        "arrival_s": null,
+        "related_cashier_order_id": null,
+        "assigned_order_id": "A"
+      }
+    },
+    {
+      "seq": 6,
+      "time_s": 5,
+      "type": "preparation_paused",
+      "order_id": "A",
+      "person_ids": [
+        "synthetic-A1"
+      ],
+      "worker_id": "integrated-1",
+      "data": {
+        "stage": "preparation_paused",
+        "queue": null,
+        "queue_rank": null,
+        "worker_reserved": false,
+        "worker_active": false,
+        "initial_stage": null,
+        "remaining_s": 7,
+        "arrival_s": null,
+        "related_cashier_order_id": "B",
+        "assigned_order_id": null
+      }
+    },
+    {
+      "seq": 7,
+      "time_s": 5,
+      "type": "payment_started",
+      "order_id": "B",
+      "person_ids": [
+        "synthetic-B1"
+      ],
+      "worker_id": "integrated-1",
+      "data": {
+        "stage": "payment_active",
+        "queue": null,
+        "queue_rank": null,
+        "worker_reserved": true,
+        "worker_active": true,
+        "initial_stage": null,
+        "remaining_s": null,
+        "arrival_s": null,
+        "related_cashier_order_id": null,
+        "assigned_order_id": "B"
+      }
+    },
+    {
+      "seq": 8,
+      "time_s": 7,
+      "type": "payment_active_ended",
+      "order_id": "B",
+      "person_ids": [
+        "synthetic-B1"
+      ],
+      "worker_id": "integrated-1",
+      "data": {
+        "stage": "waiting_preparation",
+        "queue": null,
+        "queue_rank": null,
+        "worker_reserved": true,
+        "worker_active": false,
+        "initial_stage": null,
+        "remaining_s": null,
+        "arrival_s": null,
+        "related_cashier_order_id": null,
+        "assigned_order_id": "B"
+      }
+    },
+    {
+      "seq": 9,
+      "time_s": 7,
+      "type": "payment_completed",
+      "order_id": "B",
+      "person_ids": [
+        "synthetic-B1"
+      ],
+      "worker_id": "integrated-1",
+      "data": {
+        "stage": "waiting_preparation",
+        "queue": "preparation",
+        "queue_rank": null,
+        "worker_reserved": false,
+        "worker_active": false,
+        "initial_stage": null,
+        "remaining_s": null,
+        "arrival_s": null,
+        "related_cashier_order_id": null,
+        "assigned_order_id": null
+      }
+    },
+    {
+      "seq": 10,
+      "time_s": 7,
+      "type": "preparation_resumed",
+      "order_id": "A",
+      "person_ids": [
+        "synthetic-A1"
+      ],
+      "worker_id": "integrated-1",
+      "data": {
+        "stage": "preparing",
+        "queue": null,
+        "queue_rank": null,
+        "worker_reserved": true,
+        "worker_active": true,
+        "initial_stage": null,
+        "remaining_s": 7,
+        "arrival_s": null,
+        "related_cashier_order_id": "B",
+        "assigned_order_id": "A"
+      }
+    },
+    {
+      "seq": 11,
+      "time_s": 14,
+      "type": "order_delivered",
+      "order_id": "A",
+      "person_ids": [
+        "synthetic-A1"
+      ],
+      "worker_id": "integrated-1",
+      "data": {
+        "stage": "completed",
+        "queue": null,
+        "queue_rank": null,
+        "worker_reserved": false,
+        "worker_active": false,
+        "initial_stage": null,
+        "remaining_s": null,
+        "arrival_s": null,
+        "related_cashier_order_id": null,
+        "assigned_order_id": null
+      }
+    },
+    {
+      "seq": 12,
+      "time_s": 14,
+      "type": "preparation_started",
+      "order_id": "B",
+      "person_ids": [
+        "synthetic-B1"
+      ],
+      "worker_id": "integrated-1",
+      "data": {
+        "stage": "preparation",
+        "queue": null,
+        "queue_rank": null,
+        "worker_reserved": true,
+        "worker_active": true,
+        "initial_stage": null,
+        "remaining_s": null,
+        "arrival_s": null,
+        "related_cashier_order_id": null,
+        "assigned_order_id": "B"
+      }
+    },
+    {
+      "seq": 13,
+      "time_s": 17,
+      "type": "order_delivered",
+      "order_id": "B",
+      "person_ids": [
+        "synthetic-B1"
+      ],
+      "worker_id": "integrated-1",
+      "data": {
+        "stage": "completed",
+        "queue": null,
+        "queue_rank": null,
+        "worker_reserved": false,
+        "worker_active": false,
+        "initial_stage": null,
+        "remaining_s": null,
+        "arrival_s": null,
+        "related_cashier_order_id": null,
+        "assigned_order_id": null
+      }
+    },
+    {
+      "seq": 14,
+      "time_s": 20,
+      "type": "admissions_closed",
+      "order_id": null,
+      "person_ids": [],
+      "worker_id": null,
+      "data": {
+        "stage": null,
+        "queue": null,
+        "queue_rank": null,
+        "worker_reserved": false,
+        "worker_active": false,
+        "initial_stage": null,
+        "remaining_s": null,
+        "arrival_s": null,
+        "related_cashier_order_id": null,
+        "assigned_order_id": null
+      }
+    },
+    {
+      "seq": 15,
+      "time_s": 20,
+      "type": "run_finished",
+      "order_id": null,
+      "person_ids": [],
+      "worker_id": null,
+      "data": {
+        "stage": null,
+        "queue": null,
+        "queue_rank": null,
+        "worker_reserved": false,
+        "worker_active": false,
+        "initial_stage": null,
+        "remaining_s": null,
+        "arrival_s": null,
+        "related_cashier_order_id": null,
+        "assigned_order_id": null
+      }
+    }
+  ],
+  "window_end_s": 20,
+  "drain_end_s": 20,
+  "final_orders": [
+    {
+      "order_id": "A",
+      "person_ids": [
+        "synthetic-A1"
+      ],
+      "state": "completed",
+      "arrival_s": 0,
+      "worker_id": null
+    },
+    {
+      "order_id": "B",
+      "person_ids": [
+        "synthetic-B1"
+      ],
+      "state": "completed",
+      "arrival_s": 0,
+      "worker_id": null
+    }
+  ],
+  "final_people": [
+    {
+      "person_id": "synthetic-A1",
+      "order_id": "A",
+      "state": "completed"
+    },
+    {
+      "person_id": "synthetic-B1",
+      "order_id": "B",
+      "state": "completed"
+    }
+  ],
+  "final_workers": [
+    {
+      "worker_id": "integrated-1",
+      "pool": "integrated",
+      "assigned_order_id": null,
+      "reserved": false,
+      "active": false,
+      "stage": null
+    }
+  ]
+}

@@ -1,5 +1,6 @@
 # Keep fixture and provenance bytes stable across platform line-ending settings.
 tests/fixtures/observation-import/*.txt -text
+web/tests/fixtures/** -text
 openspec/changes/** -text
 docs/** -text
 plans/evidence/** -text
