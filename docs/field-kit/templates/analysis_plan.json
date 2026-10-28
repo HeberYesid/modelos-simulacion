@@ -1,0 +1,89 @@
+{
+  "schema_version": 1,
+  "study_question": "¿Cómo se comportan los tiempos de espera y de atención en Boquitas bajo las configuraciones de personal de los martes de promoción y los demás días, y qué alternativas podrían evaluarse mediante simulación?",
+  "approval_state": "pending",
+  "approvals": {
+    "study_owner": {
+      "status": "pending",
+      "anonymous_id": null,
+      "approved_at": null
+    },
+    "operator": {
+      "status": "pending",
+      "anonymous_id": null,
+      "approved_at": null
+    }
+  },
+  "decisions": {
+    "event_definitions": {
+      "status": "pending",
+      "version": null,
+      "definitions": {
+        "arrival": null,
+        "payment_start": null,
+        "active_payment_end": null,
+        "external_confirmation_start": null,
+        "external_confirmation_end": null,
+        "preparation_start": null,
+        "partial_receipt": null,
+        "final_delivery": null,
+        "withdrawal": null,
+        "worker_segment_types": null
+      }
+    },
+    "privacy_handling": {
+      "status": "pending",
+      "reference": null
+    },
+    "collection_coverage": {
+      "status": "pending",
+      "day_types": null,
+      "operating_periods": null,
+      "coverage_rationale": null
+    },
+    "calibration_validation_split": {
+      "status": "pending",
+      "version": null,
+      "rationale": null
+    },
+    "sample_targets": {
+      "status": "unset",
+      "by_day_type": null,
+      "rationale": null
+    },
+    "target_precision": {
+      "status": "unset",
+      "estimand": null,
+      "target": null,
+      "unit": null,
+      "rationale": null
+    },
+    "tolerances": {
+      "status": "unset",
+      "metrics": null,
+      "rationale": null
+    },
+    "calibration_method": {
+      "status": "pending",
+      "method": null,
+      "eligible_records_rule": null,
+      "uncertainty_method": null
+    },
+    "censoring_treatment": {
+      "status": "pending",
+      "value": null
+    },
+    "validation_summaries": {
+      "status": "pending",
+      "measures": null,
+      "rationale": null
+    },
+    "acceptance_criteria": {
+      "status": "pending",
+      "criteria": null,
+      "rationale": null
+    }
+  },
+  "notes": "Null and unset values are undecided or unknown. This template sets no thresholds, target precision, sample sizes, fitted parameters, or approval.",
+  "study_question_source": "Existing academic report, section Pregunta de investigación; not a newly selected question or an approved statistical estimand."
+}
