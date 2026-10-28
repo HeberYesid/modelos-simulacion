@@ -13,12 +13,26 @@ export type DistributionKey = "interarrival" | "payment_active" | "preparation" 
 
 const DISTRIBUTIONS: Array<{ key: Exclude<DistributionKey, "patience">; title: string; note: string }> = [
   { key: "interarrival", title: "Tiempo entre llegadas", note: "Primera llegada después de la apertura" },
-  { key: "payment_active", title: "Pago activo", note: "Trabajo activo por orden" },
+  { key: "payment_active", title: "Pago", note: "Un cobro por orden" },
   { key: "preparation", title: "Preparación", note: "Un tiempo completo por orden; no depende del tamaño del grupo" },
-  { key: "transfer_confirmation", title: "Confirmación externa", note: "Solo se usa para una transferencia" },
 ];
 
-const STAGES = ["waiting_payment", "payment_active", "payment_pending", "waiting_preparation", "preparing"];
+const STAGES = ["waiting_payment", "payment_active", "waiting_preparation", "preparing"];
+
+function simplifyPayment(draft: ScenarioDraft): ScenarioDraft {
+  draft.transfer_confirmation = { kind: "constant", value_s: 0 };
+  for (const order of draft.initial_state) {
+    if (!order.payment_method && ((order.transfer_wait_s ?? 0) > 0 || order.stage === "payment_pending")) {
+      order.payment_method = "transfer";
+    }
+    if (order.stage === "waiting_payment" || order.stage === "payment_active") {
+      order.transfer_wait_s = 0;
+    } else if (order.stage === "payment_pending") {
+      order.remaining_s = 0;
+    }
+  }
+  return draft;
+}
 
 function finite(value: number | null | undefined): value is number {
   return value != null && Number.isFinite(value);
@@ -63,10 +77,11 @@ function draftIsComplete(draft: ScenarioDraft): boolean {
 export function scenarioToDraft(scenario: Scenario): ScenarioDraft {
   const copy = structuredClone(scenario) as unknown as ScenarioDraft;
   copy.contract_version = String(scenario.contract_version) as ScenarioDraft["contract_version"];
-  return copy;
+  return simplifyPayment(copy);
 }
 
 export function scenarioDraftToWire(draft: ScenarioDraft): Scenario | null {
+  draft = simplifyPayment(structuredClone(draft));
   const version = Number(draft.contract_version);
   if ((version !== 1 && version !== 2) || draft.engine_config.contract_version !== version || !draftIsComplete(draft)) {
     return null;
@@ -276,7 +291,7 @@ function initialOrderMarkup(initial: InitialOrderDraft, index: number, scenario:
   const queued = stage === "waiting_payment" || stage === "waiting_preparation";
   const needsWorker = stage === "payment_active" || stage === "preparing"
     || (stage === "payment_pending" && scenario.engine_config.mode === "regular");
-  const needsRemaining = stage === "payment_active" || stage === "payment_pending" || stage === "preparing";
+  const needsRemaining = stage === "payment_active" || stage === "preparing";
   const needsPaymentParts = stage === "waiting_payment" || stage === "payment_active";
   const needsPreparation = stage === "waiting_payment" || stage === "payment_active"
     || stage === "payment_pending" || stage === "waiting_preparation";
@@ -299,10 +314,16 @@ function initialOrderMarkup(initial: InitialOrderDraft, index: number, scenario:
         <input id="initial-${index}-remaining" type="number" min="0" step="any" required name="initial_remaining_${index}" data-initial-field="${index}.remaining_s" value="${inputValue(initial.remaining_s)}"></div>`
     : "";
   const paymentControls = needsPaymentParts ? `
-    <div class="compact-field"><label for="initial-${index}-payment">Pago activo restante/total (s)</label>
+    <div class="compact-field"><label for="initial-${index}-payment">Tiempo de pago (s)</label>
       <input id="initial-${index}-payment" type="number" min="0" step="any" required name="initial_payment_${index}" data-initial-field="${index}.payment_active_s" value="${inputValue(initial.payment_active_s)}"></div>
-    <div class="compact-field"><label for="initial-${index}-transfer">Confirmación externa (s)</label>
-      <input id="initial-${index}-transfer" type="number" min="0" step="any" required name="initial_transfer_${index}" data-initial-field="${index}.transfer_wait_s" value="${inputValue(initial.transfer_wait_s)}"></div>` : "";
+    ` : "";
+  const paymentMethod = `
+    <div class="compact-field"><label for="initial-${index}-method">Medio de pago</label>
+      <select id="initial-${index}-method" name="initial_method_${index}" data-initial-field="${index}.payment_method">
+        <option value="" ${!initial.payment_method ? "selected" : ""}>Sin especificar</option>
+        <option value="cash" ${initial.payment_method === "cash" ? "selected" : ""}>Efectivo</option>
+        <option value="transfer" ${initial.payment_method === "transfer" ? "selected" : ""}>Transferencia</option>
+      </select></div>`;
   const preparationControl = needsPreparation ? `
     <div class="compact-field"><label for="initial-${index}-preparation">Preparación prevista (s)</label>
       <input id="initial-${index}-preparation" type="number" min="0" step="any" required name="initial_preparation_${index}" data-initial-field="${index}.preparation_s" value="${inputValue(initial.preparation_s)}"></div>` : "";
@@ -325,7 +346,7 @@ function initialOrderMarkup(initial: InitialOrderDraft, index: number, scenario:
           <input id="initial-${index}-arrival" type="number" max="0" step="any" name="initial_arrival_${index}" data-initial-field="${index}.arrival_s" value="${inputValue(initial.arrival_s)}"></div>
         <div class="compact-field span-two"><label for="initial-${index}-people">Personas vinculadas (un identificador por línea)</label>
           <textarea id="initial-${index}-people" required rows="2" name="initial_people_${index}" data-initial-field="${index}.person_ids">${escapeHtml(ids)}</textarea></div>
-        ${rankControl}${workerControl}${remainingControl}${paymentControls}${preparationControl}${patienceControl}
+        ${rankControl}${workerControl}${remainingControl}${paymentControls}${paymentMethod}${preparationControl}${patienceControl}
       </div>
     </article>`;
 }
@@ -352,7 +373,7 @@ function staffMarkup(scenario: ScenarioDraft): string {
       <div class="field-grid">
         <div class="field"><label for="integrated-workers">Personas en el equipo integrado</label>
           <input id="integrated-workers" type="number" min="1" step="1" required name="integrated_workers" data-integer-field data-scenario-field="engine_config.integrated_workers" value="${inputValue(config.integrated_workers, 0)}">
-          <p class="help-text">Una persona reserva la orden durante la confirmación externa, sin trabajo activo en ese lapso.</p></div>
+          <p class="help-text">La misma persona cobra y prepara la orden.</p></div>
       </div>`;
   }
   return `
@@ -484,7 +505,7 @@ function interruptionPolicyMarkup(scenario: ScenarioDraft, pending: boolean): st
     <fieldset class="scenario-section interruption-section" data-interruption-schedule>
       <legend>Pausas programadas para cobrar</legend>
       <p id="interruption-schedule-help" class="help-text"><strong>Supuesto explícito del usuario.</strong> El horario y las órdenes no se infieren de las observaciones reales. Cada pausa requiere exactamente una persona en el equipo integrado del modo normal.</p>
-      <p class="help-text">Indica el segundo desde la apertura, la orden cuya preparación se pausa y la orden que pasará a cobrar. La primera orden se reanuda después del pago y cualquier confirmación externa.</p>
+      <p class="help-text">Indica el segundo desde la apertura, la orden cuya preparación se pausa y la orden que pasará a cobrar. La primera orden se reanuda después del pago.</p>
       <p class="help-text">Los identificadores deben existir en cada réplica; no se sustituyen ni ajustan automáticamente.</p>
       <p class="help-text"><strong>Política activa:</strong> pausas programadas para cobrar; requiere modo normal con exactamente una persona integrada.</p>
       ${compatibility}${interruptionRowsMarkup(entries)}
@@ -612,7 +633,7 @@ export function renderScenarioView(options: {
           <div class="field-grid transfer-settings">
             <div class="field"><label for="transfer-probability">Probabilidad de transferencia</label>
               <input id="transfer-probability" type="number" min="0" max="1" step="any" required name="transfer_probability" data-scenario-field="transfer_probability" value="${inputValue(scenario.transfer_probability)}">
-              <p class="help-text">Valor entre 0 y 1. La confirmación externa solo se sortea si hay transferencia.</p></div>
+              <p class="help-text">Valor entre 0 y 1. Las demás órdenes pagan en efectivo.</p></div>
           </div>
           <div class="field patience-field">
             <label class="checkbox-row" for="patience-enabled"><input id="patience-enabled" type="checkbox" name="patience_enabled" data-patience-enabled ${patience ? "checked" : ""}>
@@ -794,6 +815,8 @@ export function collectScenarioDraft(
     }
     const worker = row.querySelector<HTMLSelectElement>(`[data-initial-field="${index}.worker_id"]`);
     if (worker) item.worker_id = worker.value || null;
+    const method = row.querySelector<HTMLSelectElement>(`[data-initial-field="${index}.payment_method"]`)?.value;
+    if (method === "cash" || method === "transfer") item.payment_method = method;
     initial.push(item);
   }
   next.initial_state = initial;
@@ -819,7 +842,7 @@ export function collectScenarioDraft(
   }
 
   const replications = readNumber(String(data.get("replications") ?? "")) ?? 1;
-  return { scenario: next, replications };
+  return { scenario: simplifyPayment(next), replications };
 }
 
 export function setScenarioTimeValidity(form: HTMLFormElement): boolean {

@@ -14,7 +14,7 @@ from boquitas.exports import (
     load_scenario_json,
 )
 from boquitas.observation_import import import_observations
-from boquitas.scenarios import Scenario, demo_scenario
+from boquitas.scenarios import Scenario, demo_scenario, method_only_scenario
 
 
 def test_health_uses_versioned_public_contract() -> None:
@@ -37,6 +37,36 @@ def test_demo_endpoint_returns_labeled_teaching_defaults() -> None:
     assert body["scenario"]["provenance"] == "synthetic_demo"
     assert body["root_seed"] == 20261020
     assert body["replications"] == 30
+
+
+def test_run_api_eliminates_transfer_confirmation_wait_but_keeps_method() -> None:
+    scenario = demo_scenario().model_dump(mode="json")
+    scenario["engine_config"].update(
+        {"mode": "tuesday", "opening_time": "09:00:00", "horizon_s": 2,
+         "cashiers": 1, "preparers": 4, "integrated_workers": 0}
+    )
+    scenario["interarrival"] = {"kind": "constant", "value_s": 1}
+    scenario["payment_active"] = {"kind": "constant", "value_s": 2}
+    scenario["preparation"] = {"kind": "constant", "value_s": 3}
+    scenario["transfer_probability"] = 1
+    scenario["transfer_confirmation"] = {"kind": "constant", "value_s": 7}
+    scenario["group_sizes"] = [{"size": 1, "probability": 1}]
+    client = TestClient(create_app())
+
+    response = client.post(
+        "/api/v1/runs",
+        json={"scenario": scenario, "root_seed": 7, "replication_index": 0},
+    )
+
+    assert response.status_code == 200
+    body = response.json()
+    assert body["scenario"]["transfer_confirmation"] == {"kind": "constant", "value_s": 0}
+    assert body["demand_tape"][0]["payment_method"] == "transfer"
+    events = {event["type"]: event["time_s"] for event in body["trace"]["events"]}
+    assert events["payment_started"] == 1
+    assert events["payment_completed"] == 3
+    assert events["preparation_started"] == 3
+    assert events["order_delivered"] == 6
 
 
 def test_zero_tuesday_preparers_returns_field_issue_without_result() -> None:
@@ -206,6 +236,10 @@ def test_complete_experiment_returns_the_upstream_result_contract() -> None:
     assert result["status"] == "complete"
     assert result["n_requested"] == 1
     assert result["replication_results"][0]["scenario_id"] == scenario.scenario_id
+    assert result["scenarios"][0]["transfer_confirmation"] == {
+        "kind": "constant",
+        "value_s": 0,
+    }
 
 
 def test_run_result_over_saved_json_cap_returns_actionable_error(monkeypatch) -> None:
@@ -270,7 +304,7 @@ def test_run_response_limit_is_inclusive_and_counts_utf8_bytes(monkeypatch) -> N
         }
     )
     expected = (
-        run_scenario(scenario, root_seed=25, replication_index=4)
+        run_scenario(method_only_scenario(scenario), root_seed=25, replication_index=4)
         .model_dump_json()
         .encode("utf-8")
     )

@@ -1,4 +1,5 @@
 import type { ExperimentResult, ImportReport, MetricSummary, RunResult } from "../api/types";
+import { paymentMethodLabel } from "../domain/payment";
 import { escapeHtml, formatClockFromOpening, formatNumber, formatSeconds, safeFileName } from "../domain/format";
 import { issueMessage, systemAssumption, translateEnum } from "../domain/errors";
 
@@ -150,7 +151,9 @@ function renderMetricRows(metrics: MetricSummary[]): string {
 }
 
 function renderRunMetrics(run: RunResult): string {
-  const metrics = [...run.metrics.metric_summaries];
+  const metrics = run.metrics.metric_summaries.filter((metric) =>
+    !metric.metric_id.includes(".external_confirmation.") || metric.value !== 0,
+  );
   return `
     <section class="work-surface results-surface" aria-labelledby="run-metrics-title">
       <div class="surface-heading"><div><h2 id="run-metrics-title">Indicadores calculados por el motor</h2>
@@ -249,9 +252,8 @@ function renderAssumptions(run: RunResult): string {
         <summary>Ver parámetros exactos enviados al motor</summary>
         <div><dl class="event-detail">
           <div><dt>Tiempo entre llegadas</dt><dd>${escapeHtml(describeDistribution(scenario.interarrival))}</dd></div>
-          <div><dt>Pago activo</dt><dd>${escapeHtml(describeDistribution(scenario.payment_active))}</dd></div>
+          <div><dt>Pago</dt><dd>${escapeHtml(describeDistribution(scenario.payment_active))}</dd></div>
           <div><dt>Preparación por orden</dt><dd>${escapeHtml(describeDistribution(scenario.preparation))}</dd></div>
-          <div><dt>Confirmación externa</dt><dd>${escapeHtml(describeDistribution(scenario.transfer_confirmation))}</dd></div>
           <div><dt>Probabilidad de transferencia</dt><dd>${formatNumber(scenario.transfer_probability * 100, 4)} %</dd></div>
           <div><dt>Paciencia</dt><dd>${scenario.patience ? escapeHtml(describeDistribution(scenario.patience)) : "Desactivada"}</dd></div>
           <div><dt>Semilla raíz</dt><dd>${formatNumber(run.root_seed, 0)}</dd></div>
@@ -448,6 +450,7 @@ function renderRunOrders(run: RunResult): string {
     <tr><td><code>${escapeHtml(order.order_id)}</code></td>
       <td>${escapeHtml(translateEnum(order.cohort))}</td>
       <td>${escapeHtml(translateEnum(order.state))}</td>
+      <td>${escapeHtml(paymentMethodLabel(run, order.order_id))}</td>
       <td>${formatNumber(order.person_ids.length, 0)}</td>
       <td>${order.arrival_s == null ? "Desconocida" : escapeHtml(formatClockFromOpening(run.trace.config.opening_time, order.arrival_s))}</td>
       <td>${order.delivery_s == null ? "No disponible" : escapeHtml(formatClockFromOpening(run.trace.config.opening_time, order.delivery_s))}</td>
@@ -463,8 +466,8 @@ function renderRunOrders(run: RunResult): string {
         <p>Una fila es una orden compartida; la cantidad de personas aparece separada. La actividad, las pausas y el tiempo transcurrido usan las medidas guardadas por el motor; si el historial no las permite, se indica como no disponible.</p></div></div>
       <div class="data-table-wrap result-orders" role="group" aria-label="Tabla de órdenes" tabindex="0"><table class="data-table">
         <caption class="visually-hidden">Órdenes simuladas, su cohorte, tiempos de preparación y pausas</caption>
-        <thead><tr><th>Orden</th><th>Cohorte</th><th>Estado</th><th>Personas</th><th>Llegada simulada</th><th>Entrega</th><th>Permanencia</th><th>Trabajo activo</th><th>Tiempo en pausa</th><th>Recuento de pausas</th><th>Tiempo transcurrido</th></tr></thead>
-        <tbody>${rows || `<tr><td colspan="11">No se registraron órdenes en esta réplica.</td></tr>`}</tbody>
+        <thead><tr><th>Orden</th><th>Cohorte</th><th>Estado</th><th>Medio de pago</th><th>Personas</th><th>Llegada simulada</th><th>Entrega</th><th>Permanencia</th><th>Trabajo activo</th><th>Tiempo en pausa</th><th>Recuento de pausas</th><th>Tiempo transcurrido</th></tr></thead>
+        <tbody>${rows || `<tr><td colspan="12">No se registraron órdenes en esta réplica.</td></tr>`}</tbody>
       </table></div>
     </section>`;
 }

@@ -94,6 +94,7 @@ export interface EngineConfigDraft {
 }
 
 export interface InitialOrderDraft {
+  payment_method?: "cash" | "transfer" | null;
   order_id: string;
   person_ids: string[];
   arrival_s?: number | null;

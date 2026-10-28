@@ -7,7 +7,7 @@
 
 ## 1. ¿Para qué sirve?
 
-Boquitas permite explorar la atención de una heladería mediante simulaciones: llegada de grupos, espera para pagar, pago, confirmación de transferencias, preparación y entrega. También permite revisar archivos de observaciones y reproducir en una escena 3D el historial de una ejecución.
+Boquitas permite explorar la atención de una heladería mediante simulaciones: llegada de grupos, espera para pagar, pago, preparación y entrega. También permite revisar archivos de observaciones y reproducir en una escena 3D el historial de una ejecución.
 
 El flujo habitual es:
 
@@ -139,7 +139,7 @@ En **Escenarios**, un escenario reúne los parámetros y supuestos que se enviar
 | **Martes de promoción** | Caja y preparación usan equipos separados. Valores iniciales: un cajero y cuatro preparadores. |
 | **Día normal** | Un equipo integrado realiza pago y preparación. El valor inicial al cambiar a este modo es una persona. |
 
-En martes, la confirmación externa de una transferencia libera al cajero para otra orden. En día normal, el trabajador conserva la orden durante esa confirmación, aunque no esté haciendo trabajo activo.
+Efectivo y transferencia usan el tiempo de pago configurado, sin una espera adicional por confirmación. El medio de pago aparece en la tabla de órdenes y el inspector. Los resultados antiguos conservan sus tiempos originales al reabrirse.
 
 Cambiar de modo no duplica automáticamente la demanda ni cambia los tamaños de grupo. Un aumento de personal representa una hipótesis que tú estás configurando.
 
@@ -170,12 +170,12 @@ Para la triangular debe cumplirse **mínimo ≤ más probable ≤ máximo**, con
 
 Un intervalo medio entre llegadas menor representa más llegadas por unidad de tiempo. El primer grupo también llega después de un intervalo generado: no se supone necesariamente una llegada al instante cero.
 
-Configura por separado el tiempo entre llegadas, el trabajo activo de pago, la preparación por orden y la confirmación externa.
+Configura por separado el tiempo entre llegadas, el pago y la preparación por orden.
 
 ### Transferencias y paciencia
 
 - **Probabilidad de transferencia:** valor de 0 a 1. `0.25` representa un 25 %; no escribas `25` para expresar ese porcentaje.
-- **Confirmación externa:** espera adicional cuando la orden usa transferencia.
+- **Medio de pago:** efectivo o transferencia; no añade tiempo de confirmación. En órdenes presentes al abrir puedes indicar el medio o dejarlo sin especificar.
 - **Aplicar paciencia mientras se espera el primer pago:** si se activa, el grupo puede retirarse antes de empezar a pagar cuando vence su paciencia. Una vez iniciado el pago, esta regla ya no lo hace abandonar.
 
 ### Pausas programadas para cobrar (contrato V2)
@@ -202,7 +202,7 @@ Los instantes son segundos de simulación desde la apertura, finitos, no negativ
 
 Los tiempos del guion pueden superar H cuando se refieren a órdenes ya inicializadas o admitidas antes del cierre. H sigue cerrando nuevas llegadas; el guion no admite órdenes nuevas. En experimentos, los IDs generados incluyen el índice de réplica, por ejemplo `r000000-o00000` para una orden de la réplica 0. Usa el ID exacto de cada cinta; no esperes que el sistema lo remapee entre réplicas. El [ejemplo V2 A/B](../../openspec/changes/boquitas-07-preparation-interruptions/review/scripted-demo-input.json) declara como supuestos del usuario dos órdenes sintéticas esperando pago al abrir, tiempos explícitos y ningún arribo nuevo en su ventana de 20 segundos; se puede abrir desde **Escenarios → Reabrir un archivo → Elegir JSON guardado** y luego ejecutar una réplica.
 
-Cada entrada atiende una orden y luego reanuda la preparación suspendida en el mismo trabajador. Si existe confirmación externa, el pago activo termina primero; durante esa confirmación el trabajador permanece reservado pero inactivo, y la preparación continúa pausada hasta que el pago se complete. La nueva orden pagada espera su primera preparación en una cola separada. La preparación pausada no cuenta también como orden en esa cola. No hay interrupciones automáticas, pausas anidadas ni atención de más de una orden por entrada.
+Cada entrada atiende una orden y luego reanuda la preparación suspendida en el mismo trabajador al completar el pago. La nueva orden pagada espera su primera preparación en una cola separada. La preparación pausada no cuenta también como orden en esa cola. No hay interrupciones automáticas, pausas anidadas ni atención de más de una orden por entrada.
 
 **Ejemplo sintético, no dato de la tienda:** con H=20, A llega a 0, paga 2 s y requiere 10 s de preparación; B llega a 5, paga 2 s y requiere 3 s. Un guion pausa A para cobrar B en t=5. A trabaja en 2–5 y 7–14; su preparación activa es 10 s, pausada 2 s y transcurrida 12 s. B paga en 5–7, espera preparación de 7–14 y se prepara en 14–17. El trabajador acumula 17 s activos en la ventana (utilización 0,85) y la cola paga promedia 0,35 órdenes. Esto verifica la aritmética del ejemplo, no que el modelo describa la operación real.
 
@@ -280,12 +280,12 @@ Lee siempre la unidad, población y cohorte de cada indicador:
 | **Órdenes / personas** | Una orden puede representar varias personas. Sus conteos y promedios no son intercambiables. |
 | **Órdenes nuevas / iniciales** | Distinguen las admitidas después de abrir del trabajo que ya existía al inicio. |
 | **Espera de pago** | Tiempo antes de comenzar el primer pago. |
-| **Pago activo / confirmación** | Separan trabajo del empleado y espera externa. |
+| **Medio de pago** | Efectivo o transferencia. Los archivos antiguos sin ese dato muestran «No registrado». |
 | **Espera antes de primera preparación** | Tiempo entre el pago completo y el inicio de la primera preparación. Se aplica al martes y, en V2, a la cola paga del día normal. Una preparación ya iniciada y pausada no se cuenta en esta cola. |
 | **Preparación activa / tiempo en pausa** | En la tabla **Órdenes de esta réplica** de V2, **Trabajo activo** y **Tiempo en pausa** muestran los segundos acumulados trabajando y pausada cuando la historia está completa. |
 | **Preparación transcurrida / recuento de pausas** | La tabla V2 también muestra **Tiempo transcurrido** desde el primer inicio hasta la entrega y **Recuento de pausas**. Cuando toda la historia está observada, transcurrido = activo + pausado. |
 | **Permanencia** | Tiempo desde la llegada conocida hasta la entrega. |
-| **Utilización activa / reserva** | Un trabajador puede estar reservado sin estar trabajando activamente, como en una confirmación del modo normal. |
+| **Utilización activa / reserva** | Fracciones de tiempo de trabajo y de ocupación del trabajador. Los resultados antiguos pueden incluir reservas durante confirmaciones externas. |
 | **Ventana / finalización de la cohorte** | Las medidas durante H pueden diferir de los resultados que incluyen entregas posteriores al cierre. |
 
 **No disponible** no significa cero: puede faltar historia, no haber muestras válidas o no aplicar el indicador. **Ver identificador y validez** permite revisar más detalles.

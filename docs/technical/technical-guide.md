@@ -4,7 +4,15 @@ This guide describes the Windows application, its local operating path, and the 
 
 For the complete Spanish workflow, see the [user manual](../user/MANUAL_USUARIO.md). The [local web application guide](../../web/README.md) retains the existing development, contracts, and verification commands.
 
+## Portable presentation package
+
+For a Windows 10/11 x64 destination, build the self-contained release with `./build-portable.ps1` on the build computer. The ZIP is written to `dist/Boquitas-Windows-x64.zip`; existing outputs are preserved. Use `-OutputDirectory <new-directory>` for another build. Only the build computer needs Python 3.13 x64, uv, Node.js and pnpm. The destination needs a compatible browser and the complete extracted package.
+
+See the [Spanish portable guide](../user/guia-portable.md) and the [observed package verification](../verification/portable-release-2026-10-28.md). To repeat the executable/API check after extracting the ZIP elsewhere, run the build computer's Python with `scripts/check_portable.py <extracted-folder>`. This check strips developer tools from the child process PATH; it does not certify another computer or disable the host network adapter.
+
 ## Scope and supported environment
+
+Since 2026-10-28, new application runs and experiments normalize transfer confirmation to zero, including opening-state residual confirmation. The scenario editor and downloaded scenarios use the same policy. Payment method is recorded independently as `cash` or `transfer`; it no longer depends on a positive confirmation duration. Saved runs are reopened without normalization, and the direct deterministic engine retains historical confirmation support for reproducibility. Missing methods in older artifacts remain unknown unless their positive transfer wait establishes a transfer.
 
 Boquitas runs a discrete-event simulation for explicitly configured scenarios. It does not infer scenario parameters from imported observations. All example defaults below are synthetic teaching inputs, not estimates of the real shop.
 
@@ -114,7 +122,7 @@ Every value in this table is a synthetic teaching assumption. Scenario edits aff
 | Active payment | Triangular 15 / 30 / 45 s (minimum / mode / maximum) |
 | Preparation per order | Triangular 60 / 120 / 180 s, independent of group size |
 | Transfer probability | 0.25 |
-| External confirmation | Triangular 30 / 60 / 90 s for transfers; zero otherwise |
+| External confirmation | Zero for all new application executions; legacy domain examples retain their original distribution |
 | Patience | Disabled (`null`) |
 | Root seed | 20261020 |
 | Experiment replications | 30 |
@@ -122,7 +130,7 @@ Every value in this table is a synthetic teaching assumption. Scenario edits aff
 
 Other accepted time distributions are constant, triangular, and exponential; group sizes are positive integers with explicit weights. Probabilities must sum to one. A time between arrivals must be strictly positive. Do not fit a distribution from the imported observations through the application.
 
-Each group shares one order, one payment, and one preparation; group size does not scale preparation time. Tuesday uses separate cashier and preparer pools. Regular mode uses an integrated worker: external transfer confirmation reserves that worker without counting as active work. Tuesday confirmation releases the cashier. Patience applies only before the first payment starts. The model has no physical queue-capacity limit, product recipes, partial deliveries, or post-payment abandonment.
+Each group shares one order, one payment, and one preparation; group size does not scale preparation time. Tuesday uses separate cashier and preparer pools. Regular mode uses an integrated worker. New application executions use the configured payment duration for both cash and transfers, with no additional confirmation wait. The historical engine contract reserves the integrated worker during confirmation and releases the Tuesday cashier. Patience applies only before the first payment starts. The model has no physical queue-capacity limit, product recipes, partial deliveries, or post-payment abandonment.
 
 New arrivals are admitted in `[0, H)`. Window throughput, queue areas, and resource utilization use that same half-open window. Orders admitted before closing continue through completion or withdrawal, so the drain may extend beyond `H`; there is no warm-up period. Initial orders are reported as a separate cohort from newly admitted orders. See the [scenario manual](../user/MANUAL_USUARIO.md#5-configurar-un-escenario) for initial-state fields and mode-specific rules.
 

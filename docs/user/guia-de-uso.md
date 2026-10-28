@@ -2,7 +2,7 @@
 
 Esta guía resume cómo preparar y usar la aplicación local. Para instrucciones detalladas de cada formulario y control, consulta el [manual completo en español](MANUAL_USUARIO.md). La [guía técnica](../technical/technical-guide.md) reúne instalación, comandos y versiones fijadas.
 
-Boquitas permite probar escenarios hipotéticos de llegada, pago, confirmación, espera, preparación y entrega. **Los valores iniciales son sintéticos y no están calibrados con el negocio.**
+Boquitas permite probar escenarios hipotéticos de llegada, pago, espera, preparación y entrega. **Los valores iniciales son sintéticos y no están calibrados con el negocio.**
 
 Las operaciones V2 descritas aquí completaron la aceptación de ingeniería de las 28 tareas de Spec07, según su [informe de verificación](../../openspec/changes/boquitas-07-preparation-interruptions/verification-report.md). La calibración y validación empírica siguen pendientes.
 
@@ -54,14 +54,14 @@ Todos estos valores son entradas sintéticas para aprender a usar el simulador:
 | Estado inicial | Vacío, como supuesto |
 | Llegadas | Exponencial, media 180 s; primera llegada después de una espera generada |
 | Grupo | 1 persona con probabilidad 0,6; 2 con probabilidad 0,4 |
-| Pago activo | Triangular 15 / 30 / 45 s |
+| Pago | Triangular 15 / 30 / 45 s |
 | Preparación por orden | Triangular 60 / 120 / 180 s, independiente del tamaño del grupo |
-| Transferencia | Probabilidad 0,25; confirmación triangular 30 / 60 / 90 s |
+| Medio de pago | Transferencia con probabilidad 0,25; efectivo en las demás órdenes, sin espera adicional |
 | Paciencia | Desactivada (`null`); si se activa, solo afecta la espera antes del primer pago |
 | Semilla raíz | `20261020` |
 | Comparación | 30 réplicas; intervalo bilateral del 95 % |
 
-Un grupo comparte una orden, un pago y una preparación; esta versión no aumenta la preparación según el tamaño del grupo. En martes, el cajero queda disponible durante la confirmación externa. En modo normal, el trabajador integrado mantiene la reserva aunque no haga trabajo activo. No se modelan recetas ni entregas parciales y la cola lógica no representa un aforo físico.
+Un grupo comparte una orden, un pago y una preparación; esta versión no aumenta la preparación según el tamaño del grupo. Las nuevas ejecuciones no añaden espera por confirmación de transferencias. La tabla de órdenes y el inspector muestran el medio de pago: efectivo o transferencia. Si un archivo antiguo no registró ese dato, aparece como no registrado. Los resultados guardados conservan sus tiempos originales al reabrirlos. No se modelan recetas ni entregas parciales y la cola lógica no representa un aforo físico.
 
 Puedes editar distribuciones, personal, tamaños y probabilidades de grupo, transferencias, paciencia, horario, semilla y órdenes presentes al abrir. Los tiempos se escriben en segundos; las probabilidades deben sumar 1. Toda edición necesita una ejecución nueva.
 

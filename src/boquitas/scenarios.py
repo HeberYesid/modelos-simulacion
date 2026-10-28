@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from typing import Annotated, Literal
+from typing import Annotated, Literal, overload
 
 from pydantic import Field, field_validator, model_validator
 
@@ -226,6 +226,53 @@ def demo_scenario() -> Scenario:
             "No warm-up period is applied; observation-window metrics start at opening.",
         ),
         default_root_seed=20261020,
+    )
+
+
+@overload
+def method_only_scenario(scenario: Scenario) -> Scenario: ...
+
+
+@overload
+def method_only_scenario(scenario: ScenarioV2) -> ScenarioV2: ...
+
+
+def method_only_scenario(scenario: Scenario | ScenarioV2) -> Scenario | ScenarioV2:
+    """Remove external transfer-confirmation time from an app execution copy."""
+
+    initial_state = tuple(
+        order.model_copy(
+            update={
+                **(
+                    {"transfer_wait_s": 0.0}
+                    if order.stage in {"waiting_payment", "payment_active"}
+                    else {}
+                ),
+                **({"remaining_s": 0.0} if order.stage == "payment_pending" else {}),
+                **(
+                    {"payment_method": "transfer"}
+                    if order.payment_method is None
+                    and (order.stage == "payment_pending" or (order.transfer_wait_s or 0) > 0)
+                    else {}
+                ),
+            }
+        )
+        if order.stage in {"waiting_payment", "payment_active", "payment_pending"}
+        else order
+        for order in scenario.initial_state
+    )
+    return scenario.model_copy(
+        update={
+            "transfer_confirmation": ConstantTime(value_s=0),
+            "initial_state": initial_state,
+            "assumptions": (
+                scenario.assumptions
+                if "External transfer confirmation time is excluded from app executions."
+                in scenario.assumptions
+                else scenario.assumptions
+                + ("External transfer confirmation time is excluded from app executions.",)
+            ),
+        }
     )
 
 

@@ -1,0 +1,51 @@
+[
+  {
+    "test": "commits a preparer increase on the first run click and exposes the new worker",
+    "status": "passed",
+    "guardActive": true,
+    "localHttpRequestCount": 6,
+    "externalHttpAttempts": []
+  },
+  {
+    "test": "compares 30 matched staffing replications, selects one indexed run, and downloads CSV",
+    "status": "passed",
+    "guardActive": true,
+    "localHttpRequestCount": 8,
+    "externalHttpAttempts": []
+  },
+  {
+    "test": "exports and reopens JSON and matches the full scientific SHA-256 reference",
+    "status": "passed",
+    "guardActive": true,
+    "localHttpRequestCount": 8,
+    "externalHttpAttempts": []
+  },
+  {
+    "test": "imports original and corrected sources with their policies and exposes the known overlap",
+    "status": "passed",
+    "guardActive": true,
+    "localHttpRequestCount": 8,
+    "externalHttpAttempts": []
+  },
+  {
+    "test": "inspects 3D stages, playback, camera controls, and repeated replay mounts",
+    "status": "passed",
+    "guardActive": true,
+    "localHttpRequestCount": 12,
+    "externalHttpAttempts": []
+  },
+  {
+    "test": "portable V2 sample shows pause and resume from the extracted ZIP",
+    "status": "passed",
+    "guardActive": true,
+    "localHttpRequestCount": 7,
+    "externalHttpAttempts": []
+  },
+  {
+    "test": "runs the installed demonstration in Tuesday and regular modes",
+    "status": "passed",
+    "guardActive": true,
+    "localHttpRequestCount": 7,
+    "externalHttpAttempts": []
+  }
+]

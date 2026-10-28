@@ -1,4 +1,5 @@
 import type { RunResult } from "../api/types";
+import { paymentMethodLabel } from "../domain/payment";
 import { formatClockFromOpening, formatNumber } from "../domain/format";
 import { updateReplayLatestEvent, updateReplayPlaybackReadout, updateReplayTimeline } from "../components/results";
 import {
@@ -151,6 +152,7 @@ function renderPersonInspector(
     <div class="replay-inspector-grid">
       <div><dt>Persona</dt><dd>${escapeHtmlText(metric.person_id)}</dd></div>
       <div><dt>Orden compartida</dt><dd>${escapeHtmlText(metric.order_id)}</dd></div>
+      <div><dt>Medio de pago</dt><dd>${escapeHtmlText(paymentMethodLabel(run, metric.order_id))}</dd></div>
       <div><dt>Estado al instante</dt><dd>${escapeHtmlText(stateName(currentPerson.state))}</dd></div>
       <div><dt>Personas de la orden</dt><dd>${formatNumber(groupMembers.length || orderMetric?.person_ids.length || 0, 0)} · ${escapeHtmlText(groupMembers.join(", ") || orderMetric?.person_ids.join(", ") || "No disponibles")}</dd></div>
       <div><dt>Trabajador en este instante</dt><dd>${escapeHtmlText(worker)}</dd></div>
@@ -172,7 +174,6 @@ function renderOrderInspector(
   const times = [
     ["Llegada", renderTimestamp(run, metric.arrival_s, initialized, "arrival_s")],
     ["Inicio del pago", renderTimestamp(run, metric.payment_started_s, false, "payment_started_s")],
-    ["Fin del trabajo activo de pago", renderTimestamp(run, metric.payment_active_ended_s, false, "payment_active_ended_s")],
     ["Pago completado", renderTimestamp(run, metric.payment_completed_s, false, "payment_completed_s")],
     ["Inicio de preparación", renderTimestamp(run, metric.preparation_started_s, false, "preparation_started_s")],
     ["Entrega", renderTimestamp(run, metric.delivery_s, false, "delivery_s")],
@@ -181,6 +182,7 @@ function renderOrderInspector(
   return `
     <div class="replay-inspector-grid">
       <div><dt>Orden</dt><dd>${escapeHtmlText(orderId)}</dd></div>
+      <div><dt>Medio de pago</dt><dd>${escapeHtmlText(paymentMethodLabel(run, orderId))}</dd></div>
       <div><dt>Estado al instante</dt><dd>${escapeHtmlText(stateName(currentOrder.state))}</dd></div>
       <div><dt>Personas vinculadas</dt><dd>${formatNumber(currentOrder.person_ids.length, 0)} · ${escapeHtmlText(currentOrder.person_ids.join(", "))}</dd></div>
       <div><dt>Trabajador en este instante</dt><dd>${escapeHtmlText(currentOrder.worker_id ?? "Sin trabajador asignado en este instante")}</dd></div>
@@ -318,7 +320,10 @@ export function mountReplayHost(
     const pausedPreparation = run.trace.contract_version === 2
       ? ` · ${formatNumber(pausedPreparationOrderCount, 0)} ${pausedPreparationOrderCount === 1 ? "orden con preparación pausada" : "órdenes con preparación pausada"}`
       : "";
-    summary.textContent = `${formatNumber(activePeopleCount, 0)} personas en la tienda · ${formatNumber(next.payment_queue.length, 0)} órdenes en fila de pago · ${formatNumber(next.pending_payments.length, 0)} órdenes con confirmación pendiente · ${formatNumber(next.preparation_queue.length, 0)} órdenes esperando preparación · ${formatNumber(preparingOrderCount, 0)} órdenes en preparación${pausedPreparation} · ${formatNumber(activeWorkerCount, 0)} trabajadores activos · ${formatNumber(reservedWorkerCount, 0)} reservados · ${formatNumber(availableWorkerCount, 0)} disponibles · ${closeState}`;
+    const pendingConfirmation = next.pending_payments.length > 0
+      ? ` · ${formatNumber(next.pending_payments.length, 0)} órdenes con confirmación pendiente`
+      : "";
+    summary.textContent = `${formatNumber(activePeopleCount, 0)} personas en la tienda · ${formatNumber(next.payment_queue.length, 0)} órdenes en fila de pago${pendingConfirmation} · ${formatNumber(next.preparation_queue.length, 0)} órdenes esperando preparación · ${formatNumber(preparingOrderCount, 0)} órdenes en preparación${pausedPreparation} · ${formatNumber(activeWorkerCount, 0)} trabajadores activos · ${formatNumber(reservedWorkerCount, 0)} reservados · ${formatNumber(availableWorkerCount, 0)} disponibles · ${closeState}`;
   };
 
   const updateInspector = (): void => {

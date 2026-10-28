@@ -13,6 +13,13 @@ Local academic discrete-event simulation of an ice cream shop. The Python backen
 
 ## Local setup and startup
 
+For a Windows 10/11 x64 presentation computer, use the self-contained ZIP described
+in the [Spanish portable guide](docs/user/guia-portable.md). It includes its Python
+runtime and built web assets; the destination needs only a compatible browser.
+Build it on Windows x64 with `./build-portable.ps1`. Build tooling and initial
+dependency downloads are needed only on the build computer. Extract the complete
+ZIP before opening `INICIAR_BOQUITAS.cmd`.
+
 Run from the repository root with Python 3.13, uv and pnpm available. See the technical guide for the supported environment and troubleshooting. Installation can require internet access; the built application operates locally afterward.
 
 ```powershell

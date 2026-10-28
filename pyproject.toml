@@ -43,3 +43,6 @@ dev = [
     "pytest>=9.1.1",
     "ruff>=0.17.1",
 ]
+release = [
+    "pyinstaller==6.22.3",
+]

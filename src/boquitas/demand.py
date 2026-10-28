@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import math
+from typing import Literal
 
 import numpy as np
 from numpy.random import Generator, SeedSequence
@@ -85,8 +86,13 @@ def generate_demand(
             _category_rng(root_seed, replication_index, order_index, _PAYMENT_ACTIVE),
         )
         transfer_rng = _category_rng(root_seed, replication_index, order_index, _TRANSFER_SELECTION)
+        payment_method: Literal["cash", "transfer"] = (
+            "transfer"
+            if transfer_rng.random() < scenario.transfer_probability
+            else "cash"
+        )
         transfer_wait_s = 0.0
-        if transfer_rng.random() < scenario.transfer_probability:
+        if payment_method == "transfer":
             transfer_wait_s = _sample(
                 scenario.transfer_confirmation,
                 _category_rng(
@@ -123,6 +129,7 @@ def generate_demand(
                 transfer_wait_s=transfer_wait_s,
                 preparation_s=preparation_s,
                 patience_s=patience_s,
+                payment_method=payment_method,
             )
         )
         order_index += 1

@@ -39,7 +39,7 @@ from .exports import export_csv_tables, load_experiment_json, load_run_json, loa
 from .file_limits import MAX_OBSERVATION_BYTES, MAX_SAVED_RESULT_BYTES
 from .models import InputValidationError
 from .observation_import import ImportReport, import_observations
-from .scenarios import Scenario, ScenarioV2, demo_scenario
+from .scenarios import Scenario, ScenarioV2, demo_scenario, method_only_scenario
 
 MAX_UPLOAD_BYTES = MAX_OBSERVATION_BYTES
 _API_FALLBACK_METHODS = ["GET", "HEAD", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"]
@@ -503,7 +503,7 @@ def create_app(frontend_dist: str | Path | None = None) -> FastAPI:
         responses={500: {"model": ErrorResponse}},
     )
     def get_demo() -> DemoResponse:
-        scenario = demo_scenario()
+        scenario = method_only_scenario(demo_scenario())
         return DemoResponse(
             scenario=scenario,
             root_seed=scenario.default_root_seed,
@@ -518,8 +518,9 @@ def create_app(frontend_dist: str | Path | None = None) -> FastAPI:
     )
     def create_run(request: RunRequest) -> Response | JSONResponse:
         try:
+            scenario = method_only_scenario(request.scenario)
             result = run_scenario(
-                request.scenario,
+                scenario,
                 root_seed=request.root_seed,
                 replication_index=request.replication_index,
             )
@@ -733,7 +734,7 @@ def create_app(frontend_dist: str | Path | None = None) -> FastAPI:
     ) -> Response | JSONResponse:
         try:
             result = run_experiment(
-                request.scenarios,
+                tuple(method_only_scenario(scenario) for scenario in request.scenarios),
                 root_seed=request.root_seed,
                 replications=request.replications,
             )
