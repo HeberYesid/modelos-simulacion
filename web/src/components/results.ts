@@ -2,6 +2,9 @@ import type { ExperimentResult, ImportReport, MetricSummary, RunResult } from ".
 import { paymentMethodLabel } from "../domain/payment";
 import { escapeHtml, formatClockFromOpening, formatNumber, formatSeconds, safeFileName } from "../domain/format";
 import { issueMessage, systemAssumption, translateEnum } from "../domain/errors";
+import { renderObjectiveAnalysisPanel, renderRunAnalysis } from "./scenario-analysis";
+import type { AnalysisObjective } from "../domain/scenario-analysis";
+import { renderQueueModels } from "./queue-models";
 
 export type CompletedResult =
   | { kind: "run"; value: RunResult; jsonText: string; label: string }
@@ -15,13 +18,25 @@ export interface ReplaySelection {
 const METRIC_LABELS: Record<string, string> = {
   "count.admitted.orders.new": "Órdenes admitidas en la ventana",
   "count.admitted.people.new": "Personas admitidas en la ventana",
+  "count.delivered.orders.new": "Órdenes entregadas",
   "count.initialized.orders": "Órdenes presentes al abrir",
   "count.initialized.people": "Personas presentes al abrir",
   "throughput.window.delivery.orders_per_s": "Ritmo de entrega · órdenes por segundo",
   "throughput.window.delivery.people_per_s": "Ritmo de entrega · personas por segundo",
   "drain.end_s": "Fin del vaciado",
   "drain.overtime_s": "Tiempo después del cierre",
+  "duration.payment_wait.served.order.new": "Espera de pago",
+  "duration.permanence.completed.order.new": "Permanencia",
+  "resource.all.total.active_fraction": "Uso activo del personal",
 };
+
+const OVERVIEW_METRIC_IDS = [
+  "count.admitted.orders.new",
+  "count.delivered.orders.new",
+  "duration.payment_wait.served.order.new",
+  "duration.permanence.completed.order.new",
+  "resource.all.total.active_fraction",
+];
 
 const METRIC_TOKENS: Record<string, string> = {
   count: "Cantidad",
@@ -150,19 +165,40 @@ function renderMetricRows(metrics: MetricSummary[]): string {
     </tr>`).join("");
 }
 
+function renderOverviewMetricRows(metrics: MetricSummary[]): string {
+  return metrics.map((metric) => `
+    <tr>
+      <td><strong>${escapeHtml(metricLabel(metric.metric_id))}</strong><br><span class="help-text">${escapeHtml(populationLabel(metric.population))} · ${escapeHtml(cohortLabel(metric.cohort))}</span></td>
+      <td class="metric-value ${metric.value == null ? "metric-unavailable" : ""}">${metric.value == null ? escapeHtml(unavailableReason(metric.unavailable_reason)) : escapeHtml(displayValue(metric.value, metric.unit))}</td>
+    </tr>`).join("");
+}
+
 function renderRunMetrics(run: RunResult): string {
   const metrics = run.metrics.metric_summaries.filter((metric) =>
     !metric.metric_id.includes(".external_confirmation.") || metric.value !== 0,
   );
+  const metricById = new Map(metrics.map((metric) => [metric.metric_id, metric]));
+  const preferredOverview = OVERVIEW_METRIC_IDS.flatMap((metricId) => {
+    const metric = metricById.get(metricId);
+    return metric ? [metric] : [];
+  });
+  const overview = preferredOverview.length ? preferredOverview : metrics.slice(0, 5);
   return `
     <section class="work-surface results-surface" aria-labelledby="run-metrics-title">
       <div class="surface-heading"><div><h2 id="run-metrics-title">Indicadores calculados por el motor</h2>
-        <p>Las unidades, poblaciones y cohortes se mantienen junto a cada valor. La interfaz no recalcula estas medidas.</p></div></div>
+        <p>Valores del motor con sus unidades y poblaciones.</p></div></div>
       <div class="data-table-wrap"><table class="data-table metric-table">
-        <caption class="visually-hidden">Métricas devueltas por el motor de simulación</caption>
-        <thead><tr><th>Indicador · población</th><th>Valor</th><th>Media</th><th>Mediana</th><th>Percentil 95</th><th>Máximo</th></tr></thead>
-        <tbody>${renderMetricRows(metrics)}</tbody>
+        <caption class="visually-hidden">Resumen de indicadores del motor</caption>
+        <thead><tr><th>Indicador</th><th>Valor</th></tr></thead>
+        <tbody>${renderOverviewMetricRows(overview)}</tbody>
       </table></div>
+      ${metrics.length ? `<details class="details-block metric-disclosure"><summary>Ver todos los indicadores</summary>
+        <div class="data-table-wrap"><table class="data-table">
+          <caption class="visually-hidden">Indicadores y estadísticas devueltos por el motor</caption>
+          <thead><tr><th>Indicador · población</th><th>Valor</th><th>Media</th><th>Mediana</th><th>Percentil 95</th><th>Máximo</th></tr></thead>
+          <tbody>${renderMetricRows(metrics)}</tbody>
+        </table></div>
+      </details>` : ""}
       <p class="provenance-line">Réplicas: 1 · semilla ${formatNumber(run.root_seed, 0)} · índice ${formatNumber(run.replication_index, 0)}. Esta ejecución sigue los supuestos del escenario indicado abajo.</p>
     </section>`;
 }
@@ -260,8 +296,8 @@ function renderAssumptions(run: RunResult): string {
           <div><dt>Pesos de tamaño de grupo</dt><dd>${escapeHtml(groupWeights || "No definidos")}</dd></div>
         </dl><div><strong>Órdenes que ya estaban presentes</strong>${initialRows}</div></div>
       </details>
-      ${assumptions.length ? `<ul class="assumption-list">${assumptions.map((item) => `<li>${escapeHtml(item)}</li>`).join("")}</ul>` : ""}
-      <p class="provenance-line">La incertidumbre de los intervalos describe variación de Monte Carlo bajo estas entradas. No mide incertidumbre sobre los parámetros reales de la tienda.</p>
+      ${assumptions.length ? `<details class="details-block"><summary>Supuestos del escenario</summary><ul class="assumption-list">${assumptions.map((item) => `<li>${escapeHtml(item)}</li>`).join("")}</ul></details>` : ""}
+      <p class="provenance-line">Los intervalos describen variación entre simulaciones, no incertidumbre en los parámetros reales.</p>
     </section>`;
 }
 
@@ -604,6 +640,7 @@ export function renderResultsView(options: {
   error: string | null;
   partialExperiment: ExperimentResult | null;
   editsNotRun: boolean;
+  analysisObjective?: AnalysisObjective;
   csvFiles: Array<{ name: string; url: string }>;
   csvLabel: string | null;
 }): string {
@@ -622,10 +659,10 @@ export function renderResultsView(options: {
   if (!options.completed) {
     return `
       <div class="page-intro"><h1>Resultados</h1>
-        <p>Los resultados pertenecen a la configuración y la semilla enviadas al motor. Aquí también quedan las comparaciones, el historial y las descargas.</p></div>
+        <p>El resultado conserva los datos y la semilla enviados al motor.</p></div>
       <div class="results-column">${pending}${error}${partial}
         <section class="empty-state" aria-labelledby="empty-results-title"><div><h2 id="empty-results-title">Todavía no hay una simulación</h2>
-          <p>Configura los tiempos, la capacidad y el estado inicial. Luego ejecuta una réplica o compara escenarios completos.</p>
+          <p>Configura y ejecuta un escenario o compara alternativas.</p>
           <div class="inline-actions"><button type="button" class="secondary-button" data-go-view="scenario">Configurar escenario</button><button type="button" class="quiet-button" data-go-view="observations">Revisar observaciones</button></div>
         </div></section>
       </div>`;
@@ -641,13 +678,14 @@ export function renderResultsView(options: {
     ? `<section class="work-surface results-surface" aria-label="Tablas CSV"><div class="surface-heading"><div><h2>${escapeHtml(options.csvLabel ?? "Tablas CSV listas")}</h2><p>El servicio de exportación conserva columnas, identificadores, unidades y advertencias del contrato.</p></div></div><div class="inline-actions">${options.csvFiles.map((file) => `<a class="secondary-button" href="${escapeHtml(file.url)}" download="${escapeHtml(file.name)}">Descargar ${escapeHtml(file.name)}</a>`).join("")}</div></section>`
     : "";
   const experiment = options.completed.kind === "experiment" ? options.completed.value : null;
+  const analysisObjective = options.analysisObjective ?? "time";
   const selectionTitle = options.selection && experiment
     ? `Réplica ${formatNumber(options.selection.replicationIndex, 0)} · ${options.selection.scenarioId}`
     : "Réplica seleccionada";
   return `
     <div class="page-intro">
       <h1>Resultados</h1>
-      <p>Los valores siguientes corresponden a los datos aceptados por la última solicitud. Una edición posterior conserva este resultado con su configuración original y pide una ejecución nueva.</p>
+      <p>Resultado de la última solicitud. Para aplicar cambios, ejecuta otra vez.</p>
     </div>
     <div class="results-column">${pending}${error}${partial}${staleNotice}
       <section class="results-toolbar">
@@ -660,6 +698,12 @@ export function renderResultsView(options: {
         </div>
       </section>
       ${csvPanel}
+      ${experiment ? renderObjectiveAnalysisPanel(experiment, analysisObjective, options.editsNotRun) : ""}
+      ${baseRun ? renderRunAnalysis(baseRun, {
+        selectedExperimentRun: experiment !== null,
+        editsNotRun: experiment === null && options.editsNotRun,
+        showAssumptions: experiment === null,
+      }) : ""}
       ${experiment ? `
         ${renderExperiment(experiment, options.selection)}
         ${selectedRun ? `<div class="results-meta"><div class="result-meta"><span class="status-chip">${escapeHtml(selectionTitle)}</span><span>Solicitud reproducible con la semilla e índice del experimento.</span></div></div>` : ""}
@@ -667,6 +711,7 @@ export function renderResultsView(options: {
       ${baseRun ? `${renderReplay(baseRun)}<div class="results-grid ${experiment ? "has-selection" : ""}"><div class="results-column">
         ${renderAssumptions(baseRun)}
         ${renderRunMetrics(baseRun)}
+        ${renderQueueModels(baseRun)}
         ${renderQueueIntervals(baseRun)}
         ${renderRunOrders(baseRun)}
       </div>${experiment ? `<div class="results-column"><section class="work-surface side-surface"><h2>Contexto de selección</h2><p>${escapeHtml(selectionTitle)} · semilla ${formatNumber(baseRun.root_seed, 0)} · índice ${formatNumber(baseRun.replication_index, 0)}. El índice se solicita sin modificar la cinta de demanda del lote.</p></section></div>` : ""}</div>` : `<div class="empty-state"><div><h2>Selecciona una réplica para inspeccionarla</h2><p>El resumen del experimento y sus intervalos están disponibles arriba. El motor trae el historial completo cuando eliges un índice específico.</p></div></div>`}

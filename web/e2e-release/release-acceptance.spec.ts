@@ -1,22 +1,37 @@
 import { createHash } from "node:crypto";
-import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
-import { join, resolve } from "node:path";
+import { readFileSync, writeFileSync } from "node:fs";
+import { resolve } from "node:path";
 import { fileURLToPath } from "node:url";
-import { expect, test as base, type Page } from "@playwright/test";
+import { expect, test as base, type Page, type TestInfo } from "@playwright/test";
 import type { ExperimentResult, ImportReport, RunResult } from "../src/api/types";
 
 const projectRoot = fileURLToPath(new URL("../../", import.meta.url));
 const localOrigin = "http://127.0.0.1:8000";
-const reviewRoot = resolve(
+const historicalReferencePath = resolve(
   projectRoot,
-  "openspec/changes/boquitas-06-validation-and-delivery/review",
+  "openspec/changes/boquitas-06-validation-and-delivery/review/release-reproducibility-reference.json",
 );
+const currentReferencePath = resolve(projectRoot, "web/contracts/fixtures/release-reproducibility-v2.json");
 const originalSource = resolve(projectRoot, "tests/fixtures/observation-import/original.txt");
 const correctedSource = resolve(
   projectRoot,
   "tests/fixtures/observation-import/corrected-reference.txt",
 );
 const correctedPolicy = "boquitas-2026-10-20-v1";
+
+async function openDisclosure(page: Page, selector: string): Promise<void> {
+  const disclosure = page.locator(selector);
+  const isOpen = await disclosure.evaluate((element) => (element as HTMLDetailsElement).open);
+  if (!isOpen) await disclosure.locator("summary").click();
+}
+
+async function openAdvancedOptions(page: Page): Promise<void> {
+  await openDisclosure(page, "details[data-advanced-options]");
+}
+
+async function openComparisonOptions(page: Page): Promise<void> {
+  await openDisclosure(page, "details[data-comparison-options]");
+}
 
 type OfflineNetworkAudit = {
   guardActive: boolean;
@@ -59,8 +74,6 @@ const test = base.extend<ReleaseFixtures>({
   }, { auto: true }],
 });
 
-test.beforeAll(() => mkdirSync(reviewRoot, { recursive: true }));
-
 test.beforeEach(async ({ offlineNetworkAudit }) => {
   expect(offlineNetworkAudit.guardActive, "offline request guard was not activated").toBe(true);
   expect(offlineNetworkAudit.localRequestCount).toBe(0);
@@ -83,7 +96,7 @@ test.afterEach(async ({ offlineNetworkAudit }, testInfo) => {
     externalHttpAttempts: offlineNetworkAudit.externalHttpAttempts,
   };
   writeFileSync(
-    evidencePath(`network-audit-${testSlug}${retrySuffix}.json`),
+    testInfo.outputPath(`network-audit-${testSlug}${retrySuffix}.json`),
     `${JSON.stringify(record, null, 2)}\n`,
     "utf8",
   );
@@ -92,13 +105,9 @@ test.afterEach(async ({ offlineNetworkAudit }, testInfo) => {
   expect(record.externalHttpAttempts, "browser attempted external HTTP(S) requests").toEqual([]);
 });
 
-function evidencePath(name: string): string {
-  return join(reviewRoot, `release-${name}`);
-}
-
-async function captureEvidence(page: Page, name: string): Promise<void> {
+async function captureEvidence(page: Page, name: string, testInfo: TestInfo): Promise<void> {
   await page.screenshot({
-    path: evidencePath(`${name}.png`),
+    path: testInfo.outputPath(`${name}.png`),
     fullPage: true,
     animations: "disabled",
   });
@@ -158,7 +167,7 @@ function canonicalScientificValue(value: unknown): unknown {
   return value;
 }
 
-function scientificHash(result: RunResult): { value: unknown; hash: string } {
+function scientificHash(result: unknown): { value: unknown; hash: string } {
   const value = canonicalScientificValue(result);
   const serialized = JSON.stringify(value);
   return {
@@ -167,33 +176,99 @@ function scientificHash(result: RunResult): { value: unknown; hash: string } {
   };
 }
 
-function saveOrCheckReproducibilityReference(result: RunResult): string {
-  const referencePath = evidencePath("reproducibility-reference.json");
-  const current = scientificHash(result);
-  if (existsSync(referencePath)) {
-    const reference = JSON.parse(readFileSync(referencePath, "utf8")) as {
-      sha256: string;
-      excluded_wall_clock_metadata: string[];
-      scientific_result: unknown;
-    };
-    expect(current.hash).toBe(reference.sha256);
-    expect(reference.excluded_wall_clock_metadata).toEqual([]);
-    expect(current.value).toEqual(reference.scientific_result);
-  } else {
-    writeFileSync(referencePath, `${JSON.stringify({
-      reference_version: 1,
-      source: "Downloaded RunResult from the installed local release workflow.",
-      canonicalization: "Recursively sorted JSON object keys; no wall-clock metadata is present in RunResult.",
-      excluded_wall_clock_metadata: [],
-      simulation_time_fields_retained: ["trace.events[].time_s", "trace.window_end_s", "trace.drain_end_s"],
-      sha256: current.hash,
-      scientific_result: current.value,
-    }, null, 2)}\n`, "utf8");
+type ReproducibilityReference = {
+  reference_version: number;
+  sha256: string;
+  excluded_wall_clock_metadata: string[];
+  scientific_result: RunResult;
+};
+
+function loadReference(path: string): ReproducibilityReference {
+  return JSON.parse(readFileSync(path, "utf8")) as ReproducibilityReference;
+}
+
+function currentScientificResultFromHistorical(reference: RunResult, current: RunResult): RunResult {
+  const expected = structuredClone(reference);
+  const transferAssumption = "Los pagos por transferencia no añaden espera de confirmación.";
+  const excludedConfirmationAssumption = "External transfer confirmation time is excluded from app executions.";
+  for (const assumptions of [expected.assumptions, expected.scenario.assumptions]) {
+    assumptions.splice(4, 0, transferAssumption);
+    assumptions.push(excludedConfirmationAssumption);
   }
+
+  expect(current.demand_tape).toHaveLength(expected.demand_tape.length);
+  expected.demand_tape = expected.demand_tape.map((demand, index) => {
+    const currentDemand = current.demand_tape[index]!;
+    const { payment_method: _paymentMethod, ...currentWithoutPaymentMethod } = currentDemand;
+    expect(currentWithoutPaymentMethod).toEqual(demand);
+    return { ...demand, payment_method: currentDemand.payment_method };
+  });
+  expected.scenario.transfer_confirmation = { kind: "constant", value_s: 0 };
+  const paymentSecondsFromDemandTape = expected.demand_tape.reduce(
+    (sum, demand) => sum + demand.payment_active_s,
+    0,
+  );
+
+  for (const pool of ["cashier", "preparer", "integrated"] as const) {
+    const components = expected.metrics.resource_usage.filter(
+      (usage) => usage.pool === pool && usage.component !== "total",
+    );
+    const total = expected.metrics.resource_usage.find(
+      (usage) => usage.pool === pool && usage.component === "total",
+    );
+    expect(components.length).toBeGreaterThan(0);
+    expect(total).toBeDefined();
+    total!.active_worker_s = components.reduce((sum, usage) => sum + usage.active_worker_s, 0);
+    total!.reserved_worker_s = components.reduce((sum, usage) => sum + usage.reserved_worker_s, 0);
+    if (pool === "cashier") {
+      expect(total!.active_worker_s).toBeCloseTo(paymentSecondsFromDemandTape, 12);
+    }
+    if (total!.available_worker_s > 0) {
+      total!.active_fraction = total!.active_worker_s / total!.available_worker_s;
+      total!.reserved_fraction = total!.reserved_worker_s / total!.available_worker_s;
+      for (const [measure, value] of [
+        ["active_fraction", total!.active_fraction],
+        ["reserved_fraction", total!.reserved_fraction],
+      ] as const) {
+        const metricId = `resource.${pool}.total.${measure}`;
+        const metric = expected.metrics.metric_summaries.find((summary) => summary.metric_id === metricId);
+        expect(metric, `missing expected resource summary ${metricId}`).toBeDefined();
+        metric!.value = value;
+      }
+    }
+  }
+
+  return expected;
+}
+
+function verifyReproducibilityReference(result: RunResult): string {
+  const historical = loadReference(historicalReferencePath);
+  const currentReference = loadReference(currentReferencePath);
+  expect(historical.reference_version).toBe(1);
+  expect(historical.excluded_wall_clock_metadata).toEqual([]);
+  const historicalHash = scientificHash(historical.scientific_result).hash;
+  expect(historical.sha256).toBe(historicalHash);
+  expect(historicalHash)
+    .toBe("62a4384e6e889698a5a62e6b63869a75efcf43bf125bc943c22cd3082a746c47");
+
+  expect(currentReference.reference_version).toBe(2);
+  expect(currentReference.excluded_wall_clock_metadata).toEqual([]);
+  const currentReferenceHash = scientificHash(currentReference.scientific_result).hash;
+  expect(currentReference.sha256).toBe(currentReferenceHash);
+  expect(currentReferenceHash)
+    .toBe("0a5cf9339fff5eb2dd463c4a9865f10ad7336cc0b74cb3e4c382d76aaa7e730b");
+  expect(currentReference.scientific_result).toEqual(
+    currentScientificResultFromHistorical(historical.scientific_result, currentReference.scientific_result),
+  );
+
+  const current = scientificHash(result);
+  expect(current.hash).toBe(currentReference.sha256);
+  expect(current.hash).toMatch(/^[a-f0-9]{64}$/);
+  expect(current.value).toEqual(currentReference.scientific_result);
   return current.hash;
 }
 
-test("imports original and corrected sources with their policies and exposes the known overlap", async ({ page }) => {
+test("imports original and corrected sources with their policies and exposes the known overlap", async ({ page }, testInfo) => {
   await page.goto("/");
 
   const originalUncorrected = await importObservation(page, originalSource, "none");
@@ -219,7 +294,7 @@ test("imports original and corrected sources with their policies and exposes the
     .toEqual(["10", "11", "6", "7", "8", "9"]);
   await expect(page.getByText(/6 intervalos de entrega coinciden/)).toBeVisible();
   await expect(page.getByText(/se reportaron 4 preparadores/)).toBeVisible();
-  await captureEvidence(page, "observation-original-corrected-overlap");
+  await captureEvidence(page, "observation-original-corrected-overlap", testInfo);
 
   const correctedReference = await importObservation(page, correctedSource, correctedPolicy);
   expect(correctedReference.policy_status).toBe("already_reflected");
@@ -231,12 +306,13 @@ test("imports original and corrected sources with their policies and exposes the
     .toBe(true);
   await expect(page.getByText(/La fuente corregida ya contiene los cambios aprobados/)).toBeVisible();
   await expect(page.getByText(/se reportaron 4 preparadores/)).toBeVisible();
-  await captureEvidence(page, "observation-corrected-reference");
+  await captureEvidence(page, "observation-corrected-reference", testInfo);
 });
 
-test("runs the installed demonstration in Tuesday and regular modes", async ({ page }) => {
+test("runs the installed demonstration in Tuesday and regular modes", async ({ page }, testInfo) => {
   await page.goto("/");
   await page.getByRole("tab", { name: "Escenarios" }).click();
+  await openAdvancedOptions(page);
   await expect(page.locator("#scenario-id")).toHaveValue("synthetic-demo-tuesday");
   await page.locator("#closing-time").fill("15:30:00");
   await page.locator("#root-seed").fill("20261020");
@@ -245,7 +321,7 @@ test("runs the installed demonstration in Tuesday and regular modes", async ({ p
   expect(tuesday.scenario.engine_config.mode).toBe("tuesday");
   expect(tuesday.scenario.engine_config.cashiers).toBe(1);
   expect(tuesday.scenario.engine_config.preparers).toBe(4);
-  await captureEvidence(page, "demo-tuesday-run");
+  await captureEvidence(page, "demo-tuesday-run", testInfo);
 
   await page.getByRole("tab", { name: "Escenarios" }).click();
   await page.locator('[data-mode="regular"]').check();
@@ -254,17 +330,20 @@ test("runs the installed demonstration in Tuesday and regular modes", async ({ p
   expect(regular.scenario.engine_config.integrated_workers).toBe(1);
   expect(regular.scenario.interarrival).toEqual(tuesday.scenario.interarrival);
   expect(regular.scenario.group_sizes).toEqual(tuesday.scenario.group_sizes);
-  await captureEvidence(page, "demo-regular-run");
+  await captureEvidence(page, "demo-regular-run", testInfo);
 });
 
-test("compares 30 matched staffing replications, selects one indexed run, and downloads CSV", async ({ page }) => {
+test("compares 30 matched staffing replications, selects one indexed run, and downloads CSV", async ({ page }, testInfo) => {
   await page.goto("/");
   await page.getByRole("tab", { name: "Escenarios" }).click();
+  await openAdvancedOptions(page);
   await expect(page.locator("#scenario-id")).toHaveValue("synthetic-demo-tuesday");
   await page.locator("#closing-time").fill("15:30:00");
   await page.locator("#root-seed").fill("20261020");
   await page.locator("#replications").fill("30");
+  await openComparisonOptions(page);
   await page.getByRole("button", { name: "Copiar referencia como candidato" }).click();
+  await openAdvancedOptions(page);
   await page.locator("#scenario-id").fill("candidate-staffing-five");
   await page.locator("#scenario-name").fill("Cinco preparadores");
   await page.locator("#preparers").fill("5");
@@ -301,7 +380,7 @@ test("compares 30 matched staffing replications, selects one indexed run, and do
   expect(paired.every((comparison) => comparison.demand_tapes_identical === true)).toBe(true);
   expect(paired.every((comparison) => comparison.replication_differences.length === 30)).toBe(true);
   await expect(page.getByRole("heading", { name: "Resumen de escenarios" })).toBeVisible();
-  await captureEvidence(page, "paired-staffing-30-replications");
+  await captureEvidence(page, "paired-staffing-30-replications", testInfo);
 
   await page.locator("#selected-scenario").selectOption("candidate-staffing-five");
   await page.locator("#selected-replication").selectOption("0");
@@ -322,7 +401,7 @@ test("compares 30 matched staffing replications, selects one indexed run, and do
   expect(selectedRun.metrics).toEqual(stored?.metrics);
   await expect(page.getByText("Réplica 0 · candidate-staffing-five", { exact: true })).toBeVisible();
   await expect(page.locator("#replay-stage")).toHaveAttribute("data-state", "available");
-  await captureEvidence(page, "indexed-replication-replay");
+  await captureEvidence(page, "indexed-replication-replay", testInfo);
 
   const csvResponsePromise = page.waitForResponse((response) =>
     response.url().endsWith("/api/v1/exports/csv") && response.request().method() === "POST",
@@ -339,16 +418,17 @@ test("compares 30 matched staffing replications, selects one indexed run, and do
   await csvLink.click();
   const csvDownload = await csvDownloadPromise;
   expect(csvDownload.suggestedFilename()).toMatch(/\.csv$/);
-  const csvPath = evidencePath("selected-replication.csv");
+  const csvPath = testInfo.outputPath("selected-replication.csv");
   await csvDownload.saveAs(csvPath);
   const csvText = readFileSync(csvPath, "utf8");
   expect(csvText).toContain("scenario_id");
   expect(csvText).toContain("candidate-staffing-five");
 });
 
-test("commits a preparer increase on the first run click and exposes the new worker", async ({ page }) => {
+test("commits a preparer increase on the first run click and exposes the new worker", async ({ page }, testInfo) => {
   await page.goto("/");
   await page.getByRole("tab", { name: "Escenarios" }).click();
+  await openAdvancedOptions(page);
   await expect(page.locator("#scenario-id")).toHaveValue("synthetic-demo-tuesday");
   await page.locator("#closing-time").fill("15:02:00");
   await page.getByRole("button", { name: "Añadir orden inicial" }).click();
@@ -383,12 +463,13 @@ test("commits a preparer increase on the first run click and exposes the new wor
   await expect(workerSelect).toHaveValue("preparer-1");
   await workerSelect.selectOption("preparer-5");
   await expect(workerSelect).toHaveValue("preparer-5");
-  await captureEvidence(page, "initial-preparer-capacity-update");
+  await captureEvidence(page, "initial-preparer-capacity-update", testInfo);
 });
 
-test("exports and reopens JSON and matches the full scientific SHA-256 reference", async ({ page }) => {
+test("exports and reopens JSON and matches the full scientific SHA-256 reference", async ({ page }, testInfo) => {
   await page.goto("/");
   await page.getByRole("tab", { name: "Escenarios" }).click();
+  await openAdvancedOptions(page);
   await expect(page.locator("#scenario-id")).toHaveValue("synthetic-demo-tuesday");
   await page.locator("#closing-time").fill("15:20:00");
   await page.locator("#root-seed").fill("424242");
@@ -402,11 +483,11 @@ test("exports and reopens JSON and matches the full scientific SHA-256 reference
   await page.getByRole("button", { name: "Descargar resultado JSON" }).click();
   const runDownload = await runDownloadPromise;
   expect(runDownload.suggestedFilename()).toMatch(/\.json$/);
-  const downloadedRunPath = evidencePath("run-export.json");
+  const downloadedRunPath = testInfo.outputPath("run-export.json");
   await runDownload.saveAs(downloadedRunPath);
   const downloadedRun = JSON.parse(readFileSync(downloadedRunPath, "utf8")) as RunResult;
   expect(downloadedRun).toEqual(firstRun);
-  const referenceHash = saveOrCheckReproducibilityReference(downloadedRun);
+  const referenceHash = verifyReproducibilityReference(downloadedRun);
   expect(referenceHash).toMatch(/^[a-f0-9]{64}$/);
   expect(downloadedRun.trace.events.some((event) => event.time_s > 0)).toBe(true);
 
@@ -419,9 +500,10 @@ test("exports and reopens JSON and matches the full scientific SHA-256 reference
   await expect(page.getByRole("tab", { name: "Resultados" })).toHaveAttribute("aria-selected", "true");
   await expect(page.getByRole("heading", { name: "Indicadores calculados por el motor" })).toBeVisible();
   expect(runRequests).toBe(1);
-  await captureEvidence(page, "json-reopened-result");
+  await captureEvidence(page, "json-reopened-result", testInfo);
 
   await page.getByRole("tab", { name: "Escenarios" }).click();
+  await openAdvancedOptions(page);
   await expect(page.locator("#scenario-id")).toHaveValue("synthetic-demo-tuesday");
   await expect(page.locator("#root-seed")).toHaveValue("424242");
   const repeatedRun = await runVisibleScenario(page);
@@ -430,19 +512,20 @@ test("exports and reopens JSON and matches the full scientific SHA-256 reference
   expect(repeatedHash.value).toEqual(scientificHash(downloadedRun).value);
 });
 
-test("inspects 3D stages, playback, camera controls, and repeated replay mounts", async ({ page }) => {
+test("inspects 3D stages, playback, camera controls, and repeated replay mounts", async ({ page }, testInfo) => {
   const prepareMotionDemo = async (navigate = true): Promise<void> => {
     if (navigate) await page.goto("/");
     await page.getByRole("tab", { name: "Escenarios" }).click();
+    await openAdvancedOptions(page);
     await expect(page.locator("#scenario-id")).toHaveValue("synthetic-demo-tuesday");
     await page.locator("#closing-time").fill("15:02:00");
     await page.locator("#root-seed").fill("20261020");
+    await expect(page.locator('[data-distribution-row="transfer_confirmation"]')).toHaveCount(0);
 
     const constantFields: Array<[string, string]> = [
       ["interarrival", "20"],
       ["payment_active", "30"],
       ["preparation", "10"],
-      ["transfer_confirmation", "40"],
     ];
     for (const [key, value] of constantFields) {
       await page.locator(`#dist-${key}-kind`).selectOption("constant");
@@ -454,8 +537,24 @@ test("inspects 3D stages, playback, camera controls, and repeated replay mounts"
     await page.locator('[data-distribution-field="patience.value_s"]').fill("5");
   };
 
+  await page.goto("/");
+  await page.getByRole("tab", { name: "Escenarios" }).click();
+  const historicalTransferRun = resolve(
+    projectRoot,
+    "web/tests/fixtures/replay/legacy-transfer-regular-run.json",
+  );
+  await page.locator("#saved-json-file").setInputFiles(historicalTransferRun);
+  await expect(page.getByRole("tab", { name: "Resultados" })).toHaveAttribute("aria-selected", "true");
+  await seekReplay(page, 1.3);
+  await expect(page.locator("#replay-scene-summary")).toContainText("1 órdenes con confirmación pendiente");
+  await expect(page.locator("#replay-scene-summary")).toContainText("1 reservados");
+  await captureEvidence(page, "legacy-transfer-confirmation", testInfo);
+
   await prepareMotionDemo();
   const run = await runVisibleScenario(page);
+  expect(run.demand_tape.length).toBeGreaterThan(0);
+  expect(run.demand_tape.every((demand) => demand.payment_method === "transfer")).toBe(true);
+  expect(run.demand_tape.every((demand) => demand.transfer_wait_s === 0)).toBe(true);
   const events = run.trace.events;
   const paymentStarted = events.find((event) => event.type === "payment_started");
   expect(paymentStarted).toBeDefined();
@@ -471,6 +570,7 @@ test("inspects 3D stages, playback, camera controls, and repeated replay mounts"
   expect(activeEnded).toBeDefined();
   expect(paymentCompleted).toBeDefined();
   expect(preparationStarted).toBeDefined();
+  expect(paymentCompleted!.time_s).toBe(activeEnded!.time_s);
   const firstOrderDelivered = events.find((event) =>
     event.type === "order_delivered" && event.order_id === paymentStarted?.order_id,
   );
@@ -492,27 +592,12 @@ test("inspects 3D stages, playback, camera controls, and repeated replay mounts"
     ?.match(/(\d+) trabajadores activos/)?.[1] ?? 0);
   expect(activeWorkers).toBeGreaterThan(0);
   await expect(page.locator("#replay-event-detail")).toContainText("Inicio del pago");
-  await captureEvidence(page, "replay-payment-active");
+  await captureEvidence(page, "replay-payment-active", testInfo);
 
-  const activeEndedIndex = events.findIndex((event, index) =>
-    event.type === "payment_active_ended"
-      && event.order_id === paymentStarted?.order_id
-      && events[index + 1]?.time_s !== undefined
-      && events[index + 1]!.time_s > event.time_s,
-  );
-  expect(activeEndedIndex).toBeGreaterThanOrEqual(0);
-  const activeEndedBoundary = events[activeEndedIndex]!;
-  const nextDistinctEvent = events[activeEndedIndex + 1]!;
-  expect(paymentCompleted!.time_s).toBeGreaterThan(activeEndedBoundary.time_s);
-  const pendingTime = (activeEndedBoundary.time_s + Math.min(
-    nextDistinctEvent.time_s,
-    paymentCompleted!.time_s,
-  )) / 2;
-  await seekReplay(page, pendingTime);
-  const pendingPayments = Number((await page.locator("#replay-scene-summary").textContent())
-    ?.match(/(\d+) órdenes con confirmación pendiente/)?.[1] ?? 0);
-  expect(pendingPayments).toBeGreaterThan(0);
-  await captureEvidence(page, "replay-transfer-pending");
+  await seekReplay(page, paymentCompleted!.time_s + 1);
+  await expect(page.locator("#replay-scene-summary")).not.toContainText("confirmación pendiente");
+  await expect(page.locator("#replay-event-detail")).toContainText("Inicio de preparación");
+  await captureEvidence(page, "replay-transfer-no-confirmation-wait", testInfo);
 
   const preparationTime = (preparationStarted!.time_s + firstOrderDelivered!.time_s) / 2;
   await seekReplay(page, preparationTime);
@@ -520,7 +605,7 @@ test("inspects 3D stages, playback, camera controls, and repeated replay mounts"
     ?.match(/(\d+) órdenes en preparación/)?.[1] ?? 0);
   expect(preparingOrders).toBeGreaterThan(0);
   await expect(page.locator("#replay-event-detail")).toContainText("Inicio de preparación");
-  await captureEvidence(page, "replay-preparation");
+  await captureEvidence(page, "replay-preparation", testInfo);
 
   const abandonmentIndex = events.findIndex((event, index) =>
     event.type === "order_abandoned" && events[index + 1]?.time_s !== event.time_s,
@@ -533,7 +618,7 @@ test("inspects 3D stages, playback, camera controls, and repeated replay mounts"
     : abandonmentBoundary.time_s;
   await seekReplay(page, abandonmentTime);
   await expect(page.locator("#replay-event-detail")).toContainText("Retiro de la fila");
-  await captureEvidence(page, "replay-abandonment");
+  await captureEvidence(page, "replay-abandonment", testInfo);
 
   await seekReplay(page, 0);
   const slider = page.locator("#replay-slider");
@@ -544,7 +629,7 @@ test("inspects 3D stages, playback, camera controls, and repeated replay mounts"
     .toBeGreaterThan(timeBeforePlayback);
   await page.getByRole("button", { name: "Pausar" }).click();
   await expect(page.getByRole("button", { name: "Reproducir" })).toHaveAttribute("aria-pressed", "false");
-  await captureEvidence(page, "replay-motion-playing");
+  await captureEvidence(page, "replay-motion-playing", testInfo);
   await page.getByRole("button", { name: "Volver al inicio" }).click();
   await expect(slider).toHaveValue("0");
 
@@ -556,12 +641,12 @@ test("inspects 3D stages, playback, camera controls, and repeated replay mounts"
   await page.getByRole("tab", { name: "Resultados" }).click();
   await expect(stage).toHaveAttribute("data-state", "available");
   await expect(page.locator("#replay-canvas")).toHaveCount(1);
-  await captureEvidence(page, "replay-repeated-mounts");
+  await captureEvidence(page, "replay-repeated-mounts", testInfo);
 
   await page.reload();
   await prepareMotionDemo(false);
   await runVisibleScenario(page);
   await expect(page.locator("#replay-stage")).toHaveAttribute("data-state", "available");
   await expect(page.locator("#replay-canvas")).toBeVisible();
-  await captureEvidence(page, "replay-after-page-reload");
+  await captureEvidence(page, "replay-after-page-reload", testInfo);
 });

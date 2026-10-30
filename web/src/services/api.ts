@@ -13,7 +13,7 @@ import type {
   CsvExportRequest,
   CsvExportResponse,
 } from "../api/types";
-import { issueMessage } from "../domain/errors";
+import { issueMessage, serviceErrorMessage } from "../domain/errors";
 import {
   MAX_OBSERVATION_BYTES,
   MAX_SAVED_RESULT_BYTES,
@@ -62,7 +62,7 @@ export class ServiceError extends Error {
         : typeof details.diagnostic_ref === "string"
           ? details.diagnostic_ref
       : null;
-    const fallbackMessage =
+    const fallbackMessage = serviceErrorMessage(code) ?? (
       issues.length > 0
         ? "El servicio local encontró datos que deben corregirse. El resultado anterior sigue disponible."
         : status === 413
@@ -75,7 +75,7 @@ export class ServiceError extends Error {
             ? RESULT_TOO_LARGE_MESSAGE
           : status === 422
             ? "El servicio local no aceptó estos datos. Revisa las indicaciones antes de intentarlo de nuevo."
-            : "No se pudo completar la solicitud al servicio local. Verifica que la aplicación siga activa e inténtalo de nuevo.";
+            : "No se pudo completar la solicitud al servicio local. Verifica que la aplicación siga activa e inténtalo de nuevo.");
     const serverMessage = typeof problem.message === "string" ? problem.message : null;
     const message = serverMessage ?? fallbackMessage;
     super(message);
@@ -122,10 +122,10 @@ async function jsonRequest<T>(path: string, init?: RequestInit): Promise<T> {
   return body as T;
 }
 
-function postJson<T>(path: string, payload: unknown): Promise<T> {
+function postJson<T>(path: string, payload: unknown, headers?: Record<string, string>): Promise<T> {
   return jsonRequest<T>(path, {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
+    headers: { "Content-Type": "application/json", ...headers },
     body: JSON.stringify(payload),
   });
 }
@@ -151,12 +151,21 @@ export function importObservations(file: File, correctionPolicy: string): Promis
   return jsonRequest<ImportReport>("/api/v1/observations/import", { method: "POST", body: form });
 }
 
-export function executeRun(request: RunRequest): Promise<RunResult> {
-  return postJson<RunResult>("/api/v1/runs", request);
+export function executeRun(request: RunRequest, executionId?: string): Promise<RunResult> {
+  const headers = executionId ? { "X-Boquitas-Execution-Id": executionId } : undefined;
+  return postJson<RunResult>("/api/v1/runs", request, headers);
 }
 
-export function executeExperiment(request: ExperimentRequest): Promise<ExperimentResult> {
-  return postJson<ExperimentResult>("/api/v1/experiments", request);
+export function executeExperiment(request: ExperimentRequest, executionId?: string): Promise<ExperimentResult> {
+  const headers = executionId ? { "X-Boquitas-Execution-Id": executionId } : undefined;
+  return postJson<ExperimentResult>("/api/v1/experiments", request, headers);
+}
+
+export function cancelExecution(executionId: string): Promise<{ status: "cancel_requested" }> {
+  return jsonRequest<{ status: "cancel_requested" }>(
+    `/api/v1/executions/${encodeURIComponent(executionId)}/cancel`,
+    { method: "POST" },
+  );
 }
 
 export function validateSavedFile(file: File): Promise<FileValidationResponse> {

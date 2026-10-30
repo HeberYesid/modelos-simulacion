@@ -1,12 +1,24 @@
-import { expect, test } from "@playwright/test";
+import { expect, test, type Page } from "@playwright/test";
 import { readFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import type { RunResult, Scenario } from "../src/api/types";
 
 const correctedReference = fileURLToPath(new URL("../../tests/fixtures/observation-import/corrected-reference.txt", import.meta.url));
 const demoScenarioFixture = JSON.parse(readFileSync(fileURLToPath(new URL("../contracts/fixtures/demo-scenario.json", import.meta.url)), "utf8")) as Scenario;
-const importDesktopEvidence = fileURLToPath(new URL("../../openspec/changes/boquitas-04-local-web-app/review/import-desktop-after-fix.png", import.meta.url));
-const importMobileEvidence = fileURLToPath(new URL("../../openspec/changes/boquitas-04-local-web-app/review/import-mobile-after-fix.png", import.meta.url));
+
+async function openDisclosure(page: Page, selector: string): Promise<void> {
+  const disclosure = page.locator(selector);
+  const isOpen = await disclosure.evaluate((element) => (element as HTMLDetailsElement).open);
+  if (!isOpen) await disclosure.locator("summary").click();
+}
+
+async function openAdvancedOptions(page: Page): Promise<void> {
+  await openDisclosure(page, "details[data-advanced-options]");
+}
+
+async function openComparisonOptions(page: Page): Promise<void> {
+  await openDisclosure(page, "details[data-comparison-options]");
+}
 
 function replayScenario(): Scenario {
   const scenario = structuredClone(demoScenarioFixture) as Scenario;
@@ -55,7 +67,7 @@ function transferScenario(mode: "tuesday" | "regular"): Scenario {
 }
 
 async function runThroughLocalApi(page: import("@playwright/test").Page, scenario: Scenario, seed: number): Promise<RunResult> {
-  const response = await page.request.post("http://127.0.0.1:8000/api/v1/runs", {
+  const response = await page.request.post("/api/v1/runs", {
     data: { scenario, root_seed: seed, replication_index: 0 },
   });
   const payload: unknown = await response.json();
@@ -99,7 +111,9 @@ function contrastRatio(foreground: string, background: string): number {
   return (Math.max(first, second) + 0.05) / (Math.min(first, second) + 0.05);
 }
 
-test("imports the corrected reference and keeps its audit warnings visible", async ({ page }) => {
+test("imports the corrected reference and keeps its audit warnings visible", async ({ page }, testInfo) => {
+  const importDesktopEvidence = testInfo.outputPath("import-desktop-after-fix.png");
+  const importMobileEvidence = testInfo.outputPath("import-mobile-after-fix.png");
   await page.setViewportSize({ width: 1440, height: 900 });
   await page.goto("/");
   await page.getByRole("tab", { name: "Datos observados" }).click();
@@ -134,8 +148,11 @@ test("imports the corrected reference and keeps its audit warnings visible", asy
 test("keeps the submitted run visible with its original parameters after an edit", async ({ page }) => {
   await page.goto("/");
   await page.getByRole("tab", { name: "Escenarios" }).click();
+  await openAdvancedOptions(page);
   await expect(page.locator("#root-seed")).toHaveValue("20261020");
+  await openComparisonOptions(page);
   await page.getByRole("button", { name: "Copiar referencia como candidato" }).click();
+  await openAdvancedOptions(page);
   await page.locator("#scenario-id").fill("candidate-single-run");
   await page.locator("#scenario-name").fill("Candidato para una réplica");
   const runResponse = page.waitForResponse((response) =>
@@ -154,6 +171,7 @@ test("keeps the submitted run visible with its original parameters after an edit
   await expect(page.getByText("Triangular · 60 / 120 / 180 s")).toBeVisible();
 
   await page.getByRole("tab", { name: "Escenarios" }).click();
+  await openAdvancedOptions(page);
   await page.locator("#group-prob-0").fill("0.2");
   await page.locator("#group-prob-1").fill("0.2");
   const invalidRun = page.waitForResponse((response) =>
@@ -182,13 +200,20 @@ test("selects and replays the exact completed experiment member", async ({ page 
   await page.goto("/");
   await page.getByRole("tab", { name: "Escenarios" }).click();
   await page.locator("#closing-time").fill("15:01:00");
+  await openAdvancedOptions(page);
   await page.locator("#replications").fill("5");
+  await openComparisonOptions(page);
   await page.getByRole("button", { name: "Copiar referencia como candidato" }).click();
+  await openAdvancedOptions(page);
   await page.locator("#scenario-id").fill("candidate-fast-preparation");
   await page.locator("#scenario-name").fill("Preparación breve");
   await page.locator('[data-distribution-field="preparation.low_s"]').fill("5.125");
   await page.locator('[data-distribution-field="preparation.mode_s"]').fill("8.25");
   await page.locator('[data-distribution-field="preparation.high_s"]').fill("12.75");
+  await page.locator("details[data-comparison-options] > summary").click();
+  await expect(page.locator("[data-active-scenario-name]")).toHaveText("Preparación breve");
+  await expect(page.locator("details[data-comparison-options]")).toHaveJSProperty("open", false);
+  await openComparisonOptions(page);
 
   const experimentResponse = page.waitForResponse((response) =>
     response.url().endsWith("/api/v1/experiments") && response.request().method() === "POST",
@@ -248,6 +273,7 @@ test("preserves demand on regular mode and inspects explicit work draining past 
   await page.goto("/");
   await page.getByRole("tab", { name: "Escenarios" }).click();
   await page.locator('[data-distribution-field="interarrival.mean_s"]').fill("211.125");
+  await openAdvancedOptions(page);
   await page.getByRole("button", { name: "Añadir orden inicial" }).click();
   await page.locator('[data-initial-stage="0"]').selectOption("waiting_preparation");
   await page.locator("#initial-0-id").fill("initial-preparation");
@@ -321,6 +347,7 @@ test("saves and reopens versioned files and exposes CSV downloads", async ({ pag
   );
   await page.locator("#saved-json-file").setInputFiles(scenarioPath as string);
   expect((await openScenarioResponse).status()).toBe(200);
+  await openAdvancedOptions(page);
   await expect(page.locator("#scenario-id")).toHaveValue("synthetic-demo-tuesday");
 
   const runResponse = page.waitForResponse((response) =>

@@ -14,9 +14,19 @@ export type ReplayOrderPhase =
   | "completed"
   | "abandoned";
 
+export type ReplayProductVisualKind = "fruit_salad" | "ice_cream" | "slush";
+
+export interface ReplayOrderItem {
+  readonly product_id: string;
+  readonly display_name: string;
+  readonly visual_kind: ReplayProductVisualKind;
+  readonly quantity: number;
+}
+
 export interface ReplayOrderState {
   readonly order_id: string;
   readonly person_ids: readonly string[];
+  readonly items: readonly ReplayOrderItem[];
   readonly state: ReplayOrderPhase;
   readonly source: "initial" | "new";
   readonly arrival_s: number | null;
@@ -216,6 +226,7 @@ export function validate_replay_trace(value: unknown): ReplayTrace {
     if (order.worker_id !== undefined && order.worker_id !== null) {
       requireString(order.worker_id, `${path}.worker_id`);
     }
+    parseReplayOrderItems(order.items, `${path}.items`);
     ordersById.set(orderId, personIds);
   }
   for (const orderId of [...initialSet, ...newSet]) {
@@ -516,6 +527,7 @@ function createReplayReducer(trace: ReplayTrace): ReplayReducer {
     orders.set(finalOrder.order_id, {
       order_id: finalOrder.order_id,
       person_ids: [...finalOrder.person_ids],
+      items: parseReplayOrderItems(finalOrder.items, `trace.final_orders.${finalOrder.order_id}.items`),
       state: "not_arrived",
       source: initialIds.has(finalOrder.order_id) ? "initial" : "new",
       arrival_s: null,
@@ -795,7 +807,11 @@ function createReplayReducer(trace: ReplayTrace): ReplayReducer {
       const orderSnapshot = Object.fromEntries(
         [...orders].map(([id, order]) => [
           id,
-          Object.freeze({ ...order, person_ids: Object.freeze([...order.person_ids]) }),
+          Object.freeze({
+            ...order,
+            person_ids: Object.freeze([...order.person_ids]),
+            items: order.items,
+          }),
         ]),
       );
       const personSnapshot = Object.fromEntries(
@@ -1087,6 +1103,47 @@ function requireString(value: unknown, path: string): string {
     fail(path, "must be a nonempty string");
   }
   return value;
+}
+
+function parseReplayOrderItems(value: unknown, path: string): readonly ReplayOrderItem[] {
+  if (value === undefined) return Object.freeze([]);
+  const rows = requireArray(value, path);
+  if (rows.length > 24) {
+    fail(path, "must contain at most 24 product lines");
+  }
+
+  const productIds = new Set<string>();
+  let totalQuantity = 0;
+  const items = rows.map((rawItem, index): ReplayOrderItem => {
+    const itemPath = `${path}[${index}]`;
+    const item = requireRecord(rawItem, itemPath);
+    const productId = requireString(item.product_id, `${itemPath}.product_id`);
+    if (productIds.has(productId)) {
+      fail(`${itemPath}.product_id`, `duplicates product ${productId}`);
+    }
+    productIds.add(productId);
+
+    const displayName = requireString(item.display_name, `${itemPath}.display_name`);
+    if (item.visual_kind !== "fruit_salad" && item.visual_kind !== "ice_cream" && item.visual_kind !== "slush") {
+      fail(`${itemPath}.visual_kind`, "must be fruit_salad, ice_cream, or slush");
+    }
+    const quantity = requireFiniteNumber(item.quantity, `${itemPath}.quantity`);
+    if (!Number.isInteger(quantity) || quantity < 1 || quantity > 50) {
+      fail(`${itemPath}.quantity`, "must be a positive integer no greater than 50");
+    }
+    totalQuantity += quantity;
+    if (totalQuantity > 50) {
+      fail(path, "must contain at most 50 total units");
+    }
+
+    return Object.freeze({
+      product_id: productId,
+      display_name: displayName,
+      visual_kind: item.visual_kind,
+      quantity,
+    });
+  });
+  return Object.freeze(items);
 }
 
 function optionalNullableString(value: unknown, path: string): string | null {

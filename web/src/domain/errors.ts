@@ -74,6 +74,13 @@ const ISSUE_LABELS: Record<string, string> = {
   upload_too_large: "El archivo supera el máximo local de 10 MiB.",
 };
 
+const SERVICE_ERROR_MESSAGES: Record<string, string> = {
+  execution_cancelled: "La ejecución fue cancelada. El resultado anterior se conserva.",
+  execution_timed_out: "La ejecución superó el tiempo disponible. Reduce la carga y vuelve a intentarlo.",
+  execution_busy: "El servicio local está atendiendo otra ejecución. Espera a que termine e inténtalo de nuevo.",
+  experiment_workload_limit_exceeded: "La comparación supera el límite computacional. Reduce la cantidad de escenarios, réplicas o demanda.",
+};
+
 const CORRECTION_REASONS: Record<string, string> = {
   "Correct the recorded cashier end time per the approved 2026-10-20 correction.": "Ajustar la hora de fin registrada en caja según la corrección aprobada del 20 de octubre de 2026.",
   "Exclude delivery 26 because the user identified it as a recording error.": "Excluir la entrega 26 porque se informó un error de registro.",
@@ -127,6 +134,10 @@ export function validationMessage(issue: ImportIssue): string {
 
 export function issueMessage(code: string, path: string): string {
   return ISSUE_LABELS[code] ?? `Revisa ${fieldLabel(path)} e inténtalo de nuevo.`;
+}
+
+export function serviceErrorMessage(code: string | null): string | null {
+  return code ? SERVICE_ERROR_MESSAGES[code] ?? null : null;
 }
 
 export function correctionReason(reason: string): string {

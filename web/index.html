@@ -4,6 +4,15 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="theme-color" content="#F6F5FA" />
+    <meta name="color-scheme" content="light dark" />
+    <script>
+      try {
+        const preference = localStorage.getItem("boquitas-color-scheme");
+        if (preference === "light" || preference === "dark") {
+          document.querySelector('meta[name="color-scheme"]').setAttribute("content", preference);
+        }
+      } catch {}
+    </script>
     <meta
       name="description"
       content="Herramienta local para revisar observaciones, configurar escenarios y consultar simulaciones de Boquitas."

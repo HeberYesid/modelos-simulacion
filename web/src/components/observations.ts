@@ -126,7 +126,7 @@ function renderReport(report: ImportReport): string {
     <section class="work-surface audit-surface" aria-labelledby="audit-title">
       <div class="surface-heading">
         <div><h2 id="audit-title">${escapeHtml(report.source_name)}</h2>
-          <p>Política: ${escapeHtml(translatePolicy(report.correction_policy))} · ${escapeHtml(translateEnum(report.policy_status))}</p>
+          <p>${escapeHtml(translatePolicy(report.correction_policy))} · ${escapeHtml(translateEnum(report.policy_status))}</p>
         </div>
         <span class="status-chip ${report.fatal_error ? "problem" : ""}">${report.fatal_error ? "Requiere revisión" : "Importada"}</span>
       </div>
@@ -136,12 +136,12 @@ function renderReport(report: ImportReport): string {
         <div class="report-count highlight"><strong>${formatNumber(withdrawalCount, 0)}</strong><span>retiros registrados</span></div>
         <div class="report-count"><strong>${formatNumber(excluded, 0)}</strong><span>filas excluidas del perfil</span></div>
       </div>
-      <p class="subtle-note">${escapeHtml(policyMessage)} Tamaño del grupo y cantidad de personas no observados en ${formatNumber(unknownGroups, 0)} filas; esta importación no modifica ni calibra ningún escenario.</p>
+      <p class="subtle-note">${escapeHtml(policyMessage)} Tamaño del grupo y cantidad de personas no observados en ${formatNumber(unknownGroups, 0)} filas. Esta fuente no calibra escenarios.</p>
 
       <div class="audit-list">
         <section aria-labelledby="station-summary-title">
           <div class="surface-heading"><div><h3 id="station-summary-title">Segmentos observados</h3>
-            <p>La caja muestra la espera registrada y su ventana de transacción; esta última no mide trabajo activo. Entrega describe preparación hasta la entrega final.</p></div></div>
+            <p>En caja, el intervalo no mide trabajo activo. Entrega cubre preparación hasta la última entrega.</p></div></div>
           <div class="data-table-wrap"><table class="data-table">
             <caption class="visually-hidden">Conteos descriptivos por estación y fecha</caption>
             <thead><tr><th>Estación</th><th>Fecha</th><th>Filas</th><th>Retiros</th><th>Personal reportado</th><th>Espera observada</th><th>Intervalo observado</th><th>Consistencia</th></tr></thead>
@@ -150,11 +150,11 @@ function renderReport(report: ImportReport): string {
           ${report.station_summaries.map(renderConflict).join("")}
         </section>
         <section aria-labelledby="corrections-title">
-          <div class="surface-heading"><div><h3 id="corrections-title">Correcciones y exclusiones</h3><p>Cada ajuste conserva su referencia y razón.</p></div></div>
+          <div class="surface-heading"><div><h3 id="corrections-title">Correcciones y exclusiones</h3><p>Cada cambio conserva su referencia.</p></div></div>
           ${correctionMarkup}
         </section>
         <section aria-labelledby="issues-title">
-          <div class="surface-heading"><div><h3 id="issues-title">Diagnósticos (${formatNumber(report.issues.length, 0)})</h3><p>Las filas señaladas conservan su contenido de origen para inspección.</p></div></div>
+          <div class="surface-heading"><div><h3 id="issues-title">Diagnósticos (${formatNumber(report.issues.length, 0)})</h3><p>Se conserva el contenido original de cada fila.</p></div></div>
           ${issueMarkup}
         </section>
       </div>
@@ -167,16 +167,25 @@ export function renderObservationsView(options: {
   mode: ObservationSourceMode;
   pending: boolean;
   error: string | null;
+  measuredReplayMarkup?: string;
 }): string {
   const panelFile = options.mode === "file";
+  const firstUse = options.report === null && options.failureReport === null;
   return `
     <div class="page-intro">
       <h1>Datos observados</h1>
-      <p>Importa las filas de caja o entrega y revisa su procedencia antes de usarlas como contexto. Las observaciones no se convierten en parámetros del modelo.</p>
+      <p>Importa registros de caja o entrega. Se revisan sin convertirlos en parámetros del modelo.</p>
     </div>
-    <div class="import-layout">
+    ${options.measuredReplayMarkup ?? ""}
+    ${firstUse ? `
+      <section class="work-surface observations-starter" aria-labelledby="first-run-title">
+        <div><h2 id="first-run-title">¿Primera vez? Empieza con una simulación</h2>
+          <p>La demostración sintética ya está lista. No necesitas importar datos para comenzar y no está calibrada con la tienda.</p></div>
+        <button class="primary-button" type="button" data-go-view="scenario">Preparar mi primera simulación</button>
+      </section>` : ""}
+    <div class="import-layout ${firstUse ? "first-use" : ""}">
       <section class="work-surface input-surface" aria-labelledby="source-title">
-        <div class="surface-heading"><div><h2 id="source-title">Revisar una fuente</h2><p>CSV o TXT en UTF-8 · máximo 10 MiB · todo el procesamiento permanece local.</p></div></div>
+        <div class="surface-heading"><div><h2 id="source-title">Revisar una fuente</h2><p>CSV/TXT en UTF-8 · hasta 10 MiB · procesamiento local.</p></div></div>
         <form id="observations-form" novalidate>
           <div class="input-mode-row">
             <div class="segmented-control" role="group" aria-label="Forma de cargar observaciones">
@@ -198,7 +207,7 @@ export function renderObservationsView(options: {
             <div class="field-stack">
               <label for="observation-text">Texto CSV/TXT</label>
               <textarea id="observation-text" name="pasted_text" maxlength="10485760" aria-describedby="paste-help" ${panelFile ? "disabled" : "required"} placeholder="lugar,fecha,tipo_dia,personal,id,hora_llegada,hora_inicio,hora_fin,hora_se_fue"></textarea>
-              <p id="paste-help" class="help-text">Pega el encabezado y las filas. El límite se aplica al contenido UTF-8 completo.</p>
+              <p id="paste-help" class="help-text">Pega el encabezado y las filas.</p>
             </div>
           </div>
           <div class="field correction-policy-field">
@@ -207,7 +216,7 @@ export function renderObservationsView(options: {
               <option value="none">Sin correcciones</option>
               <option value="boquitas-2026-10-20-v1">Correcciones aprobadas · Boquitas 2026-10-20</option>
             </select>
-            <p class="help-text">El perfil aprobado reconoce las dos correcciones conocidas; si ya aparecen en el archivo, informa que están reflejadas.</p>
+            <p class="help-text">Reconoce las correcciones aprobadas y evita aplicarlas dos veces.</p>
           </div>
           <div class="button-row">
             <span id="import-pending" class="help-text" role="status" aria-live="polite">${options.pending ? "Leyendo la fuente…" : ""}</span>
@@ -218,16 +227,7 @@ export function renderObservationsView(options: {
       </section>
       <div class="audit-result">
         ${options.failureReport ? renderReport(options.failureReport) : ""}
-        ${options.report ? renderReport(options.report) : `
-          <section class="empty-state observations-empty" aria-labelledby="empty-observations-title">
-            <div class="empty-state-copy"><h2 id="empty-observations-title">Todavía no hay una fuente revisada</h2><p>Empieza con el archivo corregido o pega las filas. La revisión conserva el origen antes de cualquier interpretación.</p>
-              <p class="subtle-note source-note">No se estimarán distribuciones, cantidad de personas ni asignaciones de trabajadores a partir de estas observaciones.</p></div>
-            <ol class="review-process" role="list" aria-label="Proceso para revisar observaciones">
-              <li><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M5 4.5h9l5 5V20H5z"/><path d="M14 4.5V10h5M8 13h8M8 16.5h5"/></svg><span><strong>Elige la fuente</strong><small>CSV/TXT o texto pegado</small></span></li>
-              <li><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M5 6h14M5 11h9M5 16h7"/><circle cx="17" cy="16" r="3.5"/><path d="m19.5 18.5 2 2"/></svg><span><strong>Inspecciona las filas</strong><small>Conteos, cambios y exclusiones</small></span></li>
-              <li><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M12 3.5 21 20H3z"/><path d="M12 9v5m0 2.5v.1"/></svg><span><strong>Lee los conflictos</strong><small>Conserva los límites de la fuente</small></span></li>
-            </ol>
-          </section>`}
+        ${options.report ? renderReport(options.report) : ""}
       </div>
     </div>`;
 }

@@ -1,33 +1,49 @@
 import "./styles.css";
+import { installColorSchemeToggle } from "./theme";
 import type { ExperimentResult, RunResult, Scenario, ScenarioDraft } from "./api/types";
 import type { CompletedResult, ReplaySelection } from "./components/results";
 import { renderResultsView, renderExperimentChartForSelection, runFilename, experimentFilename, updateReplayTimeline } from "./components/results";
 import { renderObservationsView, type ObservationSourceMode } from "./components/observations";
+import { renderObservedSection, mountObservedSection, type ObservedSectionHandle } from "./components/observed-replay";
+import { renderObjectiveAnalysisContent } from "./components/scenario-analysis";
 import {
+  addArrivalScheduleWindow,
   addInterruptionScheduleEntry,
+  addMenuBasket,
   clearInterruptionSchedule,
   collectScenarioDraft,
+  disableArrivalSchedule,
   disableInterruptionPolicy,
+  disableMenu,
+  enableArrivalSchedule,
   enableInterruptionPolicy,
+  enableMenu,
   interruptionDraftIssues,
   newInitialOrder,
+  removeArrivalScheduleWindow,
   removeInterruptionScheduleEntry,
+  removeMenuBasket,
   renderScenarioView,
   resolveInterruptionCompatibility,
+  scenarioConfigurationIssues,
   scenarioDraftToWire,
   scenarioToDraft,
   buildDistribution,
   setScenarioTimeValidity,
   refreshInitialWorkerOptions,
+  validateInitialPersonLimits,
 } from "./components/scenario-editor";
 import { renderShell, setActiveView, setDirty, announce, type MainView } from "./components/shell";
 import type { ApiSchema, CsvExportRequest, ExperimentRequest, RunRequest } from "./api/types";
 import { fieldLabel, systemAssumption } from "./domain/errors";
+import { ANALYSIS_OBJECTIVES, type AnalysisObjective } from "./domain/scenario-analysis";
+import workLimits from "../contracts/work-limits.json";
 import { downloadBytes, downloadText, escapeHtml, formatNumber, readExactJsonFile, safeFileName } from "./domain/format";
 import {
   checkHealth,
   executeExperiment,
   executeRun,
+  cancelExecution,
   exactResponseJsonFor,
   exportCsv,
   importObservations,
@@ -46,11 +62,23 @@ interface FieldIssue {
   message: string;
 }
 
+interface ActiveExecution {
+  id: string;
+  kind: "run" | "experiment";
+  cancelRequestPending: boolean;
+  cancelRequested: boolean;
+  cancelError: string | null;
+}
+
 interface AppState {
   view: MainView;
   scenarios: ScenarioDraft[];
   activeScenarioIndex: number;
   replications: number;
+  advancedOptionsOpen: boolean | null;
+  comparisonOptionsOpen: boolean | null;
+  modelHelpOpen: boolean | null;
+  resetDisclosureCapture: boolean;
   cleanScenarioJson: string[];
   cleanReplications: number;
   observationMode: ObservationSourceMode;
@@ -64,10 +92,12 @@ interface AppState {
   jsonError: string | null;
   pending: PendingAction | null;
   pendingMessage: string | null;
+  activeExecution: ActiveExecution | null;
   completed: CompletedResult | null;
   completedBytes: ArrayBuffer | null;
   selectedRun: RunResult | null;
   selection: ReplaySelection | null;
+  analysisObjective: AnalysisObjective;
   csvFiles: Array<{ name: string; url: string }>;
   csvLabel: string | null;
   scenarioFileBytes: ArrayBuffer | null;
@@ -79,6 +109,10 @@ const state: AppState = {
   scenarios: [],
   activeScenarioIndex: 0,
   replications: 30,
+  advancedOptionsOpen: null,
+  comparisonOptionsOpen: null,
+  modelHelpOpen: null,
+  resetDisclosureCapture: false,
   cleanScenarioJson: [],
   cleanReplications: 30,
   observationMode: "file",
@@ -92,10 +126,12 @@ const state: AppState = {
   jsonError: null,
   pending: null,
   pendingMessage: null,
+  activeExecution: null,
   completed: null,
   completedBytes: null,
   selectedRun: null,
   selection: null,
+  analysisObjective: "time",
   csvFiles: [],
   csvLabel: null,
   scenarioFileBytes: null,
@@ -104,6 +140,7 @@ const state: AppState = {
 
 const interacted = new WeakSet<Element>();
 let activeReplayHost: ReplayHostHandle | null = null;
+let activeObservedSection: ObservedSectionHandle | null = null;
 let replayMemoryRun: RunResult | null = null;
 let replayMemoryTimeS = 0;
 let replayMemorySelection = "";
@@ -119,6 +156,12 @@ function replayProjectorFor(run: RunResult): ReplayProjector {
 
 function activeScenario(): ScenarioDraft | null {
   return state.scenarios[state.activeScenarioIndex] ?? null;
+}
+
+function updateActiveScenarioLabel(): void {
+  const label = document.querySelector<HTMLElement>("[data-active-scenario-name]");
+  const scenario = activeScenario();
+  if (label && scenario) label.textContent = scenario.display_name;
 }
 
 function scenarioWireJson(scenario: ScenarioDraft): string | null {
@@ -165,10 +208,9 @@ function setServiceStatus(status: "checking" | "ok" | "error", message: string):
 
 function renderScenarioUnavailable(): string {
   return `
-    <div class="page-intro"><p class="section-kicker">Entradas explícitas</p><h1>Escenarios</h1>
-      <p>El servicio local carga la demostración inicial y valida cada solicitud.</p></div>
+    <div class="page-intro"><h1>Escenarios</h1></div>
     <div class="alert-box" role="alert"><h2>No se pudo cargar el escenario de demostración</h2>
-      <p>Comprueba que la aplicación local siga activa y vuelve a abrir esta vista. No se crearon valores de reemplazo en el navegador.</p>
+      <p>Inicia el servicio local y vuelve a cargar. El navegador no crea valores de reemplazo.</p>
       ${state.scenarioError ? `<p>${escapeHtml(state.scenarioError)}</p>` : ""}
       <div class="inline-actions" style="margin-top:0.8rem"><button type="button" class="secondary-button" data-reload-demo>Volver a cargar</button></div>
     </div>`;
@@ -180,12 +222,52 @@ function clearCsvFiles(): void {
   state.csvLabel = null;
 }
 
+function captureScenarioDisclosureState(): void {
+  const advanced = document.querySelector<HTMLDetailsElement>("[data-advanced-options]");
+  const comparison = document.querySelector<HTMLDetailsElement>("[data-comparison-options]");
+  const help = document.querySelector<HTMLDetailsElement>("[data-model-help]");
+  if (advanced) state.advancedOptionsOpen = advanced.open;
+  if (comparison) state.comparisonOptionsOpen = comparison.open;
+  if (help) state.modelHelpOpen = help.open;
+}
+
+function bindScenarioDisclosureState(root: HTMLElement): void {
+  const advanced = root.querySelector<HTMLDetailsElement>("[data-advanced-options]");
+  const comparison = root.querySelector<HTMLDetailsElement>("[data-comparison-options]");
+  const help = root.querySelector<HTMLDetailsElement>("[data-model-help]");
+  advanced?.addEventListener("toggle", () => { state.advancedOptionsOpen = advanced.open; });
+  comparison?.addEventListener("toggle", () => { state.comparisonOptionsOpen = comparison.open; });
+  help?.addEventListener("toggle", () => { state.modelHelpOpen = help.open; });
+}
+
+function hasAdvancedFieldIssue(issues: FieldIssue[]): boolean {
+  return issues.some(({ path: originalPath }) => {
+    const path = originalPath.replace(/^scenarios(?:\[\d+\]|\.\d+)\./, "");
+    return path === "scenario_id"
+    || path === "display_name"
+    || path === "default_root_seed"
+    || path === "root_seed"
+    || path === "group_sizes"
+    || path.startsWith("group_sizes.")
+    || path.startsWith("group_sizes[")
+    || path === "initial_state"
+    || path.startsWith("initial_state.")
+    || path.startsWith("initial_state[")
+    || path.includes("cashier_interruptions")
+    || path === "engine_config.preparation_interruption_policy";
+  });
+}
+
 function renderCurrentView(focusRoot = false): void {
+  if (state.resetDisclosureCapture) state.resetDisclosureCapture = false;
+  else captureScenarioDisclosureState();
   const replayRun = state.view === "results"
     ? state.completed?.kind === "run" ? state.completed.value : state.selectedRun
     : null;
   activeReplayHost?.dispose();
   activeReplayHost = null;
+  activeObservedSection?.dispose();
+  activeObservedSection = null;
   if (replayRun && replayRun !== replayMemoryRun) {
     replayMemoryRun = replayRun;
     replayMemoryTimeS = 0;
@@ -202,18 +284,28 @@ function renderCurrentView(focusRoot = false): void {
       mode: state.observationMode,
       pending: state.pending === "import",
       error: state.observationError,
+      measuredReplayMarkup: renderObservedSection(),
     });
+    activeObservedSection = mountObservedSection(root);
   } else if (state.view === "scenario") {
     const scenario = activeScenario();
+    const comparisonIssue = state.scenarioIssues.some((issue) => issue.path.startsWith("scenarios."));
+    const interruptionIssue = scenario?.contract_version === "2" && interruptionDraftIssues(scenario).length > 0;
     root.innerHTML = scenario ? renderScenarioView({
       scenario,
       scenarios: state.scenarios,
       activeScenarioIndex: state.activeScenarioIndex,
       replications: state.replications,
+      advancedOpen: hasAdvancedFieldIssue(state.scenarioIssues)
+        || interruptionIssue
+        || (state.advancedOptionsOpen ?? (scenario.contract_version === "2" || scenario.initial_state.length > 0)),
+      comparisonOpen: comparisonIssue || (state.comparisonOptionsOpen ?? state.scenarios.length > 1),
+      helpOpen: state.modelHelpOpen ?? false,
       pending: state.pending === "run" || state.pending === "experiment" || state.pending === "selection" || state.pending === "file",
       error: state.scenarioError ?? state.jsonError,
       failedFields: state.scenarioIssues,
     }) : renderScenarioUnavailable();
+    if (scenario) bindScenarioDisclosureState(root);
   } else {
     root.innerHTML = renderResultsView({
       completed: state.completed,
@@ -225,10 +317,12 @@ function renderCurrentView(focusRoot = false): void {
       error: state.resultError ?? state.jsonError,
       partialExperiment: state.partialExperiment,
       editsNotRun: isDirty(),
+      analysisObjective: state.analysisObjective,
       csvFiles: state.csvFiles,
       csvLabel: state.csvLabel,
     });
   }
+  if (state.activeExecution) root.insertAdjacentHTML("afterbegin", executionCancellationMarkup(state.activeExecution));
   if (replayRun && root.querySelector("#replay-stage")) {
     try {
       activeReplayHost = mountReplayHost(replayRun, {
@@ -251,6 +345,28 @@ function renderCurrentView(focusRoot = false): void {
     }
   }
   if (focusRoot) root.focus({ preventScroll: true });
+}
+
+function executionCancellationMarkup(execution: ActiveExecution): string {
+  const subject = execution.kind === "run" ? "La réplica" : "La comparación";
+  const message = execution.cancelError
+    ? `${subject} sigue en curso. No se pudo solicitar la cancelación: ${execution.cancelError} Puedes intentarlo de nuevo.`
+    : execution.cancelRequested
+      ? "Cancelación solicitada. El resultado anterior se conservará mientras el servidor detiene la ejecución."
+      : `${subject} está en curso. Puedes pedir que el servidor la cancele.`;
+  const label = execution.cancelRequestPending
+    ? "Solicitando cancelación…"
+    : execution.cancelRequested
+      ? "Cancelación solicitada"
+      : execution.cancelError
+        ? "Reintentar cancelación"
+        : "Cancelar ejecución";
+  const disabled = execution.cancelRequestPending || execution.cancelRequested;
+  return `
+    <section class="alert-box execution-cancellation" aria-labelledby="execution-cancel-status">
+      <p id="execution-cancel-status" role="${execution.cancelError ? "alert" : "status"}" aria-live="${execution.cancelError ? "assertive" : "polite"}" tabindex="-1">${escapeHtml(message)}</p>
+      <div class="inline-actions"><button class="secondary-button" type="button" data-cancel-execution ${disabled ? "disabled" : ""}>${label}</button></div>
+    </section>`;
 }
 
 function goToView(view: MainView, focus = true): void {
@@ -281,6 +397,10 @@ async function loadDemoScenario(): Promise<void> {
     state.scenarios = [demo];
     state.activeScenarioIndex = 0;
     state.replications = response.replications;
+    state.advancedOptionsOpen = null;
+    state.comparisonOptionsOpen = null;
+    state.modelHelpOpen = null;
+    state.resetDisclosureCapture = true;
     state.cleanScenarioJson = [scenarioWireJson(demo) ?? JSON.stringify(response.scenario)];
     state.cleanReplications = response.replications;
     state.scenarioFileBytes = null;
@@ -313,7 +433,45 @@ function apiFieldIssues(error: unknown): FieldIssue[] {
   return error.issues.map((issue) => ({ path: issue.path, message: `${fieldLabel(issue.path)}: ${issue.message}` }));
 }
 
+function revealDisclosureFor(element: HTMLElement): void {
+  let details = element.closest<HTMLDetailsElement>("details");
+  while (details) {
+    details.open = true;
+    if (details.matches("[data-advanced-options]")) state.advancedOptionsOpen = true;
+    if (details.matches("[data-comparison-options]")) state.comparisonOptionsOpen = true;
+    if (details.matches("[data-model-help]")) state.modelHelpOpen = true;
+    details = details.parentElement?.closest<HTMLDetailsElement>("details") ?? null;
+  }
+}
+
+function focusControl(selector: string): void {
+  const target = document.querySelector<HTMLElement>(selector);
+  if (!target) return;
+  revealDisclosureFor(target);
+  target.focus();
+}
+
 function focusField(path: string): void {
+  const scenarioPath = /^scenarios(?:\[(\d+)\]|\.(\d+))\.(.+)$/.exec(path);
+  if (scenarioPath) {
+    const index = Number(scenarioPath[1] ?? scenarioPath[2] ?? "0");
+    const fieldPath = scenarioPath[3] ?? "";
+    if (state.scenarios[index]) {
+      const changedScenario = state.activeScenarioIndex !== index;
+      if (changedScenario) {
+        captureScenarioDisclosureState();
+        state.activeScenarioIndex = index;
+        state.resetDisclosureCapture = true;
+      }
+      state.comparisonOptionsOpen = true;
+      if (hasAdvancedFieldIssue([{ path: fieldPath, message: "" }])) state.advancedOptionsOpen = true;
+      if (changedScenario) renderCurrentView();
+      const comparison = document.querySelector<HTMLDetailsElement>("[data-comparison-options]");
+      if (comparison) revealDisclosureFor(comparison);
+      focusField(fieldPath);
+    }
+    return;
+  }
   const direct: Record<string, string> = {
     scenario_id: "#scenario-id",
     display_name: "#scenario-name",
@@ -329,9 +487,16 @@ function focusField(path: string): void {
     "interarrival.value_s": "#dist-interarrival-value",
     group_sizes: "[data-group-field='probability']",
   };
+  const group = /^group_sizes(?:\[(\d+)\]|\.(\d+))?(?:\.(size|probability))?$/.exec(path);
+  if (group) {
+    const index = group[1] ?? group[2] ?? "0";
+    const field = group[3] === "size" ? "size" : "probability";
+    focusControl(`#group-${field === "size" ? "size" : "prob"}-${index}`);
+    return;
+  }
   const targetPath = path.replace(/\[\d+\]/g, "");
   if (direct[targetPath]) {
-    document.querySelector<HTMLElement>(direct[targetPath])?.focus();
+    focusControl(direct[targetPath]);
     return;
   }
   const initial = /initial_state(?:\[(\d+)\]|\.(\d+))\.(\w+)/.exec(path);
@@ -351,7 +516,7 @@ function focusField(path: string): void {
       patience_remaining_s: "patience",
     };
     const id = fields[initial[3] ?? ""];
-    if (id) document.getElementById(`initial-${index}-${id}`)?.focus();
+    if (id) focusControl(`#initial-${index}-${id}`);
     return;
   }
   const interruption = /(?:engine_config\.)?cashier_interruptions(?:\[(\d+)\]|\.(\d+))\.(at_s|suspended_order_id|cashier_order_id)/.exec(path);
@@ -361,14 +526,46 @@ function focusField(path: string): void {
     const selector = field === "at_s" ? `[data-interruption-at="${index}"]`
       : field === "suspended_order_id" ? `[data-suspended-order-id="${index}"]`
         : `[data-cashier-order-id="${index}"]`;
-    document.querySelector<HTMLInputElement>(selector)?.focus();
+    focusControl(selector);
+    return;
+  }
+  if (path === "arrival_schedule_enabled" || path === "arrival_schedule") {
+    focusControl("#arrival-schedule-enabled");
+    return;
+  }
+  const arrival = /^arrival_schedule(?:\[(\d+)\]|\.(\d+))\.(start_s|end_s|orders_per_hour)$/.exec(path);
+  if (arrival) {
+    const index = arrival[1] ?? arrival[2] ?? "0";
+    const field = arrival[3] === "orders_per_hour" ? "rate" : arrival[3] === "start_s" ? "start" : "end";
+    const boundaryIndex = field === "start" ? String(Math.max(0, Number(index) - 1)) : index;
+    focusControl(field === "start" ? `[data-arrival-window-end="${boundaryIndex}"]`
+      : field === "rate" ? `[data-arrival-orders-per-hour="${index}"]` : `[data-arrival-window-end="${index}"]`);
+    return;
+  }
+  if (path.startsWith("menu.products") || path === "menu") {
+    const product = /^menu\.products(?:\[(\d+)\]|\.(\d+))\.(preparation_s|product_id|display_name)$/.exec(path);
+    if (product) {
+      const index = product[1] ?? product[2] ?? "0";
+      focusControl(`[data-menu-product-time="${index}"]`);
+    } else {
+      focusControl("#menu-enabled");
+    }
+    return;
+  }
+  const menuBasket = /^menu\.baskets(?:\[(\d+)\]|\.(\d+))(?:\.(probability|items))?/.exec(path);
+  if (menuBasket) {
+    const index = menuBasket[1] ?? menuBasket[2] ?? "0";
+    focusControl(menuBasket[3] === "probability" ? `[data-menu-basket-probability="${index}"]`
+      : `[data-menu-basket-quantity="${index}"]`);
     return;
   }
   const distribution = /^(interarrival|payment_active|preparation|transfer_confirmation|patience)\.(value_s|mean_s|low_s|mode_s|high_s)$/.exec(path);
   if (distribution) {
     const suffix = distribution[2]?.replace("_s", "").replace("mean", "mean");
-    document.getElementById(`dist-${distribution[1]}-${suffix}`)?.focus();
+    focusControl(`#dist-${distribution[1]}-${suffix}`);
+    return;
   }
+  if (path === "interarrival.kind") focusControl("#dist-interarrival-kind");
 }
 
 function checkIntegerControls(form: HTMLFormElement): HTMLInputElement | null {
@@ -401,19 +598,38 @@ function collectCurrentScenario(): { scenario: Scenario; replications: number } 
   const form = document.querySelector<HTMLFormElement>("#scenario-form");
   const current = activeScenario();
   if (!form || !current) return null;
-  const firstInvalid = checkIntegerControls(form) ?? validateInterarrival(form);
+  const firstInvalid = checkIntegerControls(form) ?? validateInitialPersonLimits(form) ?? validateInterarrival(form);
   if (firstInvalid) {
+    revealDisclosureFor(firstInvalid);
     firstInvalid.reportValidity();
     return null;
   }
   if (!setScenarioTimeValidity(form)) {
-    form.querySelector<HTMLInputElement>("[data-closing-time]")?.reportValidity();
+    const closingTime = form.querySelector<HTMLInputElement>("[data-closing-time]");
+    if (closingTime) {
+      revealDisclosureFor(closingTime);
+      closingTime.reportValidity();
+    }
+    return null;
+  }
+  const firstInvalidControl = form.querySelector<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>("input:invalid, select:invalid, textarea:invalid");
+  if (firstInvalidControl) {
+    revealDisclosureFor(firstInvalidControl);
+    firstInvalidControl.reportValidity();
     return null;
   }
   if (!form.reportValidity()) return null;
   const draft = collectScenarioDraft(form, current);
   state.replications = draft.replications;
   markActiveScenario(draft.scenario);
+  const configurationIssues = scenarioConfigurationIssues(draft.scenario);
+  if (configurationIssues.length > 0) {
+    state.scenarioError = "Corrige el horario de llegadas o los tipos de pedido del menú; el borrador se conservó.";
+    state.scenarioIssues = configurationIssues;
+    renderCurrentView();
+    focusField(configurationIssues[0]?.path ?? "");
+    return null;
+  }
   const interruptionIssues = interruptionDraftIssues(draft.scenario);
   if (interruptionIssues.length > 0) {
     state.scenarioError = "La programación de pausas tiene campos o capacidad incompatibles. Corrige los elementos señalados; se conservaron las filas.";
@@ -485,6 +701,7 @@ function addCandidate(): void {
   );
   state.scenarios.push(candidate);
   state.activeScenarioIndex = state.scenarios.length - 1;
+  state.comparisonOptionsOpen = true;
   state.scenarioError = null;
   renderCurrentView();
   document.querySelector<HTMLButtonElement>(`[data-scenario-select="${state.activeScenarioIndex}"]`)?.focus();
@@ -538,9 +755,17 @@ async function runSingle(): Promise<void> {
     root_seed: submitted.default_root_seed,
     replication_index: 0,
   };
+  const execution: ActiveExecution = {
+    id: crypto.randomUUID(),
+    kind: "run",
+    cancelRequestPending: false,
+    cancelRequested: false,
+    cancelError: null,
+  };
+  state.activeExecution = execution;
   setPending("run", "El motor está ejecutando una réplica completa. No se muestra progreso estimado.");
   try {
-    const result = await executeRun(request);
+    const result = await executeRun(request, execution.id);
     replayProjectorFor(result);
     state.completed = {
       kind: "run",
@@ -569,9 +794,33 @@ async function runSingle(): Promise<void> {
       ? error.partialResult as ExperimentResult
       : null;
   } finally {
+    if (state.activeExecution === execution) state.activeExecution = null;
     clearPending();
     renderCurrentView();
     if (state.scenarioError) document.querySelector<HTMLElement>("#scenario-error")?.focus();
+  }
+}
+
+async function cancelActiveExecution(): Promise<void> {
+  const execution = state.activeExecution;
+  if (!execution || execution.cancelRequestPending || execution.cancelRequested) return;
+  execution.cancelRequestPending = true;
+  execution.cancelError = null;
+  renderCurrentView();
+  document.querySelector<HTMLElement>("#execution-cancel-status")?.focus({ preventScroll: true });
+  try {
+    await cancelExecution(execution.id);
+    if (state.activeExecution !== execution) return;
+    execution.cancelRequestPending = false;
+    execution.cancelRequested = true;
+    renderCurrentView();
+    document.querySelector<HTMLElement>("#execution-cancel-status")?.focus({ preventScroll: true });
+  } catch (error) {
+    if (state.activeExecution !== execution) return;
+    execution.cancelRequestPending = false;
+    execution.cancelError = apiErrorMessage(error);
+    renderCurrentView();
+    document.querySelector<HTMLElement>("[data-cancel-execution]")?.focus({ preventScroll: true });
   }
 }
 
@@ -619,9 +868,17 @@ async function runBatch(): Promise<void> {
     root_seed: currentExperimentSeed(submittedScenarios),
     replications: draft.replications,
   };
+  const execution: ActiveExecution = {
+    id: crypto.randomUUID(),
+    kind: "experiment",
+    cancelRequestPending: false,
+    cancelRequested: false,
+    cancelError: null,
+  };
+  state.activeExecution = execution;
   setPending("experiment", "El motor está ejecutando las réplicas solicitadas. No se muestra progreso estimado.");
   try {
-    const result = await executeExperiment(request);
+    const result = await executeExperiment(request, execution.id);
     state.completed = {
       kind: "experiment",
       value: result,
@@ -652,6 +909,7 @@ async function runBatch(): Promise<void> {
       ? error.partialResult as ExperimentResult
       : null;
   } finally {
+    if (state.activeExecution === execution) state.activeExecution = null;
     clearPending();
     renderCurrentView();
     if (state.scenarioError) document.querySelector<HTMLElement>("#scenario-error")?.focus();
@@ -722,6 +980,10 @@ function installScenarioFile(scenario: Scenario, bytes: ArrayBuffer, text: strin
   state.scenarioError = null;
   state.scenarioIssues = [];
   state.view = "scenario";
+  state.advancedOptionsOpen = null;
+  state.comparisonOptionsOpen = null;
+  state.modelHelpOpen = null;
+  state.resetDisclosureCapture = true;
   void text;
 }
 
@@ -757,6 +1019,10 @@ async function openSavedFile(input: HTMLInputElement): Promise<void> {
       state.activeScenarioIndex = 0;
       state.cleanScenarioJson = [JSON.stringify(result.scenario)];
       state.cleanReplications = state.replications;
+      state.advancedOptionsOpen = null;
+      state.comparisonOptionsOpen = null;
+      state.modelHelpOpen = null;
+      state.resetDisclosureCapture = true;
       state.jsonError = null;
       state.view = "results";
       clearCsvFiles();
@@ -777,6 +1043,10 @@ async function openSavedFile(input: HTMLInputElement): Promise<void> {
       state.replications = result.n_requested;
       state.cleanScenarioJson = result.scenarios.map((scenario) => JSON.stringify(scenario));
       state.cleanReplications = result.n_requested;
+      state.advancedOptionsOpen = null;
+      state.comparisonOptionsOpen = null;
+      state.modelHelpOpen = null;
+      state.resetDisclosureCapture = true;
       state.jsonError = null;
       state.view = "results";
       clearCsvFiles();
@@ -881,9 +1151,17 @@ async function selectExperimentReplication(): Promise<void> {
   }
   const identity = { scenarioId, replicationIndex };
   const request: RunRequest = { scenario, root_seed: experiment.root_seed, replication_index: replicationIndex };
+  const execution: ActiveExecution = {
+    id: crypto.randomUUID(),
+    kind: "run",
+    cancelRequestPending: false,
+    cancelRequested: false,
+    cancelError: null,
+  };
+  state.activeExecution = execution;
   setPending("selection", "El motor está reconstruyendo la réplica exacta elegida desde la semilla y el índice guardados.");
   try {
-    const result = await executeRun(request);
+    const result = await executeRun(request, execution.id);
     replayProjectorFor(result);
     if (result.scenario.scenario_id !== identity.scenarioId
       || result.root_seed !== experiment.root_seed
@@ -897,6 +1175,7 @@ async function selectExperimentReplication(): Promise<void> {
   } catch (error) {
     state.resultError = apiErrorMessage(error);
   } finally {
+    if (state.activeExecution === execution) state.activeExecution = null;
     clearPending();
     renderCurrentView();
   }
@@ -904,7 +1183,13 @@ async function selectExperimentReplication(): Promise<void> {
 
 function chooseScenarioTab(index: number): void {
   if (!Number.isInteger(index) || index < 0 || index >= state.scenarios.length) return;
+  captureScenarioDisclosureState();
   state.activeScenarioIndex = index;
+  const selected = state.scenarios[index];
+  if (selected && (selected.contract_version === "2" || selected.initial_state.length > 0)) {
+    state.advancedOptionsOpen = null;
+    state.resetDisclosureCapture = true;
+  }
   state.scenarioError = null;
   state.scenarioIssues = [];
   renderCurrentView();
@@ -929,12 +1214,29 @@ function handleInput(event: Event): void {
     if (form) setScenarioTimeValidity(form);
     return;
   }
+  if (target instanceof HTMLInputElement && target.matches("[data-arrival-window-end]")) {
+    const index = Number(target.dataset.arrivalWindowEnd);
+    const nextRow = target.closest<HTMLFormElement>("#scenario-form")
+      ?.querySelector<HTMLElement>(`[data-arrival-window="${index + 1}"]`);
+    const minutes = Number(target.value);
+    if (nextRow && target.value.trim() !== "" && Number.isFinite(minutes)) {
+      const start = nextRow.querySelector<HTMLOutputElement>("[data-arrival-start-label]");
+      const hidden = nextRow.querySelector<HTMLInputElement>(`[data-arrival-window-start="${index + 1}"]`);
+      if (start) start.textContent = formatNumber(minutes);
+      if (hidden) hidden.value = String(minutes * 60);
+    }
+  }
+  if (target instanceof HTMLTextAreaElement && target.matches('[data-initial-field$=".person_ids"]')) {
+    const form = target.closest<HTMLFormElement>("#scenario-form");
+    if (form) validateInitialPersonLimits(form);
+  }
   const current = activeScenario();
   const form = target.closest<HTMLFormElement>("#scenario-form");
   if (!current || !form) return;
   const draft = collectScenarioDraft(form, current);
   state.replications = draft.replications;
   markActiveScenario(draft.scenario);
+  updateActiveScenarioLabel();
   state.scenarioError = null;
   state.scenarioIssues = [];
   setDirty(isDirty());
@@ -942,13 +1244,27 @@ function handleInput(event: Event): void {
 
 function handleChange(event: Event): void {
   const target = event.target;
-  if (!(target instanceof HTMLInputElement || target instanceof HTMLSelectElement)) return;
+  if (!(target instanceof HTMLInputElement || target instanceof HTMLSelectElement || target instanceof HTMLTextAreaElement)) return;
+  if (target instanceof HTMLSelectElement && target.matches("[data-analysis-objective]")) {
+    const selectedObjective = ANALYSIS_OBJECTIVES.find(({ value }) => value === target.value)?.value;
+    const experiment = state.completed?.kind === "experiment" ? state.completed.value : null;
+    if (!selectedObjective || !experiment) return;
+    state.analysisObjective = selectedObjective;
+    const content = document.querySelector<HTMLElement>("#analysis-objective-content");
+    if (content) content.innerHTML = renderObjectiveAnalysisContent(experiment, selectedObjective, isDirty());
+    return;
+  }
   if (target instanceof HTMLSelectElement && target.matches("[data-replay-entity]")) {
     activeReplayHost?.selectEntity(target.value);
     return;
   }
   if (target instanceof HTMLSelectElement && target.matches("[data-replay-speed]")) {
     activeReplayHost?.setSpeed(Number(target.value));
+    return;
+  }
+  if (target instanceof HTMLTextAreaElement && target.matches('[data-initial-field$=".person_ids"]')) {
+    const form = target.closest<HTMLFormElement>("#scenario-form");
+    if (form) validateInitialPersonLimits(form);
     return;
   }
   if (target.matches("[data-opening-time], [data-closing-time]")) {
@@ -961,6 +1277,23 @@ function handleChange(event: Event): void {
     state.scenarioError = null;
     state.scenarioIssues = [];
     setDirty(isDirty());
+    return;
+  }
+  if (target instanceof HTMLInputElement && target.matches("[data-arrival-schedule-enabled], [data-menu-enabled]")) {
+    const current = activeScenario();
+    const form = target.closest<HTMLFormElement>("#scenario-form");
+    if (!current) return;
+    const base = form ? collectScenarioDraft(form, current).scenario : current;
+    if (target.matches("[data-arrival-schedule-enabled]")) {
+      const next = target.checked ? enableArrivalSchedule(base) : disableArrivalSchedule(base);
+      markActiveScenario(addScenarioAssumption(next,
+        "El horario de llegadas por franjas y sus tasas por hora son supuestos del usuario, no valores calibrados."));
+    } else {
+      const next = target.checked ? enableMenu(base) : disableMenu(base);
+      markActiveScenario(addScenarioAssumption(next,
+        "Los tipos de pedido y tiempos por unidad del menú son ejemplos editables, no mediciones del negocio."));
+    }
+    refreshScenarioAfterChange(target.id);
     return;
   }
   if (target.matches("[data-mode]")) {
@@ -1068,6 +1401,8 @@ function handleClick(event: MouseEvent): void {
       renderCurrentView();
       document.querySelector<HTMLButtonElement>(`[data-source-mode="${mode}"]`)?.focus();
     }
+  } else if (button.matches("[data-cancel-execution]")) {
+    void cancelActiveExecution();
   } else if (button.matches("[data-run-scenario]")) {
     void runSingle();
   } else if (button.matches("[data-run-experiment]")) {
@@ -1081,6 +1416,12 @@ function handleClick(event: MouseEvent): void {
   } else if (button.matches("[data-add-group]")) {
     const current = activeScenario();
     if (!current) return;
+    if (current.group_sizes.length >= workLimits.max_group_size) {
+      state.scenarioError = `El escenario admite como máximo ${workLimits.max_group_size} tamaños de grupo.`;
+      renderCurrentView();
+      document.querySelector<HTMLElement>("#scenario-error")?.focus();
+      return;
+    }
     const next = snapshot(current) as unknown as Record<string, unknown>;
     const groups = [...current.group_sizes, { size: null, probability: null }];
     next.group_sizes = groups;
@@ -1096,9 +1437,70 @@ function handleClick(event: MouseEvent): void {
     markActiveScenario(addScenarioAssumption(next as unknown as ScenarioDraft,
       "Los tamaños y pesos de los grupos son supuestos del usuario."));
     refreshScenarioAfterChange("scenario-id");
+  } else if (button.matches("[data-add-arrival-window]")) {
+    const current = activeScenario();
+    if (!current) return;
+    if ((current.arrival_schedule?.length ?? 0) >= 48) {
+      state.scenarioError = "El horario admite como máximo 48 franjas; se conservó la programación.";
+      state.scenarioIssues = [{ path: "arrival_schedule[47].end_s", message: state.scenarioError }];
+      renderCurrentView();
+      focusField("arrival_schedule[47].end_s");
+      return;
+    }
+    const next = addArrivalScheduleWindow(current);
+    const currentWindowCount = current.arrival_schedule?.length ?? 0;
+    const nextWindowCount = next.arrival_schedule?.length ?? 0;
+    const newIndex = nextWindowCount - 1;
+    if (nextWindowCount === currentWindowCount) {
+      state.scenarioError = "Divide una franja con duración positiva para añadir otra. Se conservaron los límites guardados.";
+      state.scenarioIssues = [{ path: "arrival_schedule[0].end_s", message: state.scenarioError }];
+      renderCurrentView();
+      focusField("arrival_schedule[0].end_s");
+      return;
+    }
+    markActiveScenario(addScenarioAssumption(next,
+      "El horario de llegadas por franjas y sus tasas por hora son supuestos del usuario, no valores calibrados."));
+    refreshScenarioAfterChange(`arrival-rate-${newIndex}`);
+  } else if (button.matches("[data-remove-arrival-window]")) {
+    const current = activeScenario();
+    if (!current || (current.arrival_schedule?.length ?? 0) <= 1) return;
+    const index = Number(button.dataset.removeArrivalWindow);
+    const next = removeArrivalScheduleWindow(current, index);
+    markActiveScenario(addScenarioAssumption(next,
+      "El horario de llegadas por franjas y sus tasas por hora son supuestos del usuario, no valores calibrados."));
+    refreshScenarioAfterChange(`arrival-rate-${Math.max(0, Math.min(index, (next.arrival_schedule?.length ?? 1) - 1))}`);
+  } else if (button.matches("[data-add-menu-basket]")) {
+    const current = activeScenario();
+    if (!current) return;
+    if ((current.menu?.baskets.length ?? 0) >= 32) {
+      state.scenarioError = "El menú admite como máximo 32 tipos de pedido; se conservó el borrador.";
+      state.scenarioIssues = [{ path: "menu.baskets[31].probability", message: state.scenarioError }];
+      renderCurrentView();
+      focusField("menu.baskets[31].probability");
+      return;
+    }
+    const next = addMenuBasket(current);
+    const newIndex = (next.menu?.baskets.length ?? 1) - 1;
+    markActiveScenario(addScenarioAssumption(next,
+      "Los tipos de pedido y tiempos por unidad del menú son ejemplos editables, no mediciones del negocio."));
+    refreshScenarioAfterChange(`menu-basket-probability-${newIndex}`);
+  } else if (button.matches("[data-remove-menu-basket]")) {
+    const current = activeScenario();
+    if (!current || (current.menu?.baskets.length ?? 0) <= 1) return;
+    const index = Number(button.dataset.removeMenuBasket);
+    const next = removeMenuBasket(current, index);
+    markActiveScenario(addScenarioAssumption(next,
+      "Los tipos de pedido y tiempos por unidad del menú son ejemplos editables, no mediciones del negocio."));
+    refreshScenarioAfterChange(`menu-basket-probability-${Math.max(0, Math.min(index, (next.menu?.baskets.length ?? 1) - 1))}`);
   } else if (button.matches("[data-add-initial]")) {
     const current = activeScenario();
     if (!current) return;
+    if (current.initial_state.length >= workLimits.max_initial_orders) {
+      state.scenarioError = `El estado inicial admite como máximo ${workLimits.max_initial_orders} órdenes por ejecución.`;
+      renderCurrentView();
+      document.querySelector<HTMLElement>("#scenario-error")?.focus();
+      return;
+    }
     const next = snapshot(current) as unknown as Record<string, unknown>;
     const initial = [...current.initial_state, newInitialOrder()];
     next.initial_state = initial;
@@ -1250,6 +1652,7 @@ function handleFileChange(event: Event): void {
 
 function startApp(): void {
   renderShell();
+  installColorSchemeToggle();
   const compactNavigation = window.matchMedia("(max-width: 900px)");
   const syncNavigationOrientation = (): void => {
     document.querySelector(".view-nav")?.setAttribute("aria-orientation", compactNavigation.matches ? "horizontal" : "vertical");

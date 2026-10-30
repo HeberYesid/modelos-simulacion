@@ -1,0 +1,2504 @@
+{
+  "dataset_version": 1,
+  "visits": [
+    {
+      "visit_id": "visit_2026-10-20_tuesday_promotion",
+      "label": "Martes 2x1 · visita medida",
+      "date": "2026-10-20",
+      "start_time": "16:45:35",
+      "end_time": "18:41:30",
+      "duration_s": 6955,
+      "sources": [
+        {
+          "source_id": "boquitas_tuesday_corrected_2026-10-20",
+          "sha256": "480ade881fd14bc88d8c94f037cea9ef4c2869b7ba400cbffda772f6f470caea",
+          "record_count": 119
+        }
+      ],
+      "records": [
+        {
+          "record_id": "boquitas_tuesday_corrected_2026-10-20:line:002",
+          "source_id": "boquitas_tuesday_corrected_2026-10-20",
+          "source_line": 2,
+          "station": "entrega",
+          "station_local_id": "1",
+          "raw_fields": {
+            "lugar": "entrega",
+            "fecha": "2026-10-20",
+            "tipo_dia": "Martes 2x1",
+            "personal": "4",
+            "id": "1",
+            "hora_llegada": "16:47:05",
+            "hora_inicio": "16:47:21",
+            "hora_fin": "16:48:23",
+            "hora_se_fue": ""
+          }
+        },
+        {
+          "record_id": "boquitas_tuesday_corrected_2026-10-20:line:003",
+          "source_id": "boquitas_tuesday_corrected_2026-10-20",
+          "source_line": 3,
+          "station": "entrega",
+          "station_local_id": "2",
+          "raw_fields": {
+            "lugar": "entrega",
+            "fecha": "2026-10-20",
+            "tipo_dia": "Martes 2x1",
+            "personal": "4",
+            "id": "2",
+            "hora_llegada": "16:47:42",
+            "hora_inicio": "16:48:09",
+            "hora_fin": "16:49:03",
+            "hora_se_fue": ""
+          }
+        },
+        {
+          "record_id": "boquitas_tuesday_corrected_2026-10-20:line:004",
+          "source_id": "boquitas_tuesday_corrected_2026-10-20",
+          "source_line": 4,
+          "station": "entrega",
+          "station_local_id": "3",
+          "raw_fields": {
+            "lugar": "entrega",
+            "fecha": "2026-10-20",
+            "tipo_dia": "Martes 2x1",
+            "personal": "4",
+            "id": "3",
+            "hora_llegada": "16:49:04",
+            "hora_inicio": "16:49:17",
+            "hora_fin": "16:49:25",
+            "hora_se_fue": ""
+          }
+        },
+        {
+          "record_id": "boquitas_tuesday_corrected_2026-10-20:line:005",
+          "source_id": "boquitas_tuesday_corrected_2026-10-20",
+          "source_line": 5,
+          "station": "entrega",
+          "station_local_id": "4",
+          "raw_fields": {
+            "lugar": "entrega",
+            "fecha": "2026-10-20",
+            "tipo_dia": "Martes 2x1",
+            "personal": "4",
+            "id": "4",
+            "hora_llegada": "16:50:30",
+            "hora_inicio": "16:50:39",
+            "hora_fin": "16:56:18",
+            "hora_se_fue": ""
+          }
+        },
+        {
+          "record_id": "boquitas_tuesday_corrected_2026-10-20:line:006",
+          "source_id": "boquitas_tuesday_corrected_2026-10-20",
+          "source_line": 6,
+          "station": "entrega",
+          "station_local_id": "5",
+          "raw_fields": {
+            "lugar": "entrega",
+            "fecha": "2026-10-20",
+            "tipo_dia": "Martes 2x1",
+            "personal": "4",
+            "id": "5",
+            "hora_llegada": "16:52:00",
+            "hora_inicio": "16:52:09",
+            "hora_fin": "16:57:35",
+            "hora_se_fue": ""
+          }
+        },
+        {
+          "record_id": "boquitas_tuesday_corrected_2026-10-20:line:007",
+          "source_id": "boquitas_tuesday_corrected_2026-10-20",
+          "source_line": 7,
+          "station": "entrega",
+          "station_local_id": "6",
+          "raw_fields": {
+            "lugar": "entrega",
+            "fecha": "2026-10-20",
+            "tipo_dia": "Martes 2x1",
+            "personal": "4",
+            "id": "6",
+            "hora_llegada": "16:53:07",
+            "hora_inicio": "16:53:10",
+            "hora_fin": "17:00:12",
+            "hora_se_fue": ""
+          }
+        },
+        {
+          "record_id": "boquitas_tuesday_corrected_2026-10-20:line:008",
+          "source_id": "boquitas_tuesday_corrected_2026-10-20",
+          "source_line": 8,
+          "station": "entrega",
+          "station_local_id": "7",
+          "raw_fields": {
+            "lugar": "entrega",
+            "fecha": "2026-10-20",
+            "tipo_dia": "Martes 2x1",
+            "personal": "4",
+            "id": "7",
+            "hora_llegada": "16:53:28",
+            "hora_inicio": "16:53:58",
+            "hora_fin": "17:02:55",
+            "hora_se_fue": ""
+          }
+        },
+        {
+          "record_id": "boquitas_tuesday_corrected_2026-10-20:line:009",
+          "source_id": "boquitas_tuesday_corrected_2026-10-20",
+          "source_line": 9,
+          "station": "entrega",
+          "station_local_id": "8",
+          "raw_fields": {
+            "lugar": "entrega",
+            "fecha": "2026-10-20",
+            "tipo_dia": "Martes 2x1",
+            "personal": "4",
+            "id": "8",
+            "hora_llegada": "16:55:19",
+            "hora_inicio": "16:57:31",
+            "hora_fin": "17:04:32",
+            "hora_se_fue": ""
+          }
+        },
+        {
+          "record_id": "boquitas_tuesday_corrected_2026-10-20:line:010",
+          "source_id": "boquitas_tuesday_corrected_2026-10-20",
+          "source_line": 10,
+          "station": "entrega",
+          "station_local_id": "9",
+          "raw_fields": {
+            "lugar": "entrega",
+            "fecha": "2026-10-20",
+            "tipo_dia": "Martes 2x1",
+            "personal": "4",
+            "id": "9",
+            "hora_llegada": "16:56:44",
+            "hora_inicio": "16:57:32",
+            "hora_fin": "17:04:36",
+            "hora_se_fue": ""
+          }
+        },
+        {
+          "record_id": "boquitas_tuesday_corrected_2026-10-20:line:011",
+          "source_id": "boquitas_tuesday_corrected_2026-10-20",
+          "source_line": 11,
+          "station": "entrega",
+          "station_local_id": "10",
+          "raw_fields": {
+            "lugar": "entrega",
+            "fecha": "2026-10-20",
+            "tipo_dia": "Martes 2x1",
+            "personal": "4",
+            "id": "10",
+            "hora_llegada": "16:58:53",
+            "hora_inicio": "16:58:55",
+            "hora_fin": "17:06:53",
+            "hora_se_fue": ""
+          }
+        },
+        {
+          "record_id": "boquitas_tuesday_corrected_2026-10-20:line:012",
+          "source_id": "boquitas_tuesday_corrected_2026-10-20",
+          "source_line": 12,
+          "station": "entrega",
+          "station_local_id": "11",
+          "raw_fields": {
+            "lugar": "entrega",
+            "fecha": "2026-10-20",
+            "tipo_dia": "Martes 2x1",
+            "personal": "4",
+            "id": "11",
+            "hora_llegada": "16:59:37",
+            "hora_inicio": "17:00:10",
+            "hora_fin": "17:09:08",
+            "hora_se_fue": ""
+          }
+        },
+        {
+          "record_id": "boquitas_tuesday_corrected_2026-10-20:line:013",
+          "source_id": "boquitas_tuesday_corrected_2026-10-20",
+          "source_line": 13,
+          "station": "entrega",
+          "station_local_id": "12",
+          "raw_fields": {
+            "lugar": "entrega",
+            "fecha": "2026-10-20",
+            "tipo_dia": "Martes 2x1",
+            "personal": "4",
+            "id": "12",
+            "hora_llegada": "17:01:39",
+            "hora_inicio": "17:03:13",
+            "hora_fin": "17:09:24",
+            "hora_se_fue": ""
+          }
+        },
+        {
+          "record_id": "boquitas_tuesday_corrected_2026-10-20:line:014",
+          "source_id": "boquitas_tuesday_corrected_2026-10-20",
+          "source_line": 14,
+          "station": "entrega",
+          "station_local_id": "13",
+          "raw_fields": {
+            "lugar": "entrega",
+            "fecha": "2026-10-20",
+            "tipo_dia": "Martes 2x1",
+            "personal": "4",
+            "id": "13",
+            "hora_llegada": "17:05:19",
+            "hora_inicio": "17:05:23",
+            "hora_fin": "17:11:59",
+            "hora_se_fue": ""
+          }
+        },
+        {
+          "record_id": "boquitas_tuesday_corrected_2026-10-20:line:015",
+          "source_id": "boquitas_tuesday_corrected_2026-10-20",
+          "source_line": 15,
+          "station": "entrega",
+          "station_local_id": "14",
+          "raw_fields": {
+            "lugar": "entrega",
+            "fecha": "2026-10-20",
+            "tipo_dia": "Martes 2x1",
+            "personal": "4",
+            "id": "14",
+            "hora_llegada": "17:10:03",
+            "hora_inicio": "17:10:04",
+            "hora_fin": "17:13:13",
+            "hora_se_fue": ""
+          }
+        },
+        {
+          "record_id": "boquitas_tuesday_corrected_2026-10-20:line:016",
+          "source_id": "boquitas_tuesday_corrected_2026-10-20",
+          "source_line": 16,
+          "station": "entrega",
+          "station_local_id": "15",
+          "raw_fields": {
+            "lugar": "entrega",
+            "fecha": "2026-10-20",
+            "tipo_dia": "Martes 2x1",
+            "personal": "4",
+            "id": "15",
+            "hora_llegada": "17:10:26",
+            "hora_inicio": "17:10:26",
+            "hora_fin": "17:13:30",
+            "hora_se_fue": ""
+          }
+        },
+        {
+          "record_id": "boquitas_tuesday_corrected_2026-10-20:line:017",
+          "source_id": "boquitas_tuesday_corrected_2026-10-20",
+          "source_line": 17,
+          "station": "entrega",
+          "station_local_id": "16",
+          "raw_fields": {
+            "lugar": "entrega",
+            "fecha": "2026-10-20",
+            "tipo_dia": "Martes 2x1",
+            "personal": "4",
+            "id": "16",
+            "hora_llegada": "17:12:00",
+            "hora_inicio": "17:12:00",
+            "hora_fin": "17:14:31",
+            "hora_se_fue": ""
+          }
+        },
+        {
+          "record_id": "boquitas_tuesday_corrected_2026-10-20:line:018",
+          "source_id": "boquitas_tuesday_corrected_2026-10-20",
+          "source_line": 18,
+          "station": "entrega",
+          "station_local_id": "17",
+          "raw_fields": {
+            "lugar": "entrega",
+            "fecha": "2026-10-20",
+            "tipo_dia": "Martes 2x1",
+            "personal": "4",
+            "id": "17",
+            "hora_llegada": "17:12:08",
+            "hora_inicio": "17:12:09",
+            "hora_fin": "17:16:00",
+            "hora_se_fue": ""
+          }
+        },
+        {
+          "record_id": "boquitas_tuesday_corrected_2026-10-20:line:019",
+          "source_id": "boquitas_tuesday_corrected_2026-10-20",
+          "source_line": 19,
+          "station": "entrega",
+          "station_local_id": "18",
+          "raw_fields": {
+            "lugar": "entrega",
+            "fecha": "2026-10-20",
+            "tipo_dia": "Martes 2x1",
+            "personal": "4",
+            "id": "18",
+            "hora_llegada": "17:14:32",
+            "hora_inicio": "17:15:13",
+            "hora_fin": "17:18:13",
+            "hora_se_fue": ""
+          }
+        },
+        {
+          "record_id": "boquitas_tuesday_corrected_2026-10-20:line:020",
+          "source_id": "boquitas_tuesday_corrected_2026-10-20",
+          "source_line": 20,
+          "station": "entrega",
+          "station_local_id": "19",
+          "raw_fields": {
+            "lugar": "entrega",
+            "fecha": "2026-10-20",
+            "tipo_dia": "Martes 2x1",
+            "personal": "4",
+            "id": "19",
+            "hora_llegada": "17:16:01",
+            "hora_inicio": "17:16:07",
+            "hora_fin": "17:20:37",
+            "hora_se_fue": ""
+          }
+        },
+        {
+          "record_id": "boquitas_tuesday_corrected_2026-10-20:line:021",
+          "source_id": "boquitas_tuesday_corrected_2026-10-20",
+          "source_line": 21,
+          "station": "entrega",
+          "station_local_id": "20",
+          "raw_fields": {
+            "lugar": "entrega",
+            "fecha": "2026-10-20",
+            "tipo_dia": "Martes 2x1",
+            "personal": "4",
+            "id": "20",
+            "hora_llegada": "17:17:15",
+            "hora_inicio": "17:17:17",
+            "hora_fin": "17:23:00",
+            "hora_se_fue": ""
+          }
+        },
+        {
+          "record_id": "boquitas_tuesday_corrected_2026-10-20:line:022",
+          "source_id": "boquitas_tuesday_corrected_2026-10-20",
+          "source_line": 22,
+          "station": "entrega",
+          "station_local_id": "21",
+          "raw_fields": {
+            "lugar": "entrega",
+            "fecha": "2026-10-20",
+            "tipo_dia": "Martes 2x1",
+            "personal": "4",
+            "id": "21",
+            "hora_llegada": "17:18:14",
+            "hora_inicio": "17:18:15",
+            "hora_fin": "17:25:01",
+            "hora_se_fue": ""
+          }
+        },
+        {
+          "record_id": "boquitas_tuesday_corrected_2026-10-20:line:023",
+          "source_id": "boquitas_tuesday_corrected_2026-10-20",
+          "source_line": 23,
+          "station": "entrega",
+          "station_local_id": "22",
+          "raw_fields": {
+            "lugar": "entrega",
+            "fecha": "2026-10-20",
+            "tipo_dia": "Martes 2x1",
+            "personal": "4",
+            "id": "22",
+            "hora_llegada": "17:20:40",
+            "hora_inicio": "17:22:03",
+            "hora_fin": "17:29:04",
+            "hora_se_fue": ""
+          }
+        },
+        {
+          "record_id": "boquitas_tuesday_corrected_2026-10-20:line:024",
+          "source_id": "boquitas_tuesday_corrected_2026-10-20",
+          "source_line": 24,
+          "station": "entrega",
+          "station_local_id": "23",
+          "raw_fields": {
+            "lugar": "entrega",
+            "fecha": "2026-10-20",
+            "tipo_dia": "Martes 2x1",
+            "personal": "4",
+            "id": "23",
+            "hora_llegada": "17:25:00",
+            "hora_inicio": "17:28:58",
+            "hora_fin": "17:32:19",
+            "hora_se_fue": ""
+          }
+        },
+        {
+          "record_id": "boquitas_tuesday_corrected_2026-10-20:line:025",
+          "source_id": "boquitas_tuesday_corrected_2026-10-20",
+          "source_line": 25,
+          "station": "entrega",
+          "station_local_id": "24",
+          "raw_fields": {
+            "lugar": "entrega",
+            "fecha": "2026-10-20",
+            "tipo_dia": "Martes 2x1",
+            "personal": "4",
+            "id": "24",
+            "hora_llegada": "17:27:38",
+            "hora_inicio": "17:28:59",
+            "hora_fin": "17:32:57",
+            "hora_se_fue": ""
+          }
+        },
+        {
+          "record_id": "boquitas_tuesday_corrected_2026-10-20:line:026",
+          "source_id": "boquitas_tuesday_corrected_2026-10-20",
+          "source_line": 26,
+          "station": "entrega",
+          "station_local_id": "25",
+          "raw_fields": {
+            "lugar": "entrega",
+            "fecha": "2026-10-20",
+            "tipo_dia": "Martes 2x1",
+            "personal": "4",
+            "id": "25",
+            "hora_llegada": "17:30:22",
+            "hora_inicio": "17:30:23",
+            "hora_fin": "17:34:49",
+            "hora_se_fue": ""
+          }
+        },
+        {
+          "record_id": "boquitas_tuesday_corrected_2026-10-20:line:027",
+          "source_id": "boquitas_tuesday_corrected_2026-10-20",
+          "source_line": 27,
+          "station": "entrega",
+          "station_local_id": "27",
+          "raw_fields": {
+            "lugar": "entrega",
+            "fecha": "2026-10-20",
+            "tipo_dia": "Martes 2x1",
+            "personal": "4",
+            "id": "27",
+            "hora_llegada": "17:32:07",
+            "hora_inicio": "17:32:09",
+            "hora_fin": "17:35:53",
+            "hora_se_fue": ""
+          }
+        },
+        {
+          "record_id": "boquitas_tuesday_corrected_2026-10-20:line:028",
+          "source_id": "boquitas_tuesday_corrected_2026-10-20",
+          "source_line": 28,
+          "station": "entrega",
+          "station_local_id": "28",
+          "raw_fields": {
+            "lugar": "entrega",
+            "fecha": "2026-10-20",
+            "tipo_dia": "Martes 2x1",
+            "personal": "4",
+            "id": "28",
+            "hora_llegada": "17:32:53",
+            "hora_inicio": "17:32:55",
+            "hora_fin": "17:37:14",
+            "hora_se_fue": ""
+          }
+        },
+        {
+          "record_id": "boquitas_tuesday_corrected_2026-10-20:line:029",
+          "source_id": "boquitas_tuesday_corrected_2026-10-20",
+          "source_line": 29,
+          "station": "entrega",
+          "station_local_id": "29",
+          "raw_fields": {
+            "lugar": "entrega",
+            "fecha": "2026-10-20",
+            "tipo_dia": "Martes 2x1",
+            "personal": "4",
+            "id": "29",
+            "hora_llegada": "17:33:29",
+            "hora_inicio": "17:33:30",
+            "hora_fin": "17:38:47",
+            "hora_se_fue": ""
+          }
+        },
+        {
+          "record_id": "boquitas_tuesday_corrected_2026-10-20:line:030",
+          "source_id": "boquitas_tuesday_corrected_2026-10-20",
+          "source_line": 30,
+          "station": "entrega",
+          "station_local_id": "30",
+          "raw_fields": {
+            "lugar": "entrega",
+            "fecha": "2026-10-20",
+            "tipo_dia": "Martes 2x1",
+            "personal": "4",
+            "id": "30",
+            "hora_llegada": "17:34:49",
+            "hora_inicio": "17:35:05",
+            "hora_fin": "17:42:45",
+            "hora_se_fue": ""
+          }
+        },
+        {
+          "record_id": "boquitas_tuesday_corrected_2026-10-20:line:031",
+          "source_id": "boquitas_tuesday_corrected_2026-10-20",
+          "source_line": 31,
+          "station": "entrega",
+          "station_local_id": "31",
+          "raw_fields": {
+            "lugar": "entrega",
+            "fecha": "2026-10-20",
+            "tipo_dia": "Martes 2x1",
+            "personal": "4",
+            "id": "31",
+            "hora_llegada": "17:35:45",
+            "hora_inicio": "17:35:53",
+            "hora_fin": "17:43:57",
+            "hora_se_fue": ""
+          }
+        },
+        {
+          "record_id": "boquitas_tuesday_corrected_2026-10-20:line:032",
+          "source_id": "boquitas_tuesday_corrected_2026-10-20",
+          "source_line": 32,
+          "station": "entrega",
+          "station_local_id": "32",
+          "raw_fields": {
+            "lugar": "entrega",
+            "fecha": "2026-10-20",
+            "tipo_dia": "Martes 2x1",
+            "personal": "4",
+            "id": "32",
+            "hora_llegada": "17:40:54",
+            "hora_inicio": "17:41:16",
+            "hora_fin": "17:45:23",
+            "hora_se_fue": ""
+          }
+        },
+        {
+          "record_id": "boquitas_tuesday_corrected_2026-10-20:line:033",
+          "source_id": "boquitas_tuesday_corrected_2026-10-20",
+          "source_line": 33,
+          "station": "entrega",
+          "station_local_id": "33",
+          "raw_fields": {
+            "lugar": "entrega",
+            "fecha": "2026-10-20",
+            "tipo_dia": "Martes 2x1",
+            "personal": "4",
+            "id": "33",
+            "hora_llegada": "17:42:10",
+            "hora_inicio": "17:42:43",
+            "hora_fin": "17:47:59",
+            "hora_se_fue": ""
+          }
+        },
+        {
+          "record_id": "boquitas_tuesday_corrected_2026-10-20:line:034",
+          "source_id": "boquitas_tuesday_corrected_2026-10-20",
+          "source_line": 34,
+          "station": "entrega",
+          "station_local_id": "34",
+          "raw_fields": {
+            "lugar": "entrega",
+            "fecha": "2026-10-20",
+            "tipo_dia": "Martes 2x1",
+            "personal": "4",
+            "id": "34",
+            "hora_llegada": "17:45:23",
+            "hora_inicio": "17:45:24",
+            "hora_fin": "17:48:38",
+            "hora_se_fue": ""
+          }
+        },
+        {
+          "record_id": "boquitas_tuesday_corrected_2026-10-20:line:035",
+          "source_id": "boquitas_tuesday_corrected_2026-10-20",
+          "source_line": 35,
+          "station": "entrega",
+          "station_local_id": "35",
+          "raw_fields": {
+            "lugar": "entrega",
+            "fecha": "2026-10-20",
+            "tipo_dia": "Martes 2x1",
+            "personal": "4",
+            "id": "35",
+            "hora_llegada": "17:45:43",
+            "hora_inicio": "17:46:54",
+            "hora_fin": "17:52:54",
+            "hora_se_fue": ""
+          }
+        },
+        {
+          "record_id": "boquitas_tuesday_corrected_2026-10-20:line:036",
+          "source_id": "boquitas_tuesday_corrected_2026-10-20",
+          "source_line": 36,
+          "station": "entrega",
+          "station_local_id": "36",
+          "raw_fields": {
+            "lugar": "entrega",
+            "fecha": "2026-10-20",
+            "tipo_dia": "Martes 2x1",
+            "personal": "4",
+            "id": "36",
+            "hora_llegada": "17:46:52",
+            "hora_inicio": "17:46:54",
+            "hora_fin": "17:52:58",
+            "hora_se_fue": ""
+          }
+        },
+        {
+          "record_id": "boquitas_tuesday_corrected_2026-10-20:line:037",
+          "source_id": "boquitas_tuesday_corrected_2026-10-20",
+          "source_line": 37,
+          "station": "entrega",
+          "station_local_id": "37",
+          "raw_fields": {
+            "lugar": "entrega",
+            "fecha": "2026-10-20",
+            "tipo_dia": "Martes 2x1",
+            "personal": "4",
+            "id": "37",
+            "hora_llegada": "17:48:59",
+            "hora_inicio": "17:49:01",
+            "hora_fin": "17:53:52",
+            "hora_se_fue": ""
+          }
+        },
+        {
+          "record_id": "boquitas_tuesday_corrected_2026-10-20:line:038",
+          "source_id": "boquitas_tuesday_corrected_2026-10-20",
+          "source_line": 38,
+          "station": "entrega",
+          "station_local_id": "38",
+          "raw_fields": {
+            "lugar": "entrega",
+            "fecha": "2026-10-20",
+            "tipo_dia": "Martes 2x1",
+            "personal": "4",
+            "id": "38",
+            "hora_llegada": "17:52:55",
+            "hora_inicio": "17:52:56",
+            "hora_fin": "17:56:10",
+            "hora_se_fue": ""
+          }
+        },
+        {
+          "record_id": "boquitas_tuesday_corrected_2026-10-20:line:039",
+          "source_id": "boquitas_tuesday_corrected_2026-10-20",
+          "source_line": 39,
+          "station": "entrega",
+          "station_local_id": "39",
+          "raw_fields": {
+            "lugar": "entrega",
+            "fecha": "2026-10-20",
+            "tipo_dia": "Martes 2x1",
+            "personal": "4",
+            "id": "39",
+            "hora_llegada": "17:53:53",
+            "hora_inicio": "17:53:57",
+            "hora_fin": "17:57:33",
+            "hora_se_fue": ""
+          }
+        },
+        {
+          "record_id": "boquitas_tuesday_corrected_2026-10-20:line:040",
+          "source_id": "boquitas_tuesday_corrected_2026-10-20",
+          "source_line": 40,
+          "station": "entrega",
+          "station_local_id": "40",
+          "raw_fields": {
+            "lugar": "entrega",
+            "fecha": "2026-10-20",
+            "tipo_dia": "Martes 2x1",
+            "personal": "4",
+            "id": "40",
+            "hora_llegada": "17:54:29",
+            "hora_inicio": "17:54:30",
+            "hora_fin": "17:58:10",
+            "hora_se_fue": ""
+          }
+        },
+        {
+          "record_id": "boquitas_tuesday_corrected_2026-10-20:line:041",
+          "source_id": "boquitas_tuesday_corrected_2026-10-20",
+          "source_line": 41,
+          "station": "entrega",
+          "station_local_id": "41",
+          "raw_fields": {
+            "lugar": "entrega",
+            "fecha": "2026-10-20",
+            "tipo_dia": "Martes 2x1",
+            "personal": "4",
+            "id": "41",
+            "hora_llegada": "17:56:07",
+            "hora_inicio": "17:56:10",
+            "hora_fin": "17:59:53",
+            "hora_se_fue": ""
+          }
+        },
+        {
+          "record_id": "boquitas_tuesday_corrected_2026-10-20:line:042",
+          "source_id": "boquitas_tuesday_corrected_2026-10-20",
+          "source_line": 42,
+          "station": "entrega",
+          "station_local_id": "42",
+          "raw_fields": {
+            "lugar": "entrega",
+            "fecha": "2026-10-20",
+            "tipo_dia": "Martes 2x1",
+            "personal": "4",
+            "id": "42",
+            "hora_llegada": "17:56:15",
+            "hora_inicio": "17:56:39",
+            "hora_fin": "18:00:36",
+            "hora_se_fue": ""
+          }
+        },
+        {
+          "record_id": "boquitas_tuesday_corrected_2026-10-20:line:043",
+          "source_id": "boquitas_tuesday_corrected_2026-10-20",
+          "source_line": 43,
+          "station": "entrega",
+          "station_local_id": "43",
+          "raw_fields": {
+            "lugar": "entrega",
+            "fecha": "2026-10-20",
+            "tipo_dia": "Martes 2x1",
+            "personal": "4",
+            "id": "43",
+            "hora_llegada": "17:58:12",
+            "hora_inicio": "17:58:40",
+            "hora_fin": "18:01:34",
+            "hora_se_fue": ""
+          }
+        },
+        {
+          "record_id": "boquitas_tuesday_corrected_2026-10-20:line:044",
+          "source_id": "boquitas_tuesday_corrected_2026-10-20",
+          "source_line": 44,
+          "station": "entrega",
+          "station_local_id": "44",
+          "raw_fields": {
+            "lugar": "entrega",
+            "fecha": "2026-10-20",
+            "tipo_dia": "Martes 2x1",
+            "personal": "4",
+            "id": "44",
+            "hora_llegada": "17:58:55",
+            "hora_inicio": "17:59:06",
+            "hora_fin": "18:02:51",
+            "hora_se_fue": ""
+          }
+        },
+        {
+          "record_id": "boquitas_tuesday_corrected_2026-10-20:line:045",
+          "source_id": "boquitas_tuesday_corrected_2026-10-20",
+          "source_line": 45,
+          "station": "entrega",
+          "station_local_id": "45",
+          "raw_fields": {
+            "lugar": "entrega",
+            "fecha": "2026-10-20",
+            "tipo_dia": "Martes 2x1",
+            "personal": "4",
+            "id": "45",
+            "hora_llegada": "18:00:38",
+            "hora_inicio": "18:00:47",
+            "hora_fin": "18:04:01",
+            "hora_se_fue": ""
+          }
+        },
+        {
+          "record_id": "boquitas_tuesday_corrected_2026-10-20:line:046",
+          "source_id": "boquitas_tuesday_corrected_2026-10-20",
+          "source_line": 46,
+          "station": "entrega",
+          "station_local_id": "46",
+          "raw_fields": {
+            "lugar": "entrega",
+            "fecha": "2026-10-20",
+            "tipo_dia": "Martes 2x1",
+            "personal": "4",
+            "id": "46",
+            "hora_llegada": "18:01:10",
+            "hora_inicio": "18:01:12",
+            "hora_fin": "18:04:08",
+            "hora_se_fue": ""
+          }
+        },
+        {
+          "record_id": "boquitas_tuesday_corrected_2026-10-20:line:047",
+          "source_id": "boquitas_tuesday_corrected_2026-10-20",
+          "source_line": 47,
+          "station": "entrega",
+          "station_local_id": "47",
+          "raw_fields": {
+            "lugar": "entrega",
+            "fecha": "2026-10-20",
+            "tipo_dia": "Martes 2x1",
+            "personal": "4",
+            "id": "47",
+            "hora_llegada": "18:01:30",
+            "hora_inicio": "18:01:59",
+            "hora_fin": "18:05:19",
+            "hora_se_fue": ""
+          }
+        },
+        {
+          "record_id": "boquitas_tuesday_corrected_2026-10-20:line:048",
+          "source_id": "boquitas_tuesday_corrected_2026-10-20",
+          "source_line": 48,
+          "station": "entrega",
+          "station_local_id": "48",
+          "raw_fields": {
+            "lugar": "entrega",
+            "fecha": "2026-10-20",
+            "tipo_dia": "Martes 2x1",
+            "personal": "4",
+            "id": "48",
+            "hora_llegada": "18:02:52",
+            "hora_inicio": "18:03:03",
+            "hora_fin": "18:06:33",
+            "hora_se_fue": ""
+          }
+        },
+        {
+          "record_id": "boquitas_tuesday_corrected_2026-10-20:line:049",
+          "source_id": "boquitas_tuesday_corrected_2026-10-20",
+          "source_line": 49,
+          "station": "entrega",
+          "station_local_id": "49",
+          "raw_fields": {
+            "lugar": "entrega",
+            "fecha": "2026-10-20",
+            "tipo_dia": "Martes 2x1",
+            "personal": "4",
+            "id": "49",
+            "hora_llegada": "18:04:04",
+            "hora_inicio": "18:04:13",
+            "hora_fin": "18:07:39",
+            "hora_se_fue": ""
+          }
+        },
+        {
+          "record_id": "boquitas_tuesday_corrected_2026-10-20:line:050",
+          "source_id": "boquitas_tuesday_corrected_2026-10-20",
+          "source_line": 50,
+          "station": "entrega",
+          "station_local_id": "50",
+          "raw_fields": {
+            "lugar": "entrega",
+            "fecha": "2026-10-20",
+            "tipo_dia": "Martes 2x1",
+            "personal": "4",
+            "id": "50",
+            "hora_llegada": "18:04:08",
+            "hora_inicio": "18:04:13",
+            "hora_fin": "18:10:00",
+            "hora_se_fue": ""
+          }
+        },
+        {
+          "record_id": "boquitas_tuesday_corrected_2026-10-20:line:051",
+          "source_id": "boquitas_tuesday_corrected_2026-10-20",
+          "source_line": 51,
+          "station": "entrega",
+          "station_local_id": "51",
+          "raw_fields": {
+            "lugar": "entrega",
+            "fecha": "2026-10-20",
+            "tipo_dia": "Martes 2x1",
+            "personal": "4",
+            "id": "51",
+            "hora_llegada": "18:05:22",
+            "hora_inicio": "18:05:45",
+            "hora_fin": "18:11:35",
+            "hora_se_fue": ""
+          }
+        },
+        {
+          "record_id": "boquitas_tuesday_corrected_2026-10-20:line:052",
+          "source_id": "boquitas_tuesday_corrected_2026-10-20",
+          "source_line": 52,
+          "station": "entrega",
+          "station_local_id": "52",
+          "raw_fields": {
+            "lugar": "entrega",
+            "fecha": "2026-10-20",
+            "tipo_dia": "Martes 2x1",
+            "personal": "4",
+            "id": "52",
+            "hora_llegada": "18:07:41",
+            "hora_inicio": "18:08:35",
+            "hora_fin": "18:12:07",
+            "hora_se_fue": ""
+          }
+        },
+        {
+          "record_id": "boquitas_tuesday_corrected_2026-10-20:line:053",
+          "source_id": "boquitas_tuesday_corrected_2026-10-20",
+          "source_line": 53,
+          "station": "entrega",
+          "station_local_id": "53",
+          "raw_fields": {
+            "lugar": "entrega",
+            "fecha": "2026-10-20",
+            "tipo_dia": "Martes 2x1",
+            "personal": "4",
+            "id": "53",
+            "hora_llegada": "18:11:36",
+            "hora_inicio": "18:12:07",
+            "hora_fin": "18:15:35",
+            "hora_se_fue": ""
+          }
+        },
+        {
+          "record_id": "boquitas_tuesday_corrected_2026-10-20:line:054",
+          "source_id": "boquitas_tuesday_corrected_2026-10-20",
+          "source_line": 54,
+          "station": "entrega",
+          "station_local_id": "54",
+          "raw_fields": {
+            "lugar": "entrega",
+            "fecha": "2026-10-20",
+            "tipo_dia": "Martes 2x1",
+            "personal": "4",
+            "id": "54",
+            "hora_llegada": "18:12:08",
+            "hora_inicio": "18:12:14",
+            "hora_fin": "18:18:42",
+            "hora_se_fue": ""
+          }
+        },
+        {
+          "record_id": "boquitas_tuesday_corrected_2026-10-20:line:055",
+          "source_id": "boquitas_tuesday_corrected_2026-10-20",
+          "source_line": 55,
+          "station": "entrega",
+          "station_local_id": "55",
+          "raw_fields": {
+            "lugar": "entrega",
+            "fecha": "2026-10-20",
+            "tipo_dia": "Martes 2x1",
+            "personal": "4",
+            "id": "55",
+            "hora_llegada": "18:16:52",
+            "hora_inicio": "18:16:55",
+            "hora_fin": "18:20:51",
+            "hora_se_fue": ""
+          }
+        },
+        {
+          "record_id": "boquitas_tuesday_corrected_2026-10-20:line:056",
+          "source_id": "boquitas_tuesday_corrected_2026-10-20",
+          "source_line": 56,
+          "station": "entrega",
+          "station_local_id": "56",
+          "raw_fields": {
+            "lugar": "entrega",
+            "fecha": "2026-10-20",
+            "tipo_dia": "Martes 2x1",
+            "personal": "4",
+            "id": "56",
+            "hora_llegada": "18:18:40",
+            "hora_inicio": "18:19:13",
+            "hora_fin": "18:22:42",
+            "hora_se_fue": ""
+          }
+        },
+        {
+          "record_id": "boquitas_tuesday_corrected_2026-10-20:line:057",
+          "source_id": "boquitas_tuesday_corrected_2026-10-20",
+          "source_line": 57,
+          "station": "entrega",
+          "station_local_id": "57",
+          "raw_fields": {
+            "lugar": "entrega",
+            "fecha": "2026-10-20",
+            "tipo_dia": "Martes 2x1",
+            "personal": "4",
+            "id": "57",
+            "hora_llegada": "18:19:47",
+            "hora_inicio": "18:19:53",
+            "hora_fin": "18:24:42",
+            "hora_se_fue": ""
+          }
+        },
+        {
+          "record_id": "boquitas_tuesday_corrected_2026-10-20:line:058",
+          "source_id": "boquitas_tuesday_corrected_2026-10-20",
+          "source_line": 58,
+          "station": "entrega",
+          "station_local_id": "58",
+          "raw_fields": {
+            "lugar": "entrega",
+            "fecha": "2026-10-20",
+            "tipo_dia": "Martes 2x1",
+            "personal": "4",
+            "id": "58",
+            "hora_llegada": "18:22:43",
+            "hora_inicio": "18:22:45",
+            "hora_fin": "18:28:23",
+            "hora_se_fue": ""
+          }
+        },
+        {
+          "record_id": "boquitas_tuesday_corrected_2026-10-20:line:059",
+          "source_id": "boquitas_tuesday_corrected_2026-10-20",
+          "source_line": 59,
+          "station": "entrega",
+          "station_local_id": "59",
+          "raw_fields": {
+            "lugar": "entrega",
+            "fecha": "2026-10-20",
+            "tipo_dia": "Martes 2x1",
+            "personal": "4",
+            "id": "59",
+            "hora_llegada": "18:33:01",
+            "hora_inicio": "18:33:02",
+            "hora_fin": "18:41:30",
+            "hora_se_fue": ""
+          }
+        },
+        {
+          "record_id": "boquitas_tuesday_corrected_2026-10-20:line:060",
+          "source_id": "boquitas_tuesday_corrected_2026-10-20",
+          "source_line": 60,
+          "station": "caja",
+          "station_local_id": "1",
+          "raw_fields": {
+            "lugar": "caja",
+            "fecha": "2026-10-20",
+            "tipo_dia": "Martes 2x1",
+            "personal": "1",
+            "id": "1",
+            "hora_llegada": "16:45:35",
+            "hora_inicio": "16:46:16",
+            "hora_fin": "16:46:56",
+            "hora_se_fue": ""
+          }
+        },
+        {
+          "record_id": "boquitas_tuesday_corrected_2026-10-20:line:061",
+          "source_id": "boquitas_tuesday_corrected_2026-10-20",
+          "source_line": 61,
+          "station": "caja",
+          "station_local_id": "2",
+          "raw_fields": {
+            "lugar": "caja",
+            "fecha": "2026-10-20",
+            "tipo_dia": "Martes 2x1",
+            "personal": "1",
+            "id": "2",
+            "hora_llegada": "16:46:20",
+            "hora_inicio": "16:47:59",
+            "hora_fin": "16:48:27",
+            "hora_se_fue": ""
+          }
+        },
+        {
+          "record_id": "boquitas_tuesday_corrected_2026-10-20:line:062",
+          "source_id": "boquitas_tuesday_corrected_2026-10-20",
+          "source_line": 62,
+          "station": "caja",
+          "station_local_id": "3",
+          "raw_fields": {
+            "lugar": "caja",
+            "fecha": "2026-10-20",
+            "tipo_dia": "Martes 2x1",
+            "personal": "1",
+            "id": "3",
+            "hora_llegada": "16:49:36",
+            "hora_inicio": "16:51:02",
+            "hora_fin": "16:53:05",
+            "hora_se_fue": ""
+          }
+        },
+        {
+          "record_id": "boquitas_tuesday_corrected_2026-10-20:line:063",
+          "source_id": "boquitas_tuesday_corrected_2026-10-20",
+          "source_line": 63,
+          "station": "caja",
+          "station_local_id": "4",
+          "raw_fields": {
+            "lugar": "caja",
+            "fecha": "2026-10-20",
+            "tipo_dia": "Martes 2x1",
+            "personal": "1",
+            "id": "4",
+            "hora_llegada": "16:49:37",
+            "hora_inicio": "16:50:23",
+            "hora_fin": "16:51:54",
+            "hora_se_fue": ""
+          }
+        },
+        {
+          "record_id": "boquitas_tuesday_corrected_2026-10-20:line:064",
+          "source_id": "boquitas_tuesday_corrected_2026-10-20",
+          "source_line": 64,
+          "station": "caja",
+          "station_local_id": "5",
+          "raw_fields": {
+            "lugar": "caja",
+            "fecha": "2026-10-20",
+            "tipo_dia": "Martes 2x1",
+            "personal": "1",
+            "id": "5",
+            "hora_llegada": "16:50:04",
+            "hora_inicio": "16:51:10",
+            "hora_fin": "16:52:27",
+            "hora_se_fue": ""
+          }
+        },
+        {
+          "record_id": "boquitas_tuesday_corrected_2026-10-20:line:065",
+          "source_id": "boquitas_tuesday_corrected_2026-10-20",
+          "source_line": 65,
+          "station": "caja",
+          "station_local_id": "6",
+          "raw_fields": {
+            "lugar": "caja",
+            "fecha": "2026-10-20",
+            "tipo_dia": "Martes 2x1",
+            "personal": "1",
+            "id": "6",
+            "hora_llegada": "16:50:40",
+            "hora_inicio": "16:52:11",
+            "hora_fin": "16:53:24",
+            "hora_se_fue": ""
+          }
+        },
+        {
+          "record_id": "boquitas_tuesday_corrected_2026-10-20:line:066",
+          "source_id": "boquitas_tuesday_corrected_2026-10-20",
+          "source_line": 66,
+          "station": "caja",
+          "station_local_id": "7",
+          "raw_fields": {
+            "lugar": "caja",
+            "fecha": "2026-10-20",
+            "tipo_dia": "Martes 2x1",
+            "personal": "1",
+            "id": "7",
+            "hora_llegada": "16:50:41",
+            "hora_inicio": "16:54:01",
+            "hora_fin": "16:54:41",
+            "hora_se_fue": ""
+          }
+        },
+        {
+          "record_id": "boquitas_tuesday_corrected_2026-10-20:line:067",
+          "source_id": "boquitas_tuesday_corrected_2026-10-20",
+          "source_line": 67,
+          "station": "caja",
+          "station_local_id": "8",
+          "raw_fields": {
+            "lugar": "caja",
+            "fecha": "2026-10-20",
+            "tipo_dia": "Martes 2x1",
+            "personal": "1",
+            "id": "8",
+            "hora_llegada": "16:51:38",
+            "hora_inicio": "16:54:56",
+            "hora_fin": "16:55:35",
+            "hora_se_fue": ""
+          }
+        },
+        {
+          "record_id": "boquitas_tuesday_corrected_2026-10-20:line:068",
+          "source_id": "boquitas_tuesday_corrected_2026-10-20",
+          "source_line": 68,
+          "station": "caja",
+          "station_local_id": "9",
+          "raw_fields": {
+            "lugar": "caja",
+            "fecha": "2026-10-20",
+            "tipo_dia": "Martes 2x1",
+            "personal": "1",
+            "id": "9",
+            "hora_llegada": "16:53:30",
+            "hora_inicio": "16:55:36",
+            "hora_fin": "16:59:46",
+            "hora_se_fue": ""
+          }
+        },
+        {
+          "record_id": "boquitas_tuesday_corrected_2026-10-20:line:069",
+          "source_id": "boquitas_tuesday_corrected_2026-10-20",
+          "source_line": 69,
+          "station": "caja",
+          "station_local_id": "10",
+          "raw_fields": {
+            "lugar": "caja",
+            "fecha": "2026-10-20",
+            "tipo_dia": "Martes 2x1",
+            "personal": "1",
+            "id": "10",
+            "hora_llegada": "16:54:50",
+            "hora_inicio": "16:59:48",
+            "hora_fin": "17:01:36",
+            "hora_se_fue": ""
+          }
+        },
+        {
+          "record_id": "boquitas_tuesday_corrected_2026-10-20:line:070",
+          "source_id": "boquitas_tuesday_corrected_2026-10-20",
+          "source_line": 70,
+          "station": "caja",
+          "station_local_id": "11",
+          "raw_fields": {
+            "lugar": "caja",
+            "fecha": "2026-10-20",
+            "tipo_dia": "Martes 2x1",
+            "personal": "1",
+            "id": "11",
+            "hora_llegada": "16:55:08",
+            "hora_inicio": "17:01:37",
+            "hora_fin": "17:02:25",
+            "hora_se_fue": ""
+          }
+        },
+        {
+          "record_id": "boquitas_tuesday_corrected_2026-10-20:line:071",
+          "source_id": "boquitas_tuesday_corrected_2026-10-20",
+          "source_line": 71,
+          "station": "caja",
+          "station_local_id": "12",
+          "raw_fields": {
+            "lugar": "caja",
+            "fecha": "2026-10-20",
+            "tipo_dia": "Martes 2x1",
+            "personal": "1",
+            "id": "12",
+            "hora_llegada": "16:55:40",
+            "hora_inicio": "17:02:25",
+            "hora_fin": "17:03:40",
+            "hora_se_fue": ""
+          }
+        },
+        {
+          "record_id": "boquitas_tuesday_corrected_2026-10-20:line:072",
+          "source_id": "boquitas_tuesday_corrected_2026-10-20",
+          "source_line": 72,
+          "station": "caja",
+          "station_local_id": "13",
+          "raw_fields": {
+            "lugar": "caja",
+            "fecha": "2026-10-20",
+            "tipo_dia": "Martes 2x1",
+            "personal": "1",
+            "id": "13",
+            "hora_llegada": "16:55:46",
+            "hora_inicio": "17:03:40",
+            "hora_fin": "17:04:28",
+            "hora_se_fue": ""
+          }
+        },
+        {
+          "record_id": "boquitas_tuesday_corrected_2026-10-20:line:073",
+          "source_id": "boquitas_tuesday_corrected_2026-10-20",
+          "source_line": 73,
+          "station": "caja",
+          "station_local_id": "14",
+          "raw_fields": {
+            "lugar": "caja",
+            "fecha": "2026-10-20",
+            "tipo_dia": "Martes 2x1",
+            "personal": "1",
+            "id": "14",
+            "hora_llegada": "17:06:00",
+            "hora_inicio": "17:06:48",
+            "hora_fin": "17:07:21",
+            "hora_se_fue": ""
+          }
+        },
+        {
+          "record_id": "boquitas_tuesday_corrected_2026-10-20:line:074",
+          "source_id": "boquitas_tuesday_corrected_2026-10-20",
+          "source_line": 74,
+          "station": "caja",
+          "station_local_id": "15",
+          "raw_fields": {
+            "lugar": "caja",
+            "fecha": "2026-10-20",
+            "tipo_dia": "Martes 2x1",
+            "personal": "1",
+            "id": "15",
+            "hora_llegada": "17:10:17",
+            "hora_inicio": "17:10:48",
+            "hora_fin": "17:11:43",
+            "hora_se_fue": ""
+          }
+        },
+        {
+          "record_id": "boquitas_tuesday_corrected_2026-10-20:line:075",
+          "source_id": "boquitas_tuesday_corrected_2026-10-20",
+          "source_line": 75,
+          "station": "caja",
+          "station_local_id": "16",
+          "raw_fields": {
+            "lugar": "caja",
+            "fecha": "2026-10-20",
+            "tipo_dia": "Martes 2x1",
+            "personal": "1",
+            "id": "16",
+            "hora_llegada": "17:10:25",
+            "hora_inicio": "",
+            "hora_fin": "",
+            "hora_se_fue": "17:10:36"
+          }
+        },
+        {
+          "record_id": "boquitas_tuesday_corrected_2026-10-20:line:076",
+          "source_id": "boquitas_tuesday_corrected_2026-10-20",
+          "source_line": 76,
+          "station": "caja",
+          "station_local_id": "17",
+          "raw_fields": {
+            "lugar": "caja",
+            "fecha": "2026-10-20",
+            "tipo_dia": "Martes 2x1",
+            "personal": "1",
+            "id": "17",
+            "hora_llegada": "17:11:23",
+            "hora_inicio": "17:12:55",
+            "hora_fin": "17:15:00",
+            "hora_se_fue": ""
+          }
+        },
+        {
+          "record_id": "boquitas_tuesday_corrected_2026-10-20:line:077",
+          "source_id": "boquitas_tuesday_corrected_2026-10-20",
+          "source_line": 77,
+          "station": "caja",
+          "station_local_id": "18",
+          "raw_fields": {
+            "lugar": "caja",
+            "fecha": "2026-10-20",
+            "tipo_dia": "Martes 2x1",
+            "personal": "1",
+            "id": "18",
+            "hora_llegada": "17:12:24",
+            "hora_inicio": "17:15:39",
+            "hora_fin": "17:18:27",
+            "hora_se_fue": ""
+          }
+        },
+        {
+          "record_id": "boquitas_tuesday_corrected_2026-10-20:line:078",
+          "source_id": "boquitas_tuesday_corrected_2026-10-20",
+          "source_line": 78,
+          "station": "caja",
+          "station_local_id": "19",
+          "raw_fields": {
+            "lugar": "caja",
+            "fecha": "2026-10-20",
+            "tipo_dia": "Martes 2x1",
+            "personal": "1",
+            "id": "19",
+            "hora_llegada": "17:14:12",
+            "hora_inicio": "",
+            "hora_fin": "",
+            "hora_se_fue": "17:16:49"
+          }
+        },
+        {
+          "record_id": "boquitas_tuesday_corrected_2026-10-20:line:079",
+          "source_id": "boquitas_tuesday_corrected_2026-10-20",
+          "source_line": 79,
+          "station": "caja",
+          "station_local_id": "20",
+          "raw_fields": {
+            "lugar": "caja",
+            "fecha": "2026-10-20",
+            "tipo_dia": "Martes 2x1",
+            "personal": "1",
+            "id": "20",
+            "hora_llegada": "17:14:59",
+            "hora_inicio": "17:17:02",
+            "hora_fin": "17:18:28",
+            "hora_se_fue": ""
+          }
+        },
+        {
+          "record_id": "boquitas_tuesday_corrected_2026-10-20:line:080",
+          "source_id": "boquitas_tuesday_corrected_2026-10-20",
+          "source_line": 80,
+          "station": "caja",
+          "station_local_id": "21",
+          "raw_fields": {
+            "lugar": "caja",
+            "fecha": "2026-10-20",
+            "tipo_dia": "Martes 2x1",
+            "personal": "1",
+            "id": "21",
+            "hora_llegada": "17:18:29",
+            "hora_inicio": "17:21:34",
+            "hora_fin": "17:23:54",
+            "hora_se_fue": ""
+          }
+        },
+        {
+          "record_id": "boquitas_tuesday_corrected_2026-10-20:line:081",
+          "source_id": "boquitas_tuesday_corrected_2026-10-20",
+          "source_line": 81,
+          "station": "caja",
+          "station_local_id": "22",
+          "raw_fields": {
+            "lugar": "caja",
+            "fecha": "2026-10-20",
+            "tipo_dia": "Martes 2x1",
+            "personal": "1",
+            "id": "22",
+            "hora_llegada": "17:21:32",
+            "hora_inicio": "17:21:34",
+            "hora_fin": "17:23:46",
+            "hora_se_fue": ""
+          }
+        },
+        {
+          "record_id": "boquitas_tuesday_corrected_2026-10-20:line:082",
+          "source_id": "boquitas_tuesday_corrected_2026-10-20",
+          "source_line": 82,
+          "station": "caja",
+          "station_local_id": "23",
+          "raw_fields": {
+            "lugar": "caja",
+            "fecha": "2026-10-20",
+            "tipo_dia": "Martes 2x1",
+            "personal": "1",
+            "id": "23",
+            "hora_llegada": "17:23:59",
+            "hora_inicio": "17:24:07",
+            "hora_fin": "17:27:33",
+            "hora_se_fue": ""
+          }
+        },
+        {
+          "record_id": "boquitas_tuesday_corrected_2026-10-20:line:083",
+          "source_id": "boquitas_tuesday_corrected_2026-10-20",
+          "source_line": 83,
+          "station": "caja",
+          "station_local_id": "24",
+          "raw_fields": {
+            "lugar": "caja",
+            "fecha": "2026-10-20",
+            "tipo_dia": "Martes 2x1",
+            "personal": "1",
+            "id": "24",
+            "hora_llegada": "17:24:49",
+            "hora_inicio": "17:26:00",
+            "hora_fin": "17:28:56",
+            "hora_se_fue": ""
+          }
+        },
+        {
+          "record_id": "boquitas_tuesday_corrected_2026-10-20:line:084",
+          "source_id": "boquitas_tuesday_corrected_2026-10-20",
+          "source_line": 84,
+          "station": "caja",
+          "station_local_id": "25",
+          "raw_fields": {
+            "lugar": "caja",
+            "fecha": "2026-10-20",
+            "tipo_dia": "Martes 2x1",
+            "personal": "1",
+            "id": "25",
+            "hora_llegada": "17:25:22",
+            "hora_inicio": "17:26:01",
+            "hora_fin": "17:30:08",
+            "hora_se_fue": ""
+          }
+        },
+        {
+          "record_id": "boquitas_tuesday_corrected_2026-10-20:line:085",
+          "source_id": "boquitas_tuesday_corrected_2026-10-20",
+          "source_line": 85,
+          "station": "caja",
+          "station_local_id": "26",
+          "raw_fields": {
+            "lugar": "caja",
+            "fecha": "2026-10-20",
+            "tipo_dia": "Martes 2x1",
+            "personal": "1",
+            "id": "26",
+            "hora_llegada": "17:27:25",
+            "hora_inicio": "17:30:06",
+            "hora_fin": "17:30:50",
+            "hora_se_fue": ""
+          }
+        },
+        {
+          "record_id": "boquitas_tuesday_corrected_2026-10-20:line:086",
+          "source_id": "boquitas_tuesday_corrected_2026-10-20",
+          "source_line": 86,
+          "station": "caja",
+          "station_local_id": "27",
+          "raw_fields": {
+            "lugar": "caja",
+            "fecha": "2026-10-20",
+            "tipo_dia": "Martes 2x1",
+            "personal": "1",
+            "id": "27",
+            "hora_llegada": "17:28:57",
+            "hora_inicio": "17:30:07",
+            "hora_fin": "17:34:38",
+            "hora_se_fue": ""
+          }
+        },
+        {
+          "record_id": "boquitas_tuesday_corrected_2026-10-20:line:087",
+          "source_id": "boquitas_tuesday_corrected_2026-10-20",
+          "source_line": 87,
+          "station": "caja",
+          "station_local_id": "28",
+          "raw_fields": {
+            "lugar": "caja",
+            "fecha": "2026-10-20",
+            "tipo_dia": "Martes 2x1",
+            "personal": "1",
+            "id": "28",
+            "hora_llegada": "17:32:53",
+            "hora_inicio": "17:34:44",
+            "hora_fin": "17:35:43",
+            "hora_se_fue": ""
+          }
+        },
+        {
+          "record_id": "boquitas_tuesday_corrected_2026-10-20:line:088",
+          "source_id": "boquitas_tuesday_corrected_2026-10-20",
+          "source_line": 88,
+          "station": "caja",
+          "station_local_id": "29",
+          "raw_fields": {
+            "lugar": "caja",
+            "fecha": "2026-10-20",
+            "tipo_dia": "Martes 2x1",
+            "personal": "1",
+            "id": "29",
+            "hora_llegada": "17:33:22",
+            "hora_inicio": "17:35:45",
+            "hora_fin": "17:36:31",
+            "hora_se_fue": ""
+          }
+        },
+        {
+          "record_id": "boquitas_tuesday_corrected_2026-10-20:line:089",
+          "source_id": "boquitas_tuesday_corrected_2026-10-20",
+          "source_line": 89,
+          "station": "caja",
+          "station_local_id": "30",
+          "raw_fields": {
+            "lugar": "caja",
+            "fecha": "2026-10-20",
+            "tipo_dia": "Martes 2x1",
+            "personal": "1",
+            "id": "30",
+            "hora_llegada": "17:36:27",
+            "hora_inicio": "17:36:32",
+            "hora_fin": "17:36:33",
+            "hora_se_fue": ""
+          }
+        },
+        {
+          "record_id": "boquitas_tuesday_corrected_2026-10-20:line:090",
+          "source_id": "boquitas_tuesday_corrected_2026-10-20",
+          "source_line": 90,
+          "station": "caja",
+          "station_local_id": "31",
+          "raw_fields": {
+            "lugar": "caja",
+            "fecha": "2026-10-20",
+            "tipo_dia": "Martes 2x1",
+            "personal": "1",
+            "id": "31",
+            "hora_llegada": "17:39:08",
+            "hora_inicio": "17:39:51",
+            "hora_fin": "17:40:24",
+            "hora_se_fue": ""
+          }
+        },
+        {
+          "record_id": "boquitas_tuesday_corrected_2026-10-20:line:091",
+          "source_id": "boquitas_tuesday_corrected_2026-10-20",
+          "source_line": 91,
+          "station": "caja",
+          "station_local_id": "32",
+          "raw_fields": {
+            "lugar": "caja",
+            "fecha": "2026-10-20",
+            "tipo_dia": "Martes 2x1",
+            "personal": "1",
+            "id": "32",
+            "hora_llegada": "17:39:50",
+            "hora_inicio": "17:40:15",
+            "hora_fin": "17:41:01",
+            "hora_se_fue": ""
+          }
+        },
+        {
+          "record_id": "boquitas_tuesday_corrected_2026-10-20:line:092",
+          "source_id": "boquitas_tuesday_corrected_2026-10-20",
+          "source_line": 92,
+          "station": "caja",
+          "station_local_id": "33",
+          "raw_fields": {
+            "lugar": "caja",
+            "fecha": "2026-10-20",
+            "tipo_dia": "Martes 2x1",
+            "personal": "1",
+            "id": "33",
+            "hora_llegada": "17:40:54",
+            "hora_inicio": "17:42:19",
+            "hora_fin": "17:42:20",
+            "hora_se_fue": ""
+          }
+        },
+        {
+          "record_id": "boquitas_tuesday_corrected_2026-10-20:line:093",
+          "source_id": "boquitas_tuesday_corrected_2026-10-20",
+          "source_line": 93,
+          "station": "caja",
+          "station_local_id": "34",
+          "raw_fields": {
+            "lugar": "caja",
+            "fecha": "2026-10-20",
+            "tipo_dia": "Martes 2x1",
+            "personal": "1",
+            "id": "34",
+            "hora_llegada": "17:42:13",
+            "hora_inicio": "17:43:18",
+            "hora_fin": "17:45:06",
+            "hora_se_fue": ""
+          }
+        },
+        {
+          "record_id": "boquitas_tuesday_corrected_2026-10-20:line:094",
+          "source_id": "boquitas_tuesday_corrected_2026-10-20",
+          "source_line": 94,
+          "station": "caja",
+          "station_local_id": "35",
+          "raw_fields": {
+            "lugar": "caja",
+            "fecha": "2026-10-20",
+            "tipo_dia": "Martes 2x1",
+            "personal": "1",
+            "id": "35",
+            "hora_llegada": "17:42:16",
+            "hora_inicio": "17:45:20",
+            "hora_fin": "17:46:20",
+            "hora_se_fue": ""
+          }
+        },
+        {
+          "record_id": "boquitas_tuesday_corrected_2026-10-20:line:095",
+          "source_id": "boquitas_tuesday_corrected_2026-10-20",
+          "source_line": 95,
+          "station": "caja",
+          "station_local_id": "36",
+          "raw_fields": {
+            "lugar": "caja",
+            "fecha": "2026-10-20",
+            "tipo_dia": "Martes 2x1",
+            "personal": "1",
+            "id": "36",
+            "hora_llegada": "17:45:03",
+            "hora_inicio": "17:45:22",
+            "hora_fin": "17:46:08",
+            "hora_se_fue": ""
+          }
+        },
+        {
+          "record_id": "boquitas_tuesday_corrected_2026-10-20:line:096",
+          "source_id": "boquitas_tuesday_corrected_2026-10-20",
+          "source_line": 96,
+          "station": "caja",
+          "station_local_id": "37",
+          "raw_fields": {
+            "lugar": "caja",
+            "fecha": "2026-10-20",
+            "tipo_dia": "Martes 2x1",
+            "personal": "1",
+            "id": "37",
+            "hora_llegada": "17:45:22",
+            "hora_inicio": "17:46:09",
+            "hora_fin": "17:48:21",
+            "hora_se_fue": ""
+          }
+        },
+        {
+          "record_id": "boquitas_tuesday_corrected_2026-10-20:line:097",
+          "source_id": "boquitas_tuesday_corrected_2026-10-20",
+          "source_line": 97,
+          "station": "caja",
+          "station_local_id": "38",
+          "raw_fields": {
+            "lugar": "caja",
+            "fecha": "2026-10-20",
+            "tipo_dia": "Martes 2x1",
+            "personal": "1",
+            "id": "38",
+            "hora_llegada": "17:45:59",
+            "hora_inicio": "17:48:22",
+            "hora_fin": "17:49:33",
+            "hora_se_fue": ""
+          }
+        },
+        {
+          "record_id": "boquitas_tuesday_corrected_2026-10-20:line:098",
+          "source_id": "boquitas_tuesday_corrected_2026-10-20",
+          "source_line": 98,
+          "station": "caja",
+          "station_local_id": "39",
+          "raw_fields": {
+            "lugar": "caja",
+            "fecha": "2026-10-20",
+            "tipo_dia": "Martes 2x1",
+            "personal": "1",
+            "id": "39",
+            "hora_llegada": "17:48:19",
+            "hora_inicio": "17:49:33",
+            "hora_fin": "17:51:17",
+            "hora_se_fue": ""
+          }
+        },
+        {
+          "record_id": "boquitas_tuesday_corrected_2026-10-20:line:099",
+          "source_id": "boquitas_tuesday_corrected_2026-10-20",
+          "source_line": 99,
+          "station": "caja",
+          "station_local_id": "40",
+          "raw_fields": {
+            "lugar": "caja",
+            "fecha": "2026-10-20",
+            "tipo_dia": "Martes 2x1",
+            "personal": "1",
+            "id": "40",
+            "hora_llegada": "17:48:57",
+            "hora_inicio": "17:51:18",
+            "hora_fin": "17:54:26",
+            "hora_se_fue": ""
+          }
+        },
+        {
+          "record_id": "boquitas_tuesday_corrected_2026-10-20:line:100",
+          "source_id": "boquitas_tuesday_corrected_2026-10-20",
+          "source_line": 100,
+          "station": "caja",
+          "station_local_id": "41",
+          "raw_fields": {
+            "lugar": "caja",
+            "fecha": "2026-10-20",
+            "tipo_dia": "Martes 2x1",
+            "personal": "1",
+            "id": "41",
+            "hora_llegada": "17:49:41",
+            "hora_inicio": "17:51:17",
+            "hora_fin": "17:54:25",
+            "hora_se_fue": ""
+          }
+        },
+        {
+          "record_id": "boquitas_tuesday_corrected_2026-10-20:line:101",
+          "source_id": "boquitas_tuesday_corrected_2026-10-20",
+          "source_line": 101,
+          "station": "caja",
+          "station_local_id": "42",
+          "raw_fields": {
+            "lugar": "caja",
+            "fecha": "2026-10-20",
+            "tipo_dia": "Martes 2x1",
+            "personal": "1",
+            "id": "42",
+            "hora_llegada": "17:51:22",
+            "hora_inicio": "17:54:27",
+            "hora_fin": "17:55:42",
+            "hora_se_fue": ""
+          }
+        },
+        {
+          "record_id": "boquitas_tuesday_corrected_2026-10-20:line:102",
+          "source_id": "boquitas_tuesday_corrected_2026-10-20",
+          "source_line": 102,
+          "station": "caja",
+          "station_local_id": "43",
+          "raw_fields": {
+            "lugar": "caja",
+            "fecha": "2026-10-20",
+            "tipo_dia": "Martes 2x1",
+            "personal": "1",
+            "id": "43",
+            "hora_llegada": "17:51:32",
+            "hora_inicio": "17:54:28",
+            "hora_fin": "17:57:31",
+            "hora_se_fue": ""
+          }
+        },
+        {
+          "record_id": "boquitas_tuesday_corrected_2026-10-20:line:103",
+          "source_id": "boquitas_tuesday_corrected_2026-10-20",
+          "source_line": 103,
+          "station": "caja",
+          "station_local_id": "44",
+          "raw_fields": {
+            "lugar": "caja",
+            "fecha": "2026-10-20",
+            "tipo_dia": "Martes 2x1",
+            "personal": "1",
+            "id": "44",
+            "hora_llegada": "17:54:30",
+            "hora_inicio": "17:57:32",
+            "hora_fin": "17:58:08",
+            "hora_se_fue": ""
+          }
+        },
+        {
+          "record_id": "boquitas_tuesday_corrected_2026-10-20:line:104",
+          "source_id": "boquitas_tuesday_corrected_2026-10-20",
+          "source_line": 104,
+          "station": "caja",
+          "station_local_id": "45",
+          "raw_fields": {
+            "lugar": "caja",
+            "fecha": "2026-10-20",
+            "tipo_dia": "Martes 2x1",
+            "personal": "1",
+            "id": "45",
+            "hora_llegada": "17:55:47",
+            "hora_inicio": "17:57:34",
+            "hora_fin": "17:58:09",
+            "hora_se_fue": ""
+          }
+        },
+        {
+          "record_id": "boquitas_tuesday_corrected_2026-10-20:line:105",
+          "source_id": "boquitas_tuesday_corrected_2026-10-20",
+          "source_line": 105,
+          "station": "caja",
+          "station_local_id": "46",
+          "raw_fields": {
+            "lugar": "caja",
+            "fecha": "2026-10-20",
+            "tipo_dia": "Martes 2x1",
+            "personal": "1",
+            "id": "46",
+            "hora_llegada": "17:56:22",
+            "hora_inicio": "17:59:08",
+            "hora_fin": "18:00:08",
+            "hora_se_fue": ""
+          }
+        },
+        {
+          "record_id": "boquitas_tuesday_corrected_2026-10-20:line:106",
+          "source_id": "boquitas_tuesday_corrected_2026-10-20",
+          "source_line": 106,
+          "station": "caja",
+          "station_local_id": "47",
+          "raw_fields": {
+            "lugar": "caja",
+            "fecha": "2026-10-20",
+            "tipo_dia": "Martes 2x1",
+            "personal": "1",
+            "id": "47",
+            "hora_llegada": "17:56:29",
+            "hora_inicio": "18:00:12",
+            "hora_fin": "18:00:36",
+            "hora_se_fue": ""
+          }
+        },
+        {
+          "record_id": "boquitas_tuesday_corrected_2026-10-20:line:107",
+          "source_id": "boquitas_tuesday_corrected_2026-10-20",
+          "source_line": 107,
+          "station": "caja",
+          "station_local_id": "48",
+          "raw_fields": {
+            "lugar": "caja",
+            "fecha": "2026-10-20",
+            "tipo_dia": "Martes 2x1",
+            "personal": "1",
+            "id": "48",
+            "hora_llegada": "17:59:16",
+            "hora_inicio": "18:00:12",
+            "hora_fin": "18:01:36",
+            "hora_se_fue": ""
+          }
+        },
+        {
+          "record_id": "boquitas_tuesday_corrected_2026-10-20:line:108",
+          "source_id": "boquitas_tuesday_corrected_2026-10-20",
+          "source_line": 108,
+          "station": "caja",
+          "station_local_id": "49",
+          "raw_fields": {
+            "lugar": "caja",
+            "fecha": "2026-10-20",
+            "tipo_dia": "Martes 2x1",
+            "personal": "1",
+            "id": "49",
+            "hora_llegada": "18:00:33",
+            "hora_inicio": "",
+            "hora_fin": "",
+            "hora_se_fue": "18:00:37"
+          }
+        },
+        {
+          "record_id": "boquitas_tuesday_corrected_2026-10-20:line:109",
+          "source_id": "boquitas_tuesday_corrected_2026-10-20",
+          "source_line": 109,
+          "station": "caja",
+          "station_local_id": "50",
+          "raw_fields": {
+            "lugar": "caja",
+            "fecha": "2026-10-20",
+            "tipo_dia": "Martes 2x1",
+            "personal": "1",
+            "id": "50",
+            "hora_llegada": "18:00:47",
+            "hora_inicio": "18:01:37",
+            "hora_fin": "18:02:13",
+            "hora_se_fue": ""
+          }
+        },
+        {
+          "record_id": "boquitas_tuesday_corrected_2026-10-20:line:110",
+          "source_id": "boquitas_tuesday_corrected_2026-10-20",
+          "source_line": 110,
+          "station": "caja",
+          "station_local_id": "51",
+          "raw_fields": {
+            "lugar": "caja",
+            "fecha": "2026-10-20",
+            "tipo_dia": "Martes 2x1",
+            "personal": "1",
+            "id": "51",
+            "hora_llegada": "18:01:38",
+            "hora_inicio": "18:02:14",
+            "hora_fin": "18:02:22",
+            "hora_se_fue": ""
+          }
+        },
+        {
+          "record_id": "boquitas_tuesday_corrected_2026-10-20:line:111",
+          "source_id": "boquitas_tuesday_corrected_2026-10-20",
+          "source_line": 111,
+          "station": "caja",
+          "station_local_id": "52",
+          "raw_fields": {
+            "lugar": "caja",
+            "fecha": "2026-10-20",
+            "tipo_dia": "Martes 2x1",
+            "personal": "1",
+            "id": "52",
+            "hora_llegada": "18:02:45",
+            "hora_inicio": "18:03:35",
+            "hora_fin": "18:04:43",
+            "hora_se_fue": ""
+          }
+        },
+        {
+          "record_id": "boquitas_tuesday_corrected_2026-10-20:line:112",
+          "source_id": "boquitas_tuesday_corrected_2026-10-20",
+          "source_line": 112,
+          "station": "caja",
+          "station_local_id": "53",
+          "raw_fields": {
+            "lugar": "caja",
+            "fecha": "2026-10-20",
+            "tipo_dia": "Martes 2x1",
+            "personal": "1",
+            "id": "53",
+            "hora_llegada": "18:05:22",
+            "hora_inicio": "18:06:35",
+            "hora_fin": "18:06:40",
+            "hora_se_fue": ""
+          }
+        },
+        {
+          "record_id": "boquitas_tuesday_corrected_2026-10-20:line:113",
+          "source_id": "boquitas_tuesday_corrected_2026-10-20",
+          "source_line": 113,
+          "station": "caja",
+          "station_local_id": "54",
+          "raw_fields": {
+            "lugar": "caja",
+            "fecha": "2026-10-20",
+            "tipo_dia": "Martes 2x1",
+            "personal": "1",
+            "id": "54",
+            "hora_llegada": "18:07:50",
+            "hora_inicio": "18:08:31",
+            "hora_fin": "18:08:59",
+            "hora_se_fue": ""
+          }
+        },
+        {
+          "record_id": "boquitas_tuesday_corrected_2026-10-20:line:114",
+          "source_id": "boquitas_tuesday_corrected_2026-10-20",
+          "source_line": 114,
+          "station": "caja",
+          "station_local_id": "55",
+          "raw_fields": {
+            "lugar": "caja",
+            "fecha": "2026-10-20",
+            "tipo_dia": "Martes 2x1",
+            "personal": "1",
+            "id": "55",
+            "hora_llegada": "18:12:07",
+            "hora_inicio": "18:12:08",
+            "hora_fin": "18:13:25",
+            "hora_se_fue": ""
+          }
+        },
+        {
+          "record_id": "boquitas_tuesday_corrected_2026-10-20:line:115",
+          "source_id": "boquitas_tuesday_corrected_2026-10-20",
+          "source_line": 115,
+          "station": "caja",
+          "station_local_id": "56",
+          "raw_fields": {
+            "lugar": "caja",
+            "fecha": "2026-10-20",
+            "tipo_dia": "Martes 2x1",
+            "personal": "1",
+            "id": "56",
+            "hora_llegada": "18:16:53",
+            "hora_inicio": "18:17:48",
+            "hora_fin": "18:18:11",
+            "hora_se_fue": ""
+          }
+        },
+        {
+          "record_id": "boquitas_tuesday_corrected_2026-10-20:line:116",
+          "source_id": "boquitas_tuesday_corrected_2026-10-20",
+          "source_line": 116,
+          "station": "caja",
+          "station_local_id": "57",
+          "raw_fields": {
+            "lugar": "caja",
+            "fecha": "2026-10-20",
+            "tipo_dia": "Martes 2x1",
+            "personal": "1",
+            "id": "57",
+            "hora_llegada": "18:18:06",
+            "hora_inicio": "18:18:11",
+            "hora_fin": "18:18:34",
+            "hora_se_fue": ""
+          }
+        },
+        {
+          "record_id": "boquitas_tuesday_corrected_2026-10-20:line:117",
+          "source_id": "boquitas_tuesday_corrected_2026-10-20",
+          "source_line": 117,
+          "station": "caja",
+          "station_local_id": "58",
+          "raw_fields": {
+            "lugar": "caja",
+            "fecha": "2026-10-20",
+            "tipo_dia": "Martes 2x1",
+            "personal": "1",
+            "id": "58",
+            "hora_llegada": "18:19:45",
+            "hora_inicio": "18:21:04",
+            "hora_fin": "18:21:35",
+            "hora_se_fue": ""
+          }
+        },
+        {
+          "record_id": "boquitas_tuesday_corrected_2026-10-20:line:118",
+          "source_id": "boquitas_tuesday_corrected_2026-10-20",
+          "source_line": 118,
+          "station": "caja",
+          "station_local_id": "59",
+          "raw_fields": {
+            "lugar": "caja",
+            "fecha": "2026-10-20",
+            "tipo_dia": "Martes 2x1",
+            "personal": "1",
+            "id": "59",
+            "hora_llegada": "18:21:39",
+            "hora_inicio": "18:22:50",
+            "hora_fin": "18:25:46",
+            "hora_se_fue": ""
+          }
+        },
+        {
+          "record_id": "boquitas_tuesday_corrected_2026-10-20:line:119",
+          "source_id": "boquitas_tuesday_corrected_2026-10-20",
+          "source_line": 119,
+          "station": "caja",
+          "station_local_id": "60",
+          "raw_fields": {
+            "lugar": "caja",
+            "fecha": "2026-10-20",
+            "tipo_dia": "Martes 2x1",
+            "personal": "1",
+            "id": "60",
+            "hora_llegada": "18:25:51",
+            "hora_inicio": "18:26:34",
+            "hora_fin": "18:26:46",
+            "hora_se_fue": ""
+          }
+        },
+        {
+          "record_id": "boquitas_tuesday_corrected_2026-10-20:line:120",
+          "source_id": "boquitas_tuesday_corrected_2026-10-20",
+          "source_line": 120,
+          "station": "caja",
+          "station_local_id": "61",
+          "raw_fields": {
+            "lugar": "caja",
+            "fecha": "2026-10-20",
+            "tipo_dia": "Martes 2x1",
+            "personal": "1",
+            "id": "61",
+            "hora_llegada": "18:32:51",
+            "hora_inicio": "18:33:20",
+            "hora_fin": "18:33:46",
+            "hora_se_fue": ""
+          }
+        }
+      ],
+      "warning_ids": [
+        "tuesday_station_ids_local",
+        "tuesday_initial_wait_unknown",
+        "timezone_unconfirmed",
+        "elapsed_windows_not_active_work",
+        "delivery_overlap_conflict"
+      ]
+    },
+    {
+      "visit_id": "visit_2026-10-23_regular",
+      "label": "Día normal · visita medida",
+      "date": "2026-10-23",
+      "start_time": "17:20:23",
+      "end_time": "18:21:09",
+      "duration_s": 3646,
+      "sources": [
+        {
+          "source_id": "boquitas_normal_cashier_2026-10-23",
+          "sha256": "253e1f5fea2a9a998414a3aa9accc7f4c69df68bd3c48910c9f149fdb0ca896d",
+          "record_count": 8
+        },
+        {
+          "source_id": "boquitas_normal_delivery_2026-10-23",
+          "sha256": "306894afd30abded545c5ffb6e62446cd1d7926264f162775f45bda03295f220",
+          "record_count": 8
+        }
+      ],
+      "records": [
+        {
+          "record_id": "boquitas_normal_cashier_2026-10-23:line:002",
+          "source_id": "boquitas_normal_cashier_2026-10-23",
+          "source_line": 2,
+          "station": "caja",
+          "station_local_id": "1",
+          "raw_fields": {
+            "lugar": "caja",
+            "fecha": "2026-10-23",
+            "tipo_dia": "Día normal",
+            "personal": "1",
+            "id": "1",
+            "hora_llegada": "17:20:23",
+            "hora_inicio": "17:20:44",
+            "hora_fin": "17:21:01",
+            "hora_se_fue": ""
+          },
+          "confirmed_link_id": "2026-10-23-local-id-1"
+        },
+        {
+          "record_id": "boquitas_normal_cashier_2026-10-23:line:003",
+          "source_id": "boquitas_normal_cashier_2026-10-23",
+          "source_line": 3,
+          "station": "caja",
+          "station_local_id": "2",
+          "raw_fields": {
+            "lugar": "caja",
+            "fecha": "2026-10-23",
+            "tipo_dia": "Día normal",
+            "personal": "1",
+            "id": "2",
+            "hora_llegada": "17:51:19",
+            "hora_inicio": "17:51:20",
+            "hora_fin": "17:51:50",
+            "hora_se_fue": ""
+          },
+          "confirmed_link_id": "2026-10-23-local-id-2"
+        },
+        {
+          "record_id": "boquitas_normal_cashier_2026-10-23:line:004",
+          "source_id": "boquitas_normal_cashier_2026-10-23",
+          "source_line": 4,
+          "station": "caja",
+          "station_local_id": "3",
+          "raw_fields": {
+            "lugar": "caja",
+            "fecha": "2026-10-23",
+            "tipo_dia": "Día normal",
+            "personal": "1",
+            "id": "3",
+            "hora_llegada": "17:52:53",
+            "hora_inicio": "17:54:05",
+            "hora_fin": "17:54:29",
+            "hora_se_fue": ""
+          },
+          "confirmed_link_id": "2026-10-23-local-id-3"
+        },
+        {
+          "record_id": "boquitas_normal_cashier_2026-10-23:line:005",
+          "source_id": "boquitas_normal_cashier_2026-10-23",
+          "source_line": 5,
+          "station": "caja",
+          "station_local_id": "4",
+          "raw_fields": {
+            "lugar": "caja",
+            "fecha": "2026-10-23",
+            "tipo_dia": "Día normal",
+            "personal": "1",
+            "id": "4",
+            "hora_llegada": "18:02:37",
+            "hora_inicio": "18:04:13",
+            "hora_fin": "18:04:52",
+            "hora_se_fue": ""
+          },
+          "confirmed_link_id": "2026-10-23-local-id-4"
+        },
+        {
+          "record_id": "boquitas_normal_cashier_2026-10-23:line:006",
+          "source_id": "boquitas_normal_cashier_2026-10-23",
+          "source_line": 6,
+          "station": "caja",
+          "station_local_id": "5",
+          "raw_fields": {
+            "lugar": "caja",
+            "fecha": "2026-10-23",
+            "tipo_dia": "Día normal",
+            "personal": "1",
+            "id": "5",
+            "hora_llegada": "18:08:35",
+            "hora_inicio": "18:09:18",
+            "hora_fin": "18:09:36",
+            "hora_se_fue": ""
+          },
+          "confirmed_link_id": "2026-10-23-local-id-5"
+        },
+        {
+          "record_id": "boquitas_normal_cashier_2026-10-23:line:007",
+          "source_id": "boquitas_normal_cashier_2026-10-23",
+          "source_line": 7,
+          "station": "caja",
+          "station_local_id": "6",
+          "raw_fields": {
+            "lugar": "caja",
+            "fecha": "2026-10-23",
+            "tipo_dia": "Día normal",
+            "personal": "1",
+            "id": "6",
+            "hora_llegada": "18:11:59",
+            "hora_inicio": "18:12:38",
+            "hora_fin": "18:13:10",
+            "hora_se_fue": ""
+          },
+          "confirmed_link_id": "2026-10-23-local-id-6"
+        },
+        {
+          "record_id": "boquitas_normal_cashier_2026-10-23:line:008",
+          "source_id": "boquitas_normal_cashier_2026-10-23",
+          "source_line": 8,
+          "station": "caja",
+          "station_local_id": "7",
+          "raw_fields": {
+            "lugar": "caja",
+            "fecha": "2026-10-23",
+            "tipo_dia": "Día normal",
+            "personal": "1",
+            "id": "7",
+            "hora_llegada": "18:13:59",
+            "hora_inicio": "18:14:19",
+            "hora_fin": "18:14:29",
+            "hora_se_fue": ""
+          },
+          "confirmed_link_id": "2026-10-23-local-id-7"
+        },
+        {
+          "record_id": "boquitas_normal_cashier_2026-10-23:line:009",
+          "source_id": "boquitas_normal_cashier_2026-10-23",
+          "source_line": 9,
+          "station": "caja",
+          "station_local_id": "8",
+          "raw_fields": {
+            "lugar": "caja",
+            "fecha": "2026-10-23",
+            "tipo_dia": "Día normal",
+            "personal": "1",
+            "id": "8",
+            "hora_llegada": "18:18:46",
+            "hora_inicio": "18:19:22",
+            "hora_fin": "18:19:32",
+            "hora_se_fue": ""
+          },
+          "confirmed_link_id": "2026-10-23-local-id-8"
+        },
+        {
+          "record_id": "boquitas_normal_delivery_2026-10-23:line:002",
+          "source_id": "boquitas_normal_delivery_2026-10-23",
+          "source_line": 2,
+          "station": "entrega",
+          "station_local_id": "1",
+          "raw_fields": {
+            "lugar": "entrega",
+            "fecha": "2026-10-23",
+            "tipo_dia": "Día normal",
+            "personal": "1",
+            "id": "1",
+            "hora_llegada": "17:21:03",
+            "hora_inicio": "17:21:12",
+            "hora_fin": "17:25:04",
+            "hora_se_fue": ""
+          },
+          "confirmed_link_id": "2026-10-23-local-id-1"
+        },
+        {
+          "record_id": "boquitas_normal_delivery_2026-10-23:line:003",
+          "source_id": "boquitas_normal_delivery_2026-10-23",
+          "source_line": 3,
+          "station": "entrega",
+          "station_local_id": "2",
+          "raw_fields": {
+            "lugar": "entrega",
+            "fecha": "2026-10-23",
+            "tipo_dia": "Día normal",
+            "personal": "1",
+            "id": "2",
+            "hora_llegada": "17:51:51",
+            "hora_inicio": "17:51:52",
+            "hora_fin": "17:54:03",
+            "hora_se_fue": ""
+          },
+          "confirmed_link_id": "2026-10-23-local-id-2"
+        },
+        {
+          "record_id": "boquitas_normal_delivery_2026-10-23:line:004",
+          "source_id": "boquitas_normal_delivery_2026-10-23",
+          "source_line": 4,
+          "station": "entrega",
+          "station_local_id": "3",
+          "raw_fields": {
+            "lugar": "entrega",
+            "fecha": "2026-10-23",
+            "tipo_dia": "Día normal",
+            "personal": "1",
+            "id": "3",
+            "hora_llegada": "17:54:31",
+            "hora_inicio": "17:54:35",
+            "hora_fin": "17:56:50",
+            "hora_se_fue": ""
+          },
+          "confirmed_link_id": "2026-10-23-local-id-3"
+        },
+        {
+          "record_id": "boquitas_normal_delivery_2026-10-23:line:005",
+          "source_id": "boquitas_normal_delivery_2026-10-23",
+          "source_line": 5,
+          "station": "entrega",
+          "station_local_id": "4",
+          "raw_fields": {
+            "lugar": "entrega",
+            "fecha": "2026-10-23",
+            "tipo_dia": "Día normal",
+            "personal": "1",
+            "id": "4",
+            "hora_llegada": "18:04:54",
+            "hora_inicio": "18:04:56",
+            "hora_fin": "18:07:30",
+            "hora_se_fue": ""
+          },
+          "confirmed_link_id": "2026-10-23-local-id-4"
+        },
+        {
+          "record_id": "boquitas_normal_delivery_2026-10-23:line:006",
+          "source_id": "boquitas_normal_delivery_2026-10-23",
+          "source_line": 6,
+          "station": "entrega",
+          "station_local_id": "5",
+          "raw_fields": {
+            "lugar": "entrega",
+            "fecha": "2026-10-23",
+            "tipo_dia": "Día normal",
+            "personal": "1",
+            "id": "5",
+            "hora_llegada": "18:09:37",
+            "hora_inicio": "18:09:37",
+            "hora_fin": "18:11:14",
+            "hora_se_fue": ""
+          },
+          "confirmed_link_id": "2026-10-23-local-id-5"
+        },
+        {
+          "record_id": "boquitas_normal_delivery_2026-10-23:line:007",
+          "source_id": "boquitas_normal_delivery_2026-10-23",
+          "source_line": 7,
+          "station": "entrega",
+          "station_local_id": "6",
+          "raw_fields": {
+            "lugar": "entrega",
+            "fecha": "2026-10-23",
+            "tipo_dia": "Día normal",
+            "personal": "1",
+            "id": "6",
+            "hora_llegada": "18:13:12",
+            "hora_inicio": "18:13:13",
+            "hora_fin": "18:16:16",
+            "hora_se_fue": ""
+          },
+          "confirmed_link_id": "2026-10-23-local-id-6"
+        },
+        {
+          "record_id": "boquitas_normal_delivery_2026-10-23:line:008",
+          "source_id": "boquitas_normal_delivery_2026-10-23",
+          "source_line": 8,
+          "station": "entrega",
+          "station_local_id": "7",
+          "raw_fields": {
+            "lugar": "entrega",
+            "fecha": "2026-10-23",
+            "tipo_dia": "Día normal",
+            "personal": "1",
+            "id": "7",
+            "hora_llegada": "18:14:31",
+            "hora_inicio": "18:16:17",
+            "hora_fin": "18:18:38",
+            "hora_se_fue": ""
+          },
+          "confirmed_link_id": "2026-10-23-local-id-7"
+        },
+        {
+          "record_id": "boquitas_normal_delivery_2026-10-23:line:009",
+          "source_id": "boquitas_normal_delivery_2026-10-23",
+          "source_line": 9,
+          "station": "entrega",
+          "station_local_id": "8",
+          "raw_fields": {
+            "lugar": "entrega",
+            "fecha": "2026-10-23",
+            "tipo_dia": "Día normal",
+            "personal": "1",
+            "id": "8",
+            "hora_llegada": "18:19:33",
+            "hora_inicio": "18:19:34",
+            "hora_fin": "18:21:09",
+            "hora_se_fue": ""
+          },
+          "confirmed_link_id": "2026-10-23-local-id-8"
+        }
+      ],
+      "warning_ids": [
+        "friday_link_scope",
+        "friday_other_initial_work_unknown",
+        "timezone_unconfirmed",
+        "elapsed_windows_not_active_work",
+        "confirmed_pause_boundaries_unknown"
+      ]
+    }
+  ]
+}

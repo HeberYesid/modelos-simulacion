@@ -15,6 +15,7 @@ import {
   type PlaybackSpeed,
 } from "./clock";
 import { create_replay_projector, type ReplayPersonState, type ReplayProjector, type ReplayState, type ReplayTrace } from "./project";
+import { basketUnitCount, MAX_VISIBLE_PRODUCT_MODELS } from "./products";
 import { createShopScene, type ShopScene, type ShopView } from "./scene";
 
 export interface ReplayHostOptions {
@@ -116,6 +117,19 @@ function interruptionDetails(order: ReplayState["orders"][string]): string {
     <div><dt>Trabajo restante en el evento</dt><dd>${order.remaining_s == null ? "No disponible" : `${formatNumber(order.remaining_s, 2)} s`}</dd></div>`;
 }
 
+function orderItemsDetails(items: ReplayState["orders"][string]["items"]): string {
+  if (items.length === 0) {
+    return `<div><dt>Productos</dt><dd>No registrados en este resultado.</dd></div>`;
+  }
+  const lines = items.map((item) =>
+    `<li>${formatNumber(item.quantity, 0)} × ${escapeHtmlText(item.display_name)}</li>`,
+  ).join("");
+  const visualLimit = basketUnitCount(items) > MAX_VISIBLE_PRODUCT_MODELS
+    ? `<p class="help-text">La escena representa hasta ${formatNumber(MAX_VISIBLE_PRODUCT_MODELS, 0)} unidades; aquí se muestran las cantidades exactas.</p>`
+    : "";
+  return `<div><dt>Productos</dt><dd><ul>${lines}</ul>${visualLimit}</dd></div>`;
+}
+
 function renderTimestamp(run: RunResult, value: number | null, initialized: boolean, field: string): string {
   if (value != null) return formatClockFromOpening(run.trace.config.opening_time, value);
   if (initialized && field === "arrival_s") return "Desconocida · orden presente al abrir";
@@ -158,6 +172,7 @@ function renderPersonInspector(
       <div><dt>Personas de la orden</dt><dd>${formatNumber(groupMembers.length || orderMetric?.person_ids.length || 0, 0)} · ${escapeHtmlText(groupMembers.join(", ") || orderMetric?.person_ids.join(", ") || "No disponibles")}</dd></div>
       <div><dt>Trabajador en este instante</dt><dd>${escapeHtmlText(worker)}</dd></div>
       ${order ? interruptionDetails(order) : ""}
+      ${order ? orderItemsDetails(order.items) : ""}
       ${times.map(([label, value]) => `<div><dt>${label}</dt><dd>${escapeHtmlText(value)}</dd></div>`).join("")}
     </div>`;
 }
@@ -188,6 +203,7 @@ function renderOrderInspector(
       <div><dt>Personas vinculadas</dt><dd>${formatNumber(currentOrder.person_ids.length, 0)} · ${escapeHtmlText(currentOrder.person_ids.join(", "))}</dd></div>
       <div><dt>Trabajador en este instante</dt><dd>${escapeHtmlText(currentOrder.worker_id ?? "Sin trabajador asignado en este instante")}</dd></div>
       ${interruptionDetails(currentOrder)}
+      ${orderItemsDetails(currentOrder.items)}
       ${times.map(([label, value]) => `<div><dt>${label}</dt><dd>${escapeHtmlText(value)}</dd></div>`).join("")}
     </div>`;
 }

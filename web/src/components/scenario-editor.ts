@@ -1,13 +1,21 @@
 import type {
+  ArrivalScheduleEntry,
+  ArrivalScheduleEntryDraft,
   EngineConfigDraft,
   InitialOrderDraft,
   InterruptionScheduleEntryDraft,
+  MenuConfiguration,
+  MenuConfigurationDraft,
+  MenuProduct,
   Scenario,
   ScenarioDraft,
   TimeDistributionDraft,
 } from "../api/types";
+import workLimits from "../../contracts/work-limits.json";
 import { escapeHtml, formatNumber, formatSeconds } from "../domain/format";
 import { translateEnum } from "../domain/errors";
+
+const WORK_LIMITS = workLimits;
 
 export type DistributionKey = "interarrival" | "payment_active" | "preparation" | "transfer_confirmation" | "patience";
 
@@ -45,24 +53,222 @@ function distributionIsComplete(value: TimeDistributionDraft | null | undefined)
   return finite(value.low_s) && finite(value.mode_s) && finite(value.high_s);
 }
 
+function defaultArrivalSchedule(scenario: ScenarioDraft): ArrivalScheduleEntryDraft[] {
+  const horizon = scenario.engine_config.horizon_s;
+  if (!finite(horizon) || horizon <= 0) return [];
+  const middle = horizon / 2;
+  const mean = scenario.interarrival.kind === "exponential" ? scenario.interarrival.mean_s : null;
+  const rate = finite(mean) && mean > 0 ? 3_600 / mean : 20;
+  return [
+    { start_s: 0, end_s: middle, orders_per_hour: rate },
+    { start_s: middle, end_s: horizon, orders_per_hour: rate },
+  ];
+}
+
+function defaultMenu(): MenuConfigurationDraft {
+  return {
+    products: [
+      { product_id: "ensalada-frutas", display_name: "Ensalada de frutas", visual_kind: "fruit_salad", preparation_s: 180 },
+      { product_id: "helado", display_name: "Helado", visual_kind: "ice_cream", preparation_s: 60 },
+      { product_id: "granizado", display_name: "Granizado", visual_kind: "slush", preparation_s: 90 },
+    ],
+    baskets: [
+      { probability: 0.4, items: [{ product_id: "ensalada-frutas", quantity: 1 }] },
+      { probability: 0.3, items: [{ product_id: "helado", quantity: 1 }] },
+      { probability: 0.3, items: [{ product_id: "granizado", quantity: 1 }] },
+    ],
+  };
+}
+
+export function enableArrivalSchedule(scenario: ScenarioDraft): ScenarioDraft {
+  const next = structuredClone(scenario);
+  next.arrival_schedule_enabled = true;
+  if (!next.arrival_schedule?.length) next.arrival_schedule = defaultArrivalSchedule(next);
+  return next;
+}
+
+export function disableArrivalSchedule(scenario: ScenarioDraft): ScenarioDraft {
+  return { ...structuredClone(scenario), arrival_schedule_enabled: false };
+}
+
+export function enableMenu(scenario: ScenarioDraft): ScenarioDraft {
+  const next = structuredClone(scenario);
+  next.menu_enabled = true;
+  if (!next.menu) next.menu = defaultMenu();
+  return next;
+}
+
+export function disableMenu(scenario: ScenarioDraft): ScenarioDraft {
+  return { ...structuredClone(scenario), menu_enabled: false };
+}
+
+export function addArrivalScheduleWindow(scenario: ScenarioDraft): ScenarioDraft {
+  const next = structuredClone(scenario);
+  const schedule = next.arrival_schedule ?? [];
+  const last = schedule.at(-1);
+  if (!last || !finite(last.start_s) || !finite(last.end_s) || !finite(last.orders_per_hour)
+    || last.end_s <= last.start_s) return next;
+  const middle = last.start_s + (last.end_s - last.start_s) / 2;
+  if (middle <= last.start_s || middle >= last.end_s) return next;
+  schedule[schedule.length - 1] = { ...last, end_s: middle };
+  schedule.push({ start_s: middle, end_s: last.end_s, orders_per_hour: last.orders_per_hour });
+  next.arrival_schedule = schedule;
+  return next;
+}
+
+export function removeArrivalScheduleWindow(scenario: ScenarioDraft, index: number): ScenarioDraft {
+  const next = structuredClone(scenario);
+  const schedule = next.arrival_schedule ?? [];
+  if (!Number.isInteger(index) || index < 0 || index >= schedule.length || schedule.length <= 1) return next;
+  if (index === 0) {
+    const first = schedule[0];
+    const second = schedule[1];
+    if (first && second) schedule[1] = { ...second, start_s: first.start_s };
+    schedule.shift();
+  } else {
+    const previous = schedule[index - 1];
+    const removed = schedule[index];
+    if (previous && removed) schedule[index - 1] = { ...previous, end_s: removed.end_s };
+    schedule.splice(index, 1);
+  }
+  next.arrival_schedule = schedule;
+  return next;
+}
+
+export function addMenuBasket(scenario: ScenarioDraft): ScenarioDraft {
+  const next = structuredClone(scenario);
+  if (!next.menu) next.menu = defaultMenu();
+  next.menu.baskets.push({ probability: 0, items: [] });
+  return next;
+}
+
+export function removeMenuBasket(scenario: ScenarioDraft, index: number): ScenarioDraft {
+  const next = structuredClone(scenario);
+  if (next.menu) next.menu.baskets = next.menu.baskets.filter((_basket, itemIndex) => itemIndex !== index);
+  return next;
+}
+
+export function scenarioConfigurationIssues(scenario: ScenarioDraft): Array<{ path: string; message: string }> {
+  const issues: Array<{ path: string; message: string }> = [];
+  const scheduleEnabled = scenario.arrival_schedule_enabled ?? Boolean(scenario.arrival_schedule?.length);
+  if (scheduleEnabled) {
+    const schedule = scenario.arrival_schedule ?? [];
+    const horizon = scenario.engine_config.horizon_s;
+    if (scenario.interarrival.kind !== "exponential") {
+      issues.push({
+        path: "interarrival.kind",
+        message: "Las llegadas por franja requieren interarribos exponenciales. Cambia la forma o desactiva el horario; el borrador se conservó.",
+      });
+    }
+    if (schedule.length === 0) {
+      issues.push({ path: "arrival_schedule_enabled", message: "Añade al menos una franja de llegadas." });
+    }
+    if (schedule.length > 48) {
+      issues.push({ path: "arrival_schedule[47].end_s", message: "El horario admite como máximo 48 franjas." });
+    }
+    let previousEnd: number | null = 0;
+    schedule.forEach((entry, index) => {
+      if (!finite(entry.start_s) || !finite(entry.end_s) || !finite(entry.orders_per_hour)) {
+        issues.push({ path: `arrival_schedule[${index}].end_s`, message: `Completa los límites y la tasa de la franja ${index + 1}.` });
+        previousEnd = finite(entry.end_s) ? entry.end_s : null;
+        return;
+      }
+      if (entry.orders_per_hour < 0) {
+        issues.push({ path: `arrival_schedule[${index}].orders_per_hour`, message: "La tasa debe ser cero o mayor y se expresa en órdenes por hora." });
+      }
+      if (entry.end_s <= entry.start_s) {
+        issues.push({ path: `arrival_schedule[${index}].end_s`, message: `La franja ${index + 1} debe durar más de cero segundos.` });
+      }
+      if (entry.start_s !== previousEnd) {
+        issues.push({ path: `arrival_schedule[${index}].start_s`, message: `Las franjas deben ser contiguas y ordenadas; la franja ${index + 1} no continúa la anterior.` });
+      }
+      previousEnd = entry.end_s;
+    });
+    const last = schedule.at(-1);
+    if (!finite(horizon) || !last || !finite(last.end_s) || last.end_s !== horizon) {
+      issues.push({ path: `arrival_schedule[${Math.max(0, schedule.length - 1)}].end_s`, message: "El horario debe terminar exactamente al cierre actual. Ajusta el límite final; el valor guardado no se cambió al editar la ventana." });
+    }
+  }
+
+  const menuEnabled = scenario.menu_enabled ?? scenario.menu != null;
+  if (!menuEnabled) return issues;
+  const menu = scenario.menu;
+  if (!menu) {
+    issues.push({ path: "menu.products", message: "Activa el menú para configurar sus productos y tipos de pedido." });
+    return issues;
+  }
+  if (menu.products.length === 0) issues.push({ path: "menu.products", message: "El menú necesita al menos un producto." });
+  if (menu.products.length > 24) issues.push({ path: "menu.products", message: "El menú admite como máximo 24 productos." });
+  const productIds = new Set<string>();
+  menu.products.forEach((product, index) => {
+    if (!product.product_id.trim() || productIds.has(product.product_id)) {
+      issues.push({ path: `menu.products[${index}].product_id`, message: "Cada producto necesita un identificador único y no vacío." });
+    }
+    productIds.add(product.product_id);
+    if (!product.display_name.trim()) {
+      issues.push({ path: `menu.products[${index}].display_name`, message: "Cada producto necesita un nombre visible." });
+    }
+    if (!finite(product.preparation_s) || product.preparation_s < 0) {
+      issues.push({ path: `menu.products[${index}].preparation_s`, message: "Indica un tiempo por unidad de cero segundos o más." });
+    }
+  });
+  if (menu.baskets.length === 0) issues.push({ path: "menu.baskets", message: "Añade al menos un tipo de pedido." });
+  if (menu.baskets.length > 32) issues.push({ path: "menu.baskets[31].probability", message: "El menú admite como máximo 32 tipos de pedido." });
+  let probabilityTotal = 0;
+  menu.baskets.forEach((basket, index) => {
+    if (!finite(basket.probability) || basket.probability < 0 || basket.probability > 1) {
+      issues.push({ path: `menu.baskets[${index}].probability`, message: "La probabilidad de cada tipo de pedido debe estar entre 0 y 1." });
+    } else {
+      probabilityTotal += basket.probability;
+    }
+    if (basket.items.length === 0) {
+      issues.push({ path: `menu.baskets[${index}].items`, message: `El tipo de pedido ${index + 1} está vacío. Elige al menos un producto.` });
+    }
+    let units = 0;
+    for (const item of basket.items) {
+      if (!productIds.has(item.product_id)) {
+        issues.push({ path: `menu.baskets[${index}].items`, message: `El tipo de pedido ${index + 1} referencia un producto que no existe.` });
+      }
+      if (item.quantity == null || !Number.isInteger(item.quantity) || item.quantity < 1 || item.quantity > 50) {
+        issues.push({ path: `menu.baskets[${index}].items`, message: "Cada cantidad debe ser un entero de 1 a 50; usa 0 para quitar un producto." });
+      }
+      units += item.quantity ?? 0;
+    }
+    if (units > 50) issues.push({ path: `menu.baskets[${index}].items`, message: `El tipo de pedido ${index + 1} supera 50 unidades.` });
+  });
+  if (menu.baskets.length > 0 && Math.abs(probabilityTotal - 1) > 1e-9) {
+    issues.push({ path: "menu.baskets[0].probability", message: "Las probabilidades de los tipos de pedido deben sumar exactamente 1 (con tolerancia 1e-9)." });
+  }
+  return issues;
+}
+
 function draftIsComplete(draft: ScenarioDraft): boolean {
   const config = draft.engine_config;
+  const initialPeople = draft.initial_state.reduce((total, order) => total + order.person_ids.length, 0);
   return draft.scenario_id.trim().length > 0
     && draft.display_name.trim().length > 0
     && finite(config.horizon_s) && config.horizon_s > 0
     && finite(config.cashiers) && Number.isInteger(config.cashiers)
+    && config.cashiers <= WORK_LIMITS.max_workers_per_pool
     && finite(config.preparers) && Number.isInteger(config.preparers)
+    && config.preparers <= WORK_LIMITS.max_workers_per_pool
     && finite(config.integrated_workers) && Number.isInteger(config.integrated_workers)
+    && config.integrated_workers <= WORK_LIMITS.max_workers_per_pool
     && distributionIsComplete(draft.interarrival)
     && distributionIsComplete(draft.payment_active)
     && distributionIsComplete(draft.preparation)
     && distributionIsComplete(draft.transfer_confirmation)
     && (draft.patience == null || distributionIsComplete(draft.patience))
+    && draft.group_sizes.length <= WORK_LIMITS.max_group_size
     && draft.group_sizes.every((group) => finite(group.size) && Number.isInteger(group.size)
+      && group.size > 0 && group.size <= WORK_LIMITS.max_group_size
       && finite(group.probability))
     && finite(draft.transfer_probability)
     && finite(draft.default_root_seed) && Number.isSafeInteger(draft.default_root_seed)
+    && draft.initial_state.length <= WORK_LIMITS.max_initial_orders
+    && initialPeople <= WORK_LIMITS.max_people_per_run
     && draft.initial_state.every((order) => order.order_id.trim().length > 0
+      && order.person_ids.length <= WORK_LIMITS.max_group_size
       && order.person_ids.every((personId) => personId.trim().length > 0)
       && order.arrival_s !== undefined
       && order.queue_rank !== undefined
@@ -77,13 +283,16 @@ function draftIsComplete(draft: ScenarioDraft): boolean {
 export function scenarioToDraft(scenario: Scenario): ScenarioDraft {
   const copy = structuredClone(scenario) as unknown as ScenarioDraft;
   copy.contract_version = String(scenario.contract_version) as ScenarioDraft["contract_version"];
+  copy.arrival_schedule_enabled = Boolean(scenario.arrival_schedule?.length);
+  copy.menu_enabled = scenario.menu != null;
   return simplifyPayment(copy);
 }
 
 export function scenarioDraftToWire(draft: ScenarioDraft): Scenario | null {
   draft = simplifyPayment(structuredClone(draft));
   const version = Number(draft.contract_version);
-  if ((version !== 1 && version !== 2) || draft.engine_config.contract_version !== version || !draftIsComplete(draft)) {
+  if ((version !== 1 && version !== 2) || draft.engine_config.contract_version !== version || !draftIsComplete(draft)
+    || scenarioConfigurationIssues(draft).length > 0) {
     return null;
   }
   if (version === 1) {
@@ -99,7 +308,23 @@ export function scenarioDraftToWire(draft: ScenarioDraft): Scenario | null {
       ...structuredClone(draft.engine_config),
       contract_version: version,
     },
-  };
+  } as unknown as Record<string, unknown>;
+  const scheduleEnabled = draft.arrival_schedule_enabled ?? Boolean(draft.arrival_schedule?.length);
+  if (scheduleEnabled) {
+    wire.arrival_schedule = structuredClone(draft.arrival_schedule ?? []) as ArrivalScheduleEntry[];
+  } else {
+    delete wire.arrival_schedule;
+  }
+  const menuEnabled = draft.menu_enabled ?? draft.menu != null;
+  if (menuEnabled) {
+    wire.menu = structuredClone(draft.menu) as MenuConfiguration;
+  } else if (Object.prototype.hasOwnProperty.call(draft, "menu")) {
+    wire.menu = null;
+  } else {
+    delete wire.menu;
+  }
+  delete wire.arrival_schedule_enabled;
+  delete wire.menu_enabled;
   return wire as unknown as Scenario;
 }
 
@@ -238,11 +463,110 @@ function groupWeightMarkup(weights: ScenarioDraft["group_sizes"]): string {
   return weights.map((weight, index) => `
     <div class="weight-row" data-group-row="${index}">
       <div class="compact-field"><label for="group-size-${index}">Personas en el grupo</label>
-        <input id="group-size-${index}" type="number" min="1" step="1" required name="group_size_${index}" data-group-field="size" data-integer-field value="${String(weight.size)}"></div>
+        <input id="group-size-${index}" type="number" min="1" max="${WORK_LIMITS.max_group_size}" step="1" required name="group_size_${index}" data-group-field="size" data-integer-field value="${String(weight.size)}"></div>
       <div class="compact-field"><label for="group-prob-${index}">Probabilidad</label>
         <input id="group-prob-${index}" type="number" min="0" max="1" step="any" required name="group_probability_${index}" data-group-field="probability" value="${inputValue(weight.probability)}"></div>
         <button class="quiet-button remove-weight" type="button" data-remove-group="${index}" aria-label="Quitar tamaño de grupo ${formatNumber(weight.size ?? 0, 0)}">Quitar</button>
     </div>`).join("");
+}
+
+function arrivalScheduleMarkup(scenario: ScenarioDraft): string {
+  const enabled = scenario.arrival_schedule_enabled ?? Boolean(scenario.arrival_schedule?.length);
+  const schedule = scenario.arrival_schedule?.length ? scenario.arrival_schedule : defaultArrivalSchedule(scenario);
+  const horizon = scenario.engine_config.horizon_s;
+  const rows = schedule.map((entry, index) => `
+    <div class="arrival-window" data-arrival-window="${index}">
+      <div class="arrival-window-heading"><strong>Franja ${formatNumber(index + 1, 0)}</strong>
+        <button class="quiet-button" type="button" data-remove-arrival-window="${index}" aria-label="Quitar franja ${formatNumber(index + 1, 0)}" ${schedule.length <= 1 ? "disabled" : ""}>Quitar</button></div>
+      <input type="hidden" data-arrival-window-start="${index}" value="${inputValue(entry.start_s)}">
+      <div class="field-grid three">
+        <div class="compact-field"><label for="arrival-start-${index}">Desde (minutos desde apertura)</label>
+          <output id="arrival-start-${index}" data-arrival-start-label>${finite(entry.start_s) ? formatNumber(entry.start_s / 60) : "—"}</output></div>
+        <div class="compact-field"><label for="arrival-end-${index}">Hasta (minutos desde apertura)</label>
+          <input id="arrival-end-${index}" type="number" min="0" max="${finite(horizon) ? inputValue(horizon / 60) : ""}" step="any" required data-arrival-window-end="${index}" value="${finite(entry.end_s) ? inputValue(entry.end_s / 60) : ""}" aria-describedby="arrival-schedule-help"></div>
+        <div class="compact-field"><label for="arrival-rate-${index}">Órdenes por hora</label>
+          <input id="arrival-rate-${index}" type="number" min="0" step="any" required data-arrival-orders-per-hour="${index}" value="${inputValue(entry.orders_per_hour)}" aria-describedby="arrival-schedule-help"></div>
+      </div>
+    </div>`).join("");
+  return `
+    <div class="field arrival-schedule-control">
+      <label class="checkbox-row" for="arrival-schedule-enabled"><input id="arrival-schedule-enabled" type="checkbox" name="arrival_schedule_enabled" data-arrival-schedule-enabled ${enabled ? "checked" : ""}>
+        <span>Definir llegadas por franja</span></label>
+      <p id="arrival-schedule-help" class="help-text">Las franjas usan minutos desde apertura y se encadenan en orden hasta el cierre. La tasa cuenta órdenes o grupos por hora, no personas. Cada franja usa llegadas exponenciales (Poisson por tramos), sin una media global. Al desactivar el horario vuelve a regir la distribución base guardada.</p>
+    </div>
+    ${enabled ? `<div class="arrival-schedule-editor" data-arrival-schedule>
+      <div class="arrival-window-list">${rows}</div>
+      <div class="button-row"><span class="help-text">El inicio de cada franja sigue el límite anterior. La última debe terminar exactamente al cierre.</span>
+        <button class="secondary-button" type="button" data-add-arrival-window ${schedule.length >= 48 ? "disabled" : ""}>Añadir franja</button></div>
+    </div>` : ""}`;
+}
+
+function productTypeLabel(kind: MenuProduct["visual_kind"]): string {
+  if (kind === "fruit_salad") return "Ensalada de frutas";
+  if (kind === "ice_cream") return "Helado";
+  return "Granizado";
+}
+
+function menuMarkup(scenario: ScenarioDraft): string {
+  const enabled = scenario.menu_enabled ?? scenario.menu != null;
+  const menu = scenario.menu ?? (enabled ? defaultMenu() : null);
+  const products = menu?.products ?? [];
+  const baskets = menu?.baskets ?? [];
+  const productRows = products.map((product, index) => `
+    <div class="menu-product" data-menu-product="${index}" data-menu-product-id="${escapeHtml(product.product_id)}">
+      <div class="menu-product-name"><strong>${escapeHtml(product.display_name)}</strong><small>${escapeHtml(productTypeLabel(product.visual_kind))}</small></div>
+      <div class="compact-field"><label for="menu-product-time-${index}">Preparación por unidad (s)</label>
+        <input id="menu-product-time-${index}" type="number" min="0" step="any" required data-menu-product-time="${index}" value="${inputValue(product.preparation_s)}" aria-label="Preparación por unidad de ${escapeHtml(product.display_name)} en segundos"></div>
+    </div>`).join("");
+  const basketRows = baskets.map((basket, index) => {
+    const quantityByProduct = new Map<string, number | null>();
+    for (const item of basket.items) {
+      if (quantityByProduct.has(item.product_id)) {
+        const previous = quantityByProduct.get(item.product_id);
+        quantityByProduct.set(item.product_id, previous == null || item.quantity == null
+          ? null
+          : previous + item.quantity);
+      } else {
+        quantityByProduct.set(item.product_id, item.quantity);
+      }
+    }
+    return `
+      <section class="menu-basket" data-menu-basket="${index}" aria-labelledby="menu-basket-title-${index}">
+        <div class="menu-basket-heading"><h3 id="menu-basket-title-${index}">Tipo de pedido ${formatNumber(index + 1, 0)}</h3>
+          <button class="quiet-button" type="button" data-remove-menu-basket="${index}" aria-label="Quitar tipo de pedido ${formatNumber(index + 1, 0)}" ${baskets.length <= 1 ? "disabled" : ""}>Quitar</button></div>
+        <div class="compact-field menu-probability"><label for="menu-basket-probability-${index}">Probabilidad</label>
+          <input id="menu-basket-probability-${index}" type="number" min="0" max="1" step="any" required data-menu-basket-probability="${index}" value="${inputValue(basket.probability)}" aria-describedby="menu-basket-help"></div>
+        <div class="menu-quantity-list" aria-label="Productos del tipo de pedido ${formatNumber(index + 1, 0)}">
+          ${products.map((product, productIndex) => {
+            const id = `menu-basket-${index}-quantity-${productIndex}`;
+            const quantity = quantityByProduct.has(product.product_id)
+              ? quantityByProduct.get(product.product_id)
+              : 0;
+            return `<div class="compact-field"><label for="${id}">${escapeHtml(product.display_name)}</label>
+              <input id="${id}" type="number" min="0" max="50" step="1" required data-menu-basket-quantity="${index}" data-menu-quantity="${escapeHtml(product.product_id)}" value="${quantity == null ? "" : String(quantity)}" aria-label="Unidades de ${escapeHtml(product.display_name)} en el tipo de pedido ${formatNumber(index + 1, 0)}" aria-describedby="menu-basket-help"></div>`;
+          }).join("")}
+        </div>
+      </section>`;
+  }).join("");
+  return `
+    <fieldset class="scenario-section menu-section">
+      <legend>Menú para nuevas órdenes</legend>
+      <div class="field">
+        <label class="checkbox-row" for="menu-enabled"><input id="menu-enabled" type="checkbox" name="menu_enabled" data-menu-enabled ${enabled ? "checked" : ""}>
+        <span>Generar órdenes con productos del menú</span></label>
+        <p class="help-text">Tiempos de ejemplo editables, no medidos; este menú no representa toda la oferta del negocio. Un grupo comparte una orden y un pago, y la preparación es una tarea completa según el modo. El tiempo de preparación de la orden es la suma de unidades por tiempo por unidad. Las órdenes que ya estaban al abrir conservan sus tiempos explícitos.</p>
+      </div>
+      ${enabled && menu ? `<div class="menu-editor" data-menu-editor>
+        <div class="menu-products"><h3>Productos del ejemplo</h3><div class="menu-product-list">${productRows}</div></div>
+        <div class="menu-baskets"><div class="surface-heading"><div><h3>Tipos de pedido</h3>
+          <p id="menu-basket-help" class="help-text">Usa 0 para quitar un producto. Cada tipo de pedido necesita al menos una unidad; máximo 50 por orden. Las probabilidades deben sumar 1.</p></div></div>
+          <div class="menu-basket-list">${basketRows}</div>
+          <div class="button-row"><span class="help-text">Máximo 32 tipos de pedido.</span>
+            <button class="secondary-button" type="button" data-add-menu-basket ${baskets.length >= 32 ? "disabled" : ""}>Añadir tipo de pedido</button></div>
+        </div>
+        <p class="subtle-note menu-preparation-note">Los pedidos nuevos usan estos productos y la preparación global queda inactiva mientras el menú está encendido. Al apagarlo, se conserva y vuelve a usarse.</p>
+      </div>` : ""}
+    </fieldset>`;
 }
 
 function allowedStages(scenario: ScenarioDraft): string[] {
@@ -253,20 +577,55 @@ function allowedStages(scenario: ScenarioDraft): string[] {
 
 function workerIds(scenario: ScenarioDraft, stage: string): string[] {
   const config = scenario.engine_config;
+  const boundedCount = (count: number | null | undefined): number =>
+    Number.isSafeInteger(count)
+      && (count ?? 0) >= 0
+      && (count ?? 0) <= WORK_LIMITS.max_workers_per_pool
+      ? count ?? 0
+      : 0;
   if (stage === "payment_active") {
     const count = config.mode === "regular" ? config.integrated_workers : config.cashiers;
     const pool = config.mode === "regular" ? "integrated" : "cashier";
-    return Array.from({ length: Math.max(0, count ?? 0) }, (_, index) => `${pool}-${index + 1}`);
+    return Array.from({ length: boundedCount(count) }, (_, index) => `${pool}-${index + 1}`);
   }
   if (stage === "payment_pending" && config.mode === "regular") {
-    return Array.from({ length: Math.max(0, config.integrated_workers ?? 0) }, (_, index) => `integrated-${index + 1}`);
+    return Array.from({ length: boundedCount(config.integrated_workers) }, (_, index) => `integrated-${index + 1}`);
   }
   if (stage === "preparing") {
     const count = config.mode === "regular" ? config.integrated_workers : config.preparers;
     const pool = config.mode === "regular" ? "integrated" : "preparer";
-    return Array.from({ length: Math.max(0, count ?? 0) }, (_, index) => `${pool}-${index + 1}`);
+    return Array.from({ length: boundedCount(count) }, (_, index) => `${pool}-${index + 1}`);
   }
   return [];
+}
+
+function countNonemptyLines(value: string): number {
+  let count = 0;
+  let lineStart = 0;
+  for (let index = 0; index <= value.length; index += 1) {
+    if (index !== value.length && value[index] !== "\n") continue;
+    if (value.slice(lineStart, index).trim().length > 0) count += 1;
+    lineStart = index + 1;
+  }
+  return count;
+}
+
+export function validateInitialPersonLimits(form: HTMLFormElement): HTMLTextAreaElement | null {
+  const controls = [...form.querySelectorAll<HTMLTextAreaElement>('textarea[data-initial-field$=".person_ids"]')];
+  let totalPeople = 0;
+  let firstInvalid: HTMLTextAreaElement | null = null;
+  for (const control of controls) {
+    const count = countNonemptyLines(control.value);
+    totalPeople += count;
+    const message = count > WORK_LIMITS.max_group_size
+      ? `Cada orden inicial admite como máximo ${WORK_LIMITS.max_group_size} personas.`
+      : totalPeople > WORK_LIMITS.max_people_per_run
+        ? `El estado inicial supera el máximo computacional de ${formatNumber(WORK_LIMITS.max_people_per_run, 0)} personas. Reduce los identificadores antes de ejecutar.`
+        : "";
+    control.setCustomValidity(message);
+    if (message && !firstInvalid) firstInvalid = control;
+  }
+  return firstInvalid;
 }
 
 export function refreshInitialWorkerOptions(form: HTMLFormElement, scenario: ScenarioDraft): void {
@@ -345,7 +704,8 @@ function initialOrderMarkup(initial: InitialOrderDraft, index: number, scenario:
         <div class="compact-field"><label for="initial-${index}-arrival">Llegada previa (s; en blanco = desconocida)</label>
           <input id="initial-${index}-arrival" type="number" max="0" step="any" name="initial_arrival_${index}" data-initial-field="${index}.arrival_s" value="${inputValue(initial.arrival_s)}"></div>
         <div class="compact-field span-two"><label for="initial-${index}-people">Personas vinculadas (un identificador por línea)</label>
-          <textarea id="initial-${index}-people" required rows="2" name="initial_people_${index}" data-initial-field="${index}.person_ids">${escapeHtml(ids)}</textarea></div>
+          <textarea id="initial-${index}-people" required rows="2" name="initial_people_${index}" data-initial-field="${index}.person_ids" aria-describedby="initial-people-limit-${index}">${escapeHtml(ids)}</textarea>
+          <p id="initial-people-limit-${index}" class="help-text">Máximo ${WORK_LIMITS.max_group_size} personas por orden.</p></div>
         ${rankControl}${workerControl}${remainingControl}${paymentControls}${paymentMethod}${preparationControl}${patienceControl}
       </div>
     </article>`;
@@ -372,16 +732,16 @@ function staffMarkup(scenario: ScenarioDraft): string {
     return `
       <div class="field-grid">
         <div class="field"><label for="integrated-workers">Personas en el equipo integrado</label>
-          <input id="integrated-workers" type="number" min="1" step="1" required name="integrated_workers" data-integer-field data-scenario-field="engine_config.integrated_workers" value="${inputValue(config.integrated_workers, 0)}">
+          <input id="integrated-workers" type="number" min="1" max="${WORK_LIMITS.max_workers_per_pool}" step="1" required name="integrated_workers" data-integer-field data-scenario-field="engine_config.integrated_workers" value="${inputValue(config.integrated_workers, 0)}">
           <p class="help-text">La misma persona cobra y prepara la orden.</p></div>
       </div>`;
   }
   return `
     <div class="field-grid">
       <div class="field"><label for="cashiers">Cajeros</label>
-        <input id="cashiers" type="number" min="1" step="1" required name="cashiers" data-integer-field data-scenario-field="engine_config.cashiers" value="${inputValue(config.cashiers, 0)}"></div>
+        <input id="cashiers" type="number" min="1" max="${WORK_LIMITS.max_workers_per_pool}" step="1" required name="cashiers" data-integer-field data-scenario-field="engine_config.cashiers" value="${inputValue(config.cashiers, 0)}"></div>
       <div class="field"><label for="preparers">Preparadores</label>
-        <input id="preparers" type="number" min="1" step="1" required name="preparers" data-integer-field data-scenario-field="engine_config.preparers" value="${inputValue(config.preparers, 0)}"></div>
+        <input id="preparers" type="number" min="1" max="${WORK_LIMITS.max_workers_per_pool}" step="1" required name="preparers" data-integer-field data-scenario-field="engine_config.preparers" value="${inputValue(config.preparers, 0)}"></div>
     </div>`;
 }
 
@@ -492,7 +852,7 @@ function interruptionPolicyMarkup(scenario: ScenarioDraft, pending: boolean): st
     return `
       <fieldset class="scenario-section interruption-section">
         <legend>Pausas programadas para cobrar</legend>
-        <p id="interruption-schedule-help" class="help-text">La opción está desactivada. Puedes activarla solo para una persona en el equipo integrado del modo normal y definir cada hora y orden explícitamente.</p>
+        <p id="interruption-schedule-help" class="help-text">Solo para una persona integrada en modo normal. Define cada pausa.</p>
         <button class="secondary-button" type="button" data-enable-interruptions ${pending ? "disabled" : ""}>Activar pausas programadas</button>
       </fieldset>`;
   }
@@ -504,10 +864,10 @@ function interruptionPolicyMarkup(scenario: ScenarioDraft, pending: boolean): st
   return `
     <fieldset class="scenario-section interruption-section" data-interruption-schedule>
       <legend>Pausas programadas para cobrar</legend>
-      <p id="interruption-schedule-help" class="help-text"><strong>Supuesto explícito del usuario.</strong> El horario y las órdenes no se infieren de las observaciones reales. Cada pausa requiere exactamente una persona en el equipo integrado del modo normal.</p>
-      <p class="help-text">Indica el segundo desde la apertura, la orden cuya preparación se pausa y la orden que pasará a cobrar. La primera orden se reanuda después del pago.</p>
+      <p id="interruption-schedule-help" class="help-text"><strong>Supuesto explícito del usuario.</strong> Tú defines las pausas; no se infieren de datos reales. Solo se admite una persona integrada en modo normal.</p>
+      <p class="help-text">Indica segundo desde apertura, orden pausada y orden cobrada. La primera se reanuda tras el pago.</p>
       <p class="help-text">Los identificadores deben existir en cada réplica; no se sustituyen ni ajustan automáticamente.</p>
-      <p class="help-text"><strong>Política activa:</strong> pausas programadas para cobrar; requiere modo normal con exactamente una persona integrada.</p>
+      <p class="help-text"><strong>Política activa:</strong> pausas programadas para cobrar.</p>
       ${compatibility}${interruptionRowsMarkup(entries)}
       <div class="button-row">
         ${compatibilityIssues.length ? `<button class="secondary-button" type="button" data-resolve-interruption-compatibility ${pending ? "disabled" : ""}>Resolver incompatibilidad: usar modo normal con una persona integrada</button>` : ""}
@@ -536,29 +896,36 @@ export function renderScenarioView(options: {
   scenarios: ScenarioDraft[];
   activeScenarioIndex: number;
   replications: number;
+  advancedOpen: boolean;
+  comparisonOpen: boolean;
+  helpOpen: boolean;
   pending: boolean;
   error: string | null;
   failedFields: Array<{ path: string; message: string }>;
 }): string {
   const { scenario } = options;
   const scenarioNavigator = `
-    <section class="scenario-section scenario-roster" aria-labelledby="scenario-roster-title">
-      <div class="surface-heading"><div><h2 id="scenario-roster-title">Escenarios para la siguiente ejecución</h2>
-        <p>La primera configuración es la referencia. Añade copias explícitas y edita cada una antes de comparar.</p></div>
-        <button class="secondary-button" type="button" data-add-candidate>Copiar referencia como candidato</button>
+    <details class="scenario-section scenario-roster comparison-options" data-comparison-options ${options.comparisonOpen ? "open" : ""}>
+      <summary class="scenario-disclosure-summary"><span><strong>Comparar alternativas</strong><small>Copia un escenario para revisar resultados lado a lado.</small></span></summary>
+      <div class="comparison-content">
+        <div class="surface-heading"><div><h2 id="scenario-roster-title">Escenarios disponibles</h2>
+          <p>La primera configuración es la referencia. Edita cada copia antes de comparar.</p></div>
+          <button class="secondary-button" type="button" data-add-candidate>Copiar referencia como candidato</button>
+        </div>
+        <div class="scenario-roster-list" role="tablist" aria-label="Escenarios disponibles">
+          ${options.scenarios.map((item, index) => `
+            <div class="scenario-roster-item ${index === options.activeScenarioIndex ? "active" : ""}">
+              <button type="button" role="tab" aria-selected="${index === options.activeScenarioIndex}" aria-controls="scenario-form" data-scenario-select="${index}">
+                <span>${index === 0 ? "Referencia" : `Candidato ${index}`}</span><strong>${escapeHtml(item.display_name)}</strong>
+              </button>
+              ${index > 0 && index === options.activeScenarioIndex ? `<button class="quiet-button" type="button" data-remove-candidate="${index}">Quitar candidato</button>` : ""}
+            </div>`).join("")}
+        </div>
+        <div class="button-row"><span class="help-text">${options.scenarios.length < 2 ? "Añade un candidato para habilitar la comparación." : `${formatNumber(options.scenarios.length, 0)} escenarios listos para revisar; las diferencias quedan visibles en los resultados.`}</span>
+          <button class="primary-button" type="button" data-run-experiment ${options.pending || options.scenarios.length < 2 ? "disabled" : ""}>${options.pending ? "Calculando…" : "Comparar escenarios"}</button></div>
+        <p class="help-text">El servicio verifica la carga real de la comparación: máximo ${formatNumber(WORK_LIMITS.max_experiment_orders, 0)} órdenes, ${formatNumber(WORK_LIMITS.max_experiment_people, 0)} personas y ${formatNumber(WORK_LIMITS.max_experiment_work_units, 0)} unidades de trabajo.</p>
       </div>
-      <div class="scenario-roster-list" role="tablist" aria-label="Escenarios disponibles">
-        ${options.scenarios.map((item, index) => `
-          <div class="scenario-roster-item ${index === options.activeScenarioIndex ? "active" : ""}">
-            <button type="button" role="tab" aria-selected="${index === options.activeScenarioIndex}" aria-controls="scenario-form" data-scenario-select="${index}">
-              <span>${index === 0 ? "Referencia" : `Candidato ${index}`}</span><strong>${escapeHtml(item.display_name)}</strong>
-            </button>
-            ${index > 0 && index === options.activeScenarioIndex ? `<button class="quiet-button" type="button" data-remove-candidate="${index}">Quitar candidato</button>` : ""}
-          </div>`).join("")}
-      </div>
-      <div class="button-row"><span class="help-text">${options.scenarios.length < 2 ? "Añade al menos un candidato para habilitar la comparación." : `${formatNumber(options.scenarios.length, 0)} escenarios listos para revisar; las diferencias de demanda quedan visibles en los resultados.`}</span>
-        <button class="primary-button" type="button" data-run-experiment ${options.pending || options.scenarios.length < 2 ? "disabled" : ""}>${options.pending ? "Calculando…" : "Comparar escenarios"}</button></div>
-    </section>`;
+    </details>`;
   const editableWindow = timeWindowEditable(scenario);
   const defaultSeed = scenario.default_root_seed;
   const patience = distributionValue(scenario, "patience");
@@ -587,49 +954,97 @@ export function renderScenarioView(options: {
         <div class="field"><label for="horizon-readonly">Ventana guardada</label><input id="horizon-readonly" type="text" value="${formatSeconds(scenario.engine_config.horizon_s)}" readonly></div>
       </div>
       <p class="subtle-note warning-box">Esta ventana guardada no se puede editar con los controles de apertura y cierre del mismo día. Su duración exacta se conserva; no se interpreta como otra hora de cierre.</p>`;
+  const advancedOptions = `
+      <details class="scenario-section scenario-options" data-advanced-options ${options.advancedOpen ? "open" : ""}>
+        <summary class="scenario-disclosure-summary"><span><strong>Opciones avanzadas</strong><small>Identificación, órdenes iniciales, pausas y repetición.</small></span></summary>
+        <div class="advanced-content">
+          <fieldset class="scenario-section">
+            <legend>Identificación del escenario</legend>
+            <div class="field-grid">
+              <div class="field"><label for="scenario-id">Identificador</label>
+                <input id="scenario-id" type="text" required maxlength="100" name="scenario_id" data-scenario-field="scenario_id" value="${escapeHtml(scenario.scenario_id)}">
+              </div>
+              <div class="field"><label for="scenario-name">Nombre visible</label>
+                <input id="scenario-name" type="text" required maxlength="120" name="display_name" data-scenario-field="display_name" value="${escapeHtml(scenario.display_name)}">
+              </div>
+            </div>
+            <p class="help-text">Procedencia: <strong>${escapeHtml(translateEnum(scenario.provenance))}</strong>. Los cambios son supuestos.</p>
+          </fieldset>
+
+          <fieldset class="scenario-section">
+            <legend>Tamaño de los grupos</legend>
+            <p class="help-text">El grupo llega y termina junto; hay una preparación por orden.</p>
+            <div class="weight-list" data-group-list>${groupWeightMarkup(scenario.group_sizes)}</div>
+            <div class="button-row"><span class="help-text">Las probabilidades deben sumar 1. Máximo ${WORK_LIMITS.max_group_size} tamaños de grupo.</span>
+              <button class="secondary-button" type="button" data-add-group ${scenario.group_sizes.length >= WORK_LIMITS.max_group_size ? "disabled" : ""}>Añadir tamaño</button></div>
+          </fieldset>
+
+          <fieldset class="scenario-section">
+            <legend>Estado al abrir</legend>
+            <p class="help-text">Registra aquí las órdenes presentes al abrir y los datos requeridos para su etapa.</p>
+            <div class="initial-list" data-initial-list>${initialMarkup || `<p class="subtle-note">${escapeHtml(initialStateSideNote(scenario))}</p>`}</div>
+            <div class="button-row"><span class="help-text">Las etapas incompatibles se conservan hasta que las corrijas.</span>
+              <button class="secondary-button" type="button" data-add-initial ${scenario.initial_state.length >= WORK_LIMITS.max_initial_orders ? "disabled" : ""}>Añadir orden inicial</button></div>
+          </fieldset>
+
+          ${interruptionPolicyMarkup(scenario, options.pending)}
+
+          <fieldset class="scenario-section">
+            <legend>Repetición</legend>
+            <div class="field-grid three">
+              <div class="field"><label for="root-seed">Semilla raíz</label>
+                <input id="root-seed" type="number" min="0" step="1" required name="root_seed" data-integer-field data-scenario-field="default_root_seed" value="${String(defaultSeed)}">
+                <p class="help-text">La misma semilla, escenario e índice repiten la réplica.</p></div>
+              <div class="field"><label for="replications">Réplicas para comparar</label>
+                <input id="replications" type="number" min="1" max="200" step="1" required name="replications" data-integer-field data-experiment-field="replications" value="${String(options.replications)}">
+                <p class="help-text">Solo se usan al comparar escenarios. Máximo 200.</p></div>
+              <div class="field"><label for="confidence-level">Intervalo de confianza</label>
+                <input id="confidence-level" type="text" value="95 %" readonly aria-describedby="confidence-help">
+                <p id="confidence-help" class="help-text">El servicio calcula intervalos pareados por réplica.</p></div>
+            </div>
+          </fieldset>
+        </div>
+      </details>`;
 
   return `
     <div class="page-intro">
       <h1>Escenarios</h1>
-      <p>Configura una hipótesis completa. Las distribuciones sintéticas son valores de enseñanza; no son estimaciones de la tienda.</p>
+      <p>Una réplica ejecuta esta configuración una vez. Los valores son sintéticos y no están calibrados con la tienda.</p>
+      <p class="help-text">Límites de cómputo: ${WORK_LIMITS.max_workers_per_pool} personas por equipo, ${WORK_LIMITS.max_group_size} por grupo, ${WORK_LIMITS.max_initial_orders} órdenes iniciales y ${WORK_LIMITS.max_new_orders} órdenes nuevas por réplica. La carga real también se limita a ${WORK_LIMITS.max_people_per_run} personas por ejecución. No representan la capacidad de la tienda.</p>
     </div>
     ${errorPanel}
     <div class="scenario-layout">
       <form id="scenario-form" class="scenario-main" novalidate>
-        ${scenarioNavigator}
+        <div class="form-footer">
+          <div class="form-footer-copy">
+            <p class="active-scenario-label">Configurando: <strong data-active-scenario-name>${escapeHtml(scenario.display_name)}</strong></p>
+            <span id="scenario-request-status" class="help-text" role="status" aria-live="polite">${options.pending ? "La ejecución está en curso." : "Descarga JSON para conservar el escenario."}</span>
+          </div>
+          <div class="inline-actions">
+            <button class="secondary-button" type="button" data-save-scenario>Descargar escenario JSON</button>
+            <button class="primary-button" type="button" data-run-scenario ${options.pending ? "disabled" : ""}>${options.pending ? "Calculando…" : "Ejecutar una réplica"}</button>
+          </div>
+        </div>
+
         <fieldset class="scenario-section">
           <legend>Modo y capacidad</legend>
           ${modeMarkup(scenario)}
           ${staffMarkup(scenario)}
-          <p class="subtle-note scenario-context-note">Cambiar el modo ajusta el equipo correspondiente, pero deja igual la demanda, los tiempos, las transferencias y la paciencia.</p>
+          <p class="subtle-note scenario-context-note">El modo cambia el equipo; conserva los demás valores.</p>
           ${scenario.initial_state.some((item) => !allowedStages(scenario).includes(item.stage))
             ? `<p class="alert-box warning-box" role="status">Hay una etapa inicial que no existe en este modo. Se conserva para que puedas corregirla; no se quitará ni se cambiará automáticamente.</p>` : ""}
         </fieldset>
 
-        ${interruptionPolicyMarkup(scenario, options.pending)}
-
         <fieldset class="scenario-section">
           <legend>Ventana de simulación</legend>
           ${timeInputs}
-          <p class="subtle-note simulation-window-note">Se admiten llegadas entre 0 y H; al cerrar admisiones, las órdenes iniciadas continúan hasta terminar. El reloj del recorrido puede avanzar a <code>+1 día</code>.</p>
-        </fieldset>
-
-        <fieldset class="scenario-section">
-          <legend>Identificación del escenario</legend>
-          <div class="field-grid">
-            <div class="field"><label for="scenario-id">Identificador</label>
-              <input id="scenario-id" type="text" required maxlength="100" name="scenario_id" data-scenario-field="scenario_id" value="${escapeHtml(scenario.scenario_id)}">
-            </div>
-            <div class="field"><label for="scenario-name">Nombre visible</label>
-              <input id="scenario-name" type="text" required maxlength="120" name="display_name" data-scenario-field="display_name" value="${escapeHtml(scenario.display_name)}">
-            </div>
-          </div>
-          <p class="help-text">Procedencia actual: <strong>${escapeHtml(translateEnum(scenario.provenance))}</strong>. Cualquier cambio queda marcado como supuesto del usuario.</p>
+          <p class="subtle-note simulation-window-note">Al cerrar admisiones, no entran más órdenes; las pendientes siguen hasta terminar.</p>
         </fieldset>
 
         <fieldset class="scenario-section">
           <legend>Tiempos del sistema</legend>
           <div class="distribution-list">${distributionRows}</div>
+          ${arrivalScheduleMarkup(scenario)}
           <div class="field-grid transfer-settings">
             <div class="field"><label for="transfer-probability">Probabilidad de transferencia</label>
               <input id="transfer-probability" type="number" min="0" max="1" step="any" required name="transfer_probability" data-scenario-field="transfer_probability" value="${inputValue(scenario.transfer_probability)}">
@@ -642,49 +1057,15 @@ export function renderScenarioView(options: {
           <div data-patience-slot>${patienceMarkup}</div>
         </fieldset>
 
-        <fieldset class="scenario-section">
-          <legend>Tamaño de los grupos</legend>
-          <p class="help-text">Los miembros llegan, pagan y terminan juntos; la preparación es por orden.</p>
-          <div class="weight-list" data-group-list>${groupWeightMarkup(scenario.group_sizes)}</div>
-          <div class="button-row"><span class="help-text">Las probabilidades deben sumar 1.</span>
-            <button class="secondary-button" type="button" data-add-group>Añadir tamaño</button></div>
-        </fieldset>
+        ${menuMarkup(scenario)}
 
-        <fieldset class="scenario-section">
-          <legend>Estado al abrir</legend>
-          <p class="help-text">Cada orden representa trabajo que ya existe en el minuto cero. Completa integrantes, etapa, tiempos restantes y fila o persona reteniendo trabajo según corresponda.</p>
-          <div class="initial-list" data-initial-list>${initialMarkup || `<p class="subtle-note">${escapeHtml(initialStateSideNote(scenario))}</p>`}</div>
-          <div class="button-row"><span class="help-text">Una etapa incompatible se conserva hasta que la cambies.</span>
-            <button class="secondary-button" type="button" data-add-initial>Añadir orden inicial</button></div>
-        </fieldset>
-
-        <fieldset class="scenario-section">
-          <legend>Repetición</legend>
-          <div class="field-grid three">
-            <div class="field"><label for="root-seed">Semilla raíz</label>
-              <input id="root-seed" type="number" min="0" step="1" required name="root_seed" data-integer-field data-scenario-field="default_root_seed" value="${String(defaultSeed)}">
-              <p class="help-text">La misma semilla, escenario e índice reproducen la misma réplica.</p></div>
-            <div class="field"><label for="replications">Réplicas para comparar</label>
-              <input id="replications" type="number" min="1" max="200" step="1" required name="replications" data-integer-field data-experiment-field="replications" value="${String(options.replications)}">
-              <p class="help-text">Máximo 200 por experimento.</p></div>
-            <div class="field"><label for="confidence-level">Intervalo de confianza</label>
-              <input id="confidence-level" type="text" value="95 %" readonly aria-describedby="confidence-help">
-              <p id="confidence-help" class="help-text">El servidor calcula intervalos y diferencias pareadas por réplica.</p></div>
-          </div>
-        </fieldset>
-
-        <div class="form-footer">
-          <span id="scenario-request-status" class="help-text" role="status" aria-live="polite">${options.pending ? "La solicitud está en curso. No la envíes otra vez." : "Los cambios se guardan en memoria hasta que los descargues como JSON."}</span>
-          <div class="inline-actions">
-            <button class="secondary-button" type="button" data-save-scenario>Descargar escenario JSON</button>
-            <button class="primary-button" type="button" data-run-scenario ${options.pending ? "disabled" : ""}>${options.pending ? "Calculando…" : "Ejecutar una réplica"}</button>
-          </div>
-        </div>
+        ${advancedOptions}
+        ${scenarioNavigator}
       </form>
 
       <aside class="scenario-side" aria-label="Notas del modelo y archivos">
-        <section class="work-surface side-surface">
-          <h2>Supuestos que acompañan al modelo</h2>
+        <details class="work-surface side-surface scenario-help" data-model-help ${options.helpOpen ? "open" : ""}>
+          <summary>Ayuda del modelo</summary>
           <ul class="assumption-list">
             <li>Una orden compartida tiene un pago y una preparación.</li>
             <li>El tamaño del grupo no cambia el tiempo de preparación.</li>
@@ -692,10 +1073,10 @@ export function renderScenarioView(options: {
             <li>El estado vacío al abrir es una decisión explícita.</li>
             <li>Los tiempos de confianza describen variación entre simulaciones, no incertidumbre de los datos reales.</li>
           </ul>
-        </section>
+        </details>
         <section class="work-surface side-surface">
           <h2>Reabrir un archivo</h2>
-          <p>Valida un escenario, una réplica o un experimento guardado. Abrir un resultado no vuelve a ejecutar la simulación.</p>
+          <p>Abre un escenario, réplica o experimento sin volver a ejecutarlo.</p>
           <div class="scenario-io">
             <label class="secondary-button" for="saved-json-file">Elegir JSON guardado</label>
             <input class="visually-hidden" id="saved-json-file" type="file" accept="application/json,.json" data-open-json>
@@ -770,6 +1151,67 @@ export function collectScenarioDraft(
     const definition = DISTRIBUTIONS.find((candidate) => candidate.key === key);
     if (definition) next[definition.key] = value as unknown as TimeDistributionDraft;
   }
+
+  const scheduleEnabled = data.get("arrival_schedule_enabled") === "on";
+  next.arrival_schedule_enabled = scheduleEnabled;
+  if (scheduleEnabled) {
+    const baseSchedule = base.arrival_schedule ?? [];
+    const rows = [...form.querySelectorAll<HTMLElement>("[data-arrival-window]")];
+    if (rows.length > 0) {
+      next.arrival_schedule = rows.map((row, index) => {
+        const start = readNumber(row.querySelector<HTMLInputElement>(`[data-arrival-window-start="${index}"]`)?.value ?? "");
+        const endMinutes = readNumber(row.querySelector<HTMLInputElement>(`[data-arrival-window-end="${index}"]`)?.value ?? "");
+        const rate = readNumber(row.querySelector<HTMLInputElement>(`[data-arrival-orders-per-hour="${index}"]`)?.value ?? "");
+        const previousBaseEnd = baseSchedule[index - 1]?.end_s;
+        const previousEndInput = rows[index - 1]?.querySelector<HTMLInputElement>(`[data-arrival-window-end="${index - 1}"]`);
+        const editedPreviousEnd = previousEndInput ? readNumber(previousEndInput.value) : null;
+        const previousEndSeconds = editedPreviousEnd == null ? null : editedPreviousEnd * 60;
+        const previousBoundaryChanged = index > 0 && finite(previousBaseEnd) && finite(previousEndSeconds)
+          && Math.abs(previousBaseEnd - previousEndSeconds) > 1e-7;
+        return {
+          start_s: previousBoundaryChanged ? previousEndSeconds : start,
+          end_s: endMinutes == null ? null : endMinutes * 60,
+          orders_per_hour: rate,
+        };
+      });
+    } else {
+      next.arrival_schedule = base.arrival_schedule?.length ? base.arrival_schedule : defaultArrivalSchedule(next);
+    }
+  }
+
+  const menuEnabled = data.get("menu_enabled") === "on";
+  next.menu_enabled = menuEnabled;
+  if (menuEnabled) {
+    const baseMenu = base.menu ?? defaultMenu();
+    const productRows = [...form.querySelectorAll<HTMLElement>("[data-menu-product]")];
+    if (productRows.length > 0) {
+      const products = productRows.map((row, index) => {
+        const previous = baseMenu.products[index];
+        const productId = row.dataset.menuProductId ?? previous?.product_id ?? "";
+        const preparation = readNumber(row.querySelector<HTMLInputElement>(`[data-menu-product-time="${index}"]`)?.value ?? "");
+        return previous
+          ? { ...previous, product_id: productId, preparation_s: preparation }
+          : { product_id: productId, display_name: productId, visual_kind: "fruit_salad" as const, preparation_s: preparation };
+      });
+      const basketRows = [...form.querySelectorAll<HTMLElement>("[data-menu-basket]")];
+      const baskets = basketRows.map((row, index) => {
+        const probability = readNumber(row.querySelector<HTMLInputElement>(`[data-menu-basket-probability="${index}"]`)?.value ?? "");
+        const items = [...row.querySelectorAll<HTMLInputElement>(`[data-menu-basket-quantity="${index}"]`)]
+          .map((input) => ({
+            product_id: input.dataset.menuQuantity ?? "",
+            quantity: readNumber(input.value),
+          }))
+          .filter((item) => item.quantity !== 0);
+        const represented = new Set(productRows.map((productRow) => productRow.dataset.menuProductId ?? ""));
+        const unrepresented = baseMenu.baskets[index]?.items.filter((item) => !represented.has(item.product_id)) ?? [];
+        return { probability, items: [...items, ...unrepresented] };
+      });
+      next.menu = { products, baskets };
+    } else {
+      next.menu = base.menu ?? defaultMenu();
+    }
+  }
+
   if (data.get("patience_enabled") === "on") {
     const patienceRow = form.querySelector<HTMLElement>('[data-distribution-row="patience"]');
     if (patienceRow) {
@@ -790,6 +1232,7 @@ export function collectScenarioDraft(
   const initial: InitialOrderDraft[] = [];
   for (const row of form.querySelectorAll<HTMLElement>("[data-initial-order]")) {
     const index = Number(row.dataset.initialOrder);
+    const baseItems = base.initial_state[index]?.items;
     const stage = row.querySelector<HTMLSelectElement>(`[data-initial-stage="${index}"]`)?.value ?? "waiting_payment";
     const item: InitialOrderDraft = {
       order_id: row.querySelector<HTMLInputElement>(`[data-initial-field="${index}.order_id"]`)?.value ?? "",
@@ -817,6 +1260,7 @@ export function collectScenarioDraft(
     if (worker) item.worker_id = worker.value || null;
     const method = row.querySelector<HTMLSelectElement>(`[data-initial-field="${index}.payment_method"]`)?.value;
     if (method === "cash" || method === "transfer") item.payment_method = method;
+    if (baseItems !== undefined) item.items = structuredClone(baseItems);
     initial.push(item);
   }
   next.initial_state = initial;
