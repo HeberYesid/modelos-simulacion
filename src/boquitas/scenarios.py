@@ -7,7 +7,10 @@ from typing import Annotated, Literal, overload
 from pydantic import Field, field_validator, model_validator
 
 from .engine import simulate
-from .models import EngineConfig, EngineConfigV2, InitialOrder, PublicModel
+from .models import EngineConfig, EngineConfigV2, InitialOrder, MenuConfig, PublicModel
+from .work_limits import MAX_GROUP_SIZE, MAX_INITIAL_ORDERS
+
+MAX_ARRIVAL_PERIODS = 48
 
 
 class ConstantTime(PublicModel):
@@ -54,6 +57,25 @@ class ExponentialTime(PublicModel):
         return _reject_boolean_number(value)
 
 
+class ArrivalPeriod(PublicModel):
+    """One half-open simulation interval with a constant arrival rate."""
+
+    start_s: float = Field(ge=0, allow_inf_nan=False)
+    end_s: float = Field(gt=0, allow_inf_nan=False)
+    orders_per_hour: float = Field(ge=0, allow_inf_nan=False)
+
+    @field_validator("start_s", "end_s", "orders_per_hour", mode="before")
+    @classmethod
+    def reject_boolean_values(cls, value: object) -> object:
+        return _reject_boolean_number(value)
+
+    @model_validator(mode="after")
+    def validate_bounds(self) -> ArrivalPeriod:
+        if self.end_s <= self.start_s:
+            raise ValueError("Arrival period end_s must be greater than start_s.")
+        return self
+
+
 type TimeDistribution = Annotated[
     ConstantTime | TriangularTime | ExponentialTime,
     Field(discriminator="kind"),
@@ -63,7 +85,7 @@ type TimeDistribution = Annotated[
 class GroupWeight(PublicModel):
     """One positive order group size and its probability weight."""
 
-    size: int = Field(ge=1, strict=True)
+    size: int = Field(ge=1, le=MAX_GROUP_SIZE, strict=True)
     probability: float = Field(ge=0, le=1, allow_inf_nan=False)
 
     @field_validator("probability", mode="before")
@@ -79,9 +101,15 @@ class Scenario(PublicModel):
     scenario_id: str
     display_name: str
     engine_config: EngineConfig
-    initial_state: tuple[InitialOrder, ...] = ()
+    initial_state: tuple[InitialOrder, ...] = Field(default=(), max_length=MAX_INITIAL_ORDERS)
     interarrival: TimeDistribution
-    group_sizes: tuple[GroupWeight, ...]
+    arrival_schedule: tuple[ArrivalPeriod, ...] = Field(
+        default_factory=tuple,
+        max_length=MAX_ARRIVAL_PERIODS,
+        exclude_if=lambda value: not value,
+    )
+    menu: MenuConfig | None = Field(default=None, exclude_if=lambda value: value is None)
+    group_sizes: tuple[GroupWeight, ...] = Field(max_length=MAX_GROUP_SIZE)
     payment_active: TimeDistribution
     preparation: TimeDistribution
     transfer_probability: float = Field(ge=0, le=1, allow_inf_nan=False)
@@ -115,6 +143,11 @@ class Scenario(PublicModel):
             raise ValueError("Interarrival times must be strictly positive.")
         if isinstance(self.interarrival, TriangularTime) and self.interarrival.low_s <= 0:
             raise ValueError("Interarrival times must have a strictly positive lower bound.")
+        _validate_arrival_schedule(
+            self.arrival_schedule,
+            self.interarrival,
+            self.engine_config.horizon_s,
+        )
 
         normalized = tuple(
             group.model_copy(update={"probability": group.probability / weights_total})
@@ -137,9 +170,15 @@ class ScenarioV2(PublicModel):
     scenario_id: str
     display_name: str
     engine_config: EngineConfigV2
-    initial_state: tuple[InitialOrder, ...] = ()
+    initial_state: tuple[InitialOrder, ...] = Field(default=(), max_length=MAX_INITIAL_ORDERS)
     interarrival: TimeDistribution
-    group_sizes: tuple[GroupWeight, ...]
+    arrival_schedule: tuple[ArrivalPeriod, ...] = Field(
+        default_factory=tuple,
+        max_length=MAX_ARRIVAL_PERIODS,
+        exclude_if=lambda value: not value,
+    )
+    menu: MenuConfig | None = Field(default=None, exclude_if=lambda value: value is None)
+    group_sizes: tuple[GroupWeight, ...] = Field(max_length=MAX_GROUP_SIZE)
     payment_active: TimeDistribution
     preparation: TimeDistribution
     transfer_probability: float = Field(ge=0, le=1, allow_inf_nan=False)
@@ -173,6 +212,11 @@ class ScenarioV2(PublicModel):
             raise ValueError("Interarrival times must be strictly positive.")
         if isinstance(self.interarrival, TriangularTime) and self.interarrival.low_s <= 0:
             raise ValueError("Interarrival times must have a strictly positive lower bound.")
+        _validate_arrival_schedule(
+            self.arrival_schedule,
+            self.interarrival,
+            self.engine_config.horizon_s,
+        )
 
         normalized = tuple(
             group.model_copy(update={"probability": group.probability / weights_total})
@@ -280,3 +324,23 @@ def _reject_boolean_number(value: object) -> object:
     if isinstance(value, bool):
         raise ValueError("Boolean values are not valid numeric scenario inputs.")
     return value
+
+
+def _validate_arrival_schedule(
+    periods: tuple[ArrivalPeriod, ...],
+    interarrival: TimeDistribution,
+    horizon_s: float,
+) -> None:
+    if not periods:
+        return
+    if not isinstance(interarrival, ExponentialTime):
+        raise ValueError("Arrival schedules require exponential interarrival settings.")
+    if periods[0].start_s != 0 or periods[-1].end_s != horizon_s:
+        raise ValueError("Arrival schedule periods must cover the full [0, horizon_s] window.")
+    if any(
+        left.end_s != right.start_s
+        for left, right in zip(periods, periods[1:], strict=False)
+    ):
+        raise ValueError(
+            "Arrival schedule periods must be ordered, contiguous, and nonoverlapping."
+        )

@@ -21,6 +21,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/executions/{execution_id}/cancel": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Cancel Execution */
+        post: operations["cancel_execution_api_v1_executions__execution_id__cancel_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/experiments": {
         parameters: {
             query?: never;
@@ -127,6 +144,28 @@ export interface paths {
 export type webhooks = Record<string, never>;
 export interface components {
     schemas: {
+        /**
+         * ArrivalPeriod
+         * @description One half-open simulation interval with a constant arrival rate.
+         */
+        ArrivalPeriod: {
+            /** End S */
+            end_s: number;
+            /** Orders Per Hour */
+            orders_per_hour: number;
+            /** Start S */
+            start_s: number;
+        };
+        /**
+         * BasketItem
+         * @description One product selection and quantity in a generated order basket.
+         */
+        BasketItem: {
+            /** Product Id */
+            product_id: string;
+            /** Quantity */
+            quantity: number;
+        };
         /** Body_import_observation_upload_api_v1_observations_import_post */
         Body_import_observation_upload_api_v1_observations_import_post: {
             /**
@@ -497,6 +536,17 @@ export interface components {
             row_key?: string | null;
         };
         /**
+         * ExecutionCancelResponse
+         * @description Acknowledgement that an execution cancellation signal was recorded.
+         */
+        ExecutionCancelResponse: {
+            /**
+             * Status
+             * @constant
+             */
+            status: "cancel_requested";
+        };
+        /**
          * ExperimentIssue
          * @description An explicit diagnostic retained from a failed scenario replication.
          */
@@ -620,6 +670,8 @@ export interface components {
         FinalOrderState: {
             /** Arrival S */
             arrival_s?: number | null;
+            /** Items */
+            items?: components["schemas"]["OrderItem"][];
             /** Order Id */
             order_id: string;
             /** Person Ids */
@@ -650,6 +702,11 @@ export interface components {
             probability: number;
             /** Size */
             size: number;
+        };
+        /** HTTPValidationError */
+        HTTPValidationError: {
+            /** Detail */
+            detail?: components["schemas"]["ValidationError"][];
         };
         /** HealthResponse */
         HealthResponse: {
@@ -767,6 +824,8 @@ export interface components {
         InitialOrder: {
             /** Arrival S */
             arrival_s?: number | null;
+            /** Items */
+            items?: components["schemas"]["OrderItem"][];
             /** Order Id */
             order_id: string;
             /** Patience Remaining S */
@@ -827,6 +886,33 @@ export interface components {
             reason?: string | null;
             /** Upper */
             upper?: number | null;
+        };
+        /**
+         * MenuConfig
+         * @description Explicit menu products and weighted complete order baskets.
+         */
+        MenuConfig: {
+            /** Baskets */
+            baskets: components["schemas"]["OrderBasket"][];
+            /** Products */
+            products: components["schemas"]["MenuProduct"][];
+        };
+        /**
+         * MenuProduct
+         * @description A selectable product with an explicit, per-unit preparation assumption.
+         */
+        MenuProduct: {
+            /** Display Name */
+            display_name: string;
+            /** Preparation S */
+            preparation_s: number;
+            /** Product Id */
+            product_id: string;
+            /**
+             * Visual Kind
+             * @enum {string}
+             */
+            visual_kind: "fruit_salad" | "ice_cream" | "slush";
         };
         /**
          * MetricEstimate
@@ -945,12 +1031,24 @@ export interface components {
             withdrawal_reason?: "not_observed" | null;
         };
         /**
+         * OrderBasket
+         * @description One weighted, complete product basket for a generated shared order.
+         */
+        OrderBasket: {
+            /** Items */
+            items: components["schemas"]["BasketItem"][];
+            /** Probability */
+            probability: number;
+        };
+        /**
          * OrderInput
          * @description One newly arriving shared order with its individual members.
          */
         OrderInput: {
             /** Arrival S */
             arrival_s: number;
+            /** Items */
+            items?: components["schemas"]["OrderItem"][];
             /** Order Id */
             order_id: string;
             /** Patience S */
@@ -965,6 +1063,23 @@ export interface components {
             preparation_s: number;
             /** Transfer Wait S */
             transfer_wait_s: number;
+        };
+        /**
+         * OrderItem
+         * @description Immutable product metadata attached to one shared order for replay.
+         */
+        OrderItem: {
+            /** Display Name */
+            display_name: string;
+            /** Product Id */
+            product_id: string;
+            /** Quantity */
+            quantity: number;
+            /**
+             * Visual Kind
+             * @enum {string}
+             */
+            visual_kind: "fruit_salad" | "ice_cream" | "slush";
         };
         /**
          * OrderMetric
@@ -1406,6 +1521,8 @@ export interface components {
          * @description A versioned, immutable set of hypothetical simulation inputs.
          */
         Scenario: {
+            /** Arrival Schedule */
+            arrival_schedule?: components["schemas"]["ArrivalPeriod"][];
             /**
              * Assumptions
              * @default []
@@ -1432,6 +1549,7 @@ export interface components {
              */
             initial_state: components["schemas"]["InitialOrder"][];
             interarrival: components["schemas"]["TimeDistribution"];
+            menu?: components["schemas"]["MenuConfig"] | null;
             patience?: components["schemas"]["TimeDistribution"] | null;
             payment_active: components["schemas"]["TimeDistribution"];
             preparation: components["schemas"]["TimeDistribution"];
@@ -1451,6 +1569,8 @@ export interface components {
          * @description A version-2 scenario with explicit scripted scheduling assumptions.
          */
         ScenarioV2: {
+            /** Arrival Schedule */
+            arrival_schedule?: components["schemas"]["ArrivalPeriod"][];
             /**
              * Assumptions
              * @default []
@@ -1477,6 +1597,7 @@ export interface components {
              */
             initial_state: components["schemas"]["InitialOrder"][];
             interarrival: components["schemas"]["TimeDistribution"];
+            menu?: components["schemas"]["MenuConfig"] | null;
             patience?: components["schemas"]["TimeDistribution"] | null;
             payment_active: components["schemas"]["TimeDistribution"];
             preparation: components["schemas"]["TimeDistribution"];
@@ -1707,6 +1828,19 @@ export interface components {
             /** Value */
             value: (components["schemas"]["Scenario"] | components["schemas"]["ScenarioV2"]) | (components["schemas"]["RunResult"] | components["schemas"]["RunResultV2"]) | (components["schemas"]["ExperimentResult"] | components["schemas"]["ExperimentResultV2"]);
         };
+        /** ValidationError */
+        ValidationError: {
+            /** Context */
+            ctx?: Record<string, never>;
+            /** Input */
+            input?: unknown;
+            /** Location */
+            loc: (string | number)[];
+            /** Message */
+            msg: string;
+            /** Error Type */
+            type: string;
+        };
         /**
          * WorkerState
          * @description Public current state of a declared worker.
@@ -1772,10 +1906,52 @@ export interface operations {
             };
         };
     };
-    create_experiment_api_v1_experiments_post: {
+    cancel_execution_api_v1_executions__execution_id__cancel_post: {
         parameters: {
             query?: never;
             header?: never;
+            path: {
+                execution_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            202: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ExecutionCancelResponse"];
+                };
+            };
+            /** @description Conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    create_experiment_api_v1_experiments_post: {
+        parameters: {
+            query?: never;
+            header?: {
+                "X-Boquitas-Execution-Id"?: string | null;
+            };
             path?: never;
             cookie?: never;
         };
@@ -1792,6 +1968,24 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["ExperimentResult"] | components["schemas"]["ExperimentResultV2"];
+                };
+            };
+            /** @description Request Timeout */
+            408: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
                 };
             };
             /** @description Unprocessable Content */
@@ -1981,7 +2175,9 @@ export interface operations {
     create_run_api_v1_runs_post: {
         parameters: {
             query?: never;
-            header?: never;
+            header?: {
+                "X-Boquitas-Execution-Id"?: string | null;
+            };
             path?: never;
             cookie?: never;
         };
@@ -1998,6 +2194,24 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["RunResult"] | components["schemas"]["RunResultV2"];
+                };
+            };
+            /** @description Request Timeout */
+            408: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
                 };
             };
             /** @description Unprocessable Content */

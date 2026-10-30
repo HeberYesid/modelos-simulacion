@@ -6,6 +6,7 @@ from collections import defaultdict
 from collections.abc import Callable, Iterable, Mapping
 from typing import Protocol, overload
 
+from .execution import check_execution
 from .metrics_models import (
     MetricCohort,
     MetricSummary,
@@ -44,6 +45,7 @@ def summarize(trace: SimulationTraceV2) -> RunMetricsV2: ...
 def summarize(trace: SimulationTrace | SimulationTraceV2) -> RunMetrics | RunMetricsV2:
     """Summarize either supported public trace version without mutating it."""
 
+    check_execution()
     if isinstance(trace, SimulationTraceV2):
         return _summarize_v2(trace)
     return _summarize_v1(trace)
@@ -54,7 +56,9 @@ def _summarize_v1(trace: SimulationTrace) -> RunMetrics:
 
     lifecycle: dict[str, dict[str, float | str | None]] = defaultdict(dict)
     initial_stages: dict[str, str] = {}
-    for event in trace.events:
+    for event_index, event in enumerate(trace.events):
+        if event_index % 256 == 0:
+            check_execution()
         if event.order_id is None:
             continue
         data = lifecycle[event.order_id]
@@ -73,24 +77,31 @@ def _summarize_v1(trace: SimulationTrace) -> RunMetrics:
         elif event.type == "order_abandoned":
             data["abandonment_s"] = event.time_s
 
-    order_metrics = tuple(
-        _make_order_metric(
-            order.order_id,
-            order.person_ids,
-            "initialized" if order.order_id in trace.initialized_order_ids else "new",
-            order.state,
-            order.arrival_s,
-            lifecycle[order.order_id],
-            initial_stages.get(order.order_id),
-            trace.config.mode,
+    order_metrics_list: list[OrderMetric] = []
+    for order_index, order in enumerate(trace.final_orders):
+        if order_index % 256 == 0:
+            check_execution()
+        order_metrics_list.append(
+            _make_order_metric(
+                order.order_id,
+                order.person_ids,
+                "initialized" if order.order_id in trace.initialized_order_ids else "new",
+                order.state,
+                order.arrival_s,
+                lifecycle[order.order_id],
+                initial_stages.get(order.order_id),
+                trace.config.mode,
+            )
         )
-        for order in trace.final_orders
-    )
-    person_metrics = tuple(
-        _as_person_metric(order_metric, person_id)
-        for order_metric in order_metrics
-        for person_id in order_metric.person_ids
-    )
+    order_metrics = tuple(order_metrics_list)
+    person_metrics_list: list[PersonMetric] = []
+    for order_index, order_metric in enumerate(order_metrics):
+        if order_index % 256 == 0:
+            check_execution()
+        person_metrics_list.extend(
+            _as_person_metric(order_metric, person_id) for person_id in order_metric.person_ids
+        )
+    person_metrics = tuple(person_metrics_list)
     queue_series = _queue_intervals(trace)
     resource_usage = _resource_usage(trace)
 
@@ -119,7 +130,9 @@ def _summarize_v2(trace: SimulationTraceV2) -> RunMetricsV2:
     paused_seconds: dict[str, float] = defaultdict(float)
     pause_started: dict[str, float] = {}
     pause_counts: dict[str, int] = defaultdict(int)
-    for event in trace.events:
+    for event_index, event in enumerate(trace.events):
+        if event_index % 256 == 0:
+            check_execution()
         if event.order_id is None:
             continue
         data = lifecycle[event.order_id]
@@ -146,7 +159,9 @@ def _summarize_v2(trace: SimulationTraceV2) -> RunMetricsV2:
             data["abandonment_s"] = event.time_s
 
     order_metrics: list[OrderMetricV2] = []
-    for order in trace.final_orders:
+    for order_index, order in enumerate(trace.final_orders):
+        if order_index % 256 == 0:
+            check_execution()
         initial_stage = initial_stages.get(order.order_id)
         base = _make_order_metric(
             order.order_id,
@@ -205,11 +220,14 @@ def _summarize_v2(trace: SimulationTraceV2) -> RunMetricsV2:
         )
 
     typed_orders = tuple(order_metrics)
-    person_metrics = tuple(
-        _as_person_metric_v2(order_metric, person_id)
-        for order_metric in typed_orders
-        for person_id in order_metric.person_ids
-    )
+    person_metrics_list: list[PersonMetricV2] = []
+    for order_index, order_metric in enumerate(typed_orders):
+        if order_index % 256 == 0:
+            check_execution()
+        person_metrics_list.extend(
+            _as_person_metric_v2(order_metric, person_id) for person_id in order_metric.person_ids
+        )
+    person_metrics = tuple(person_metrics_list)
     queue_series = _queue_intervals(trace)
     resource_usage = _resource_usage(trace)
 
@@ -370,6 +388,7 @@ def _count_summaries(
 ) -> list[MetricSummary]:
     summaries: list[MetricSummary] = []
     for cohort in ("new", "initialized", "all"):
+        check_execution()
         selected_orders = _select_cohort(orders, cohort)
         selected_people = _select_cohort(people, cohort)
         if cohort == "new":
@@ -449,6 +468,7 @@ def _payment_wait_summaries(
 ) -> list[MetricSummary]:
     summaries: list[MetricSummary] = []
     for outcome in ("served", "withdrawn"):
+        check_execution()
         selected_orders = tuple(
             order
             for order in orders
@@ -468,6 +488,7 @@ def _payment_wait_summaries(
             )
         )
         for cohort in ("new", "initialized", "all"):
+            check_execution()
             cohort_orders = _select_cohort(selected_orders, cohort)
             cohort_people = _select_cohort(selected_people, cohort)
             wait_field = "payment_wait_s" if outcome == "served" else "withdrawal_wait_s"
@@ -512,7 +533,9 @@ def _elapsed_summaries(
     )
     summaries: list[MetricSummary] = []
     for metric_name, field, empty_reason in definitions:
+        check_execution()
         for cohort in ("new", "initialized", "all"):
+            check_execution()
             cohort_orders = _select_cohort(orders, cohort)
             cohort_people = _select_cohort(people, cohort)
             order_values = [getattr(order, field) for order in cohort_orders]
@@ -571,7 +594,9 @@ def _preparation_detail_summaries(
         ("preparation_paused", "preparation_paused_s", "s"),
         ("preparation_pause_count", "preparation_pause_count", "pauses"),
     ):
+        check_execution()
         for cohort in ("new", "initialized", "all"):
+            check_execution()
             for population, records in (("order", orders), ("person", people)):
                 selected: tuple[_MetricRecord, ...] = tuple(
                     item for item in records if cohort == "all" or item.cohort == cohort
@@ -673,7 +698,13 @@ def _duration_summary(
     *,
     empty_reason: str = "no_eligible_samples",
 ) -> MetricSummary:
-    valid = sorted(value for value in values if value is not None)
+    valid_values: list[float] = []
+    for index, value in enumerate(values):
+        if index % 256 == 0:
+            check_execution()
+        if value is not None:
+            valid_values.append(value)
+    valid = sorted(valid_values)
     n_valid = len(valid)
     if n_valid == 0:
         return MetricSummary(
@@ -711,15 +742,23 @@ def _queue_intervals(trace: SimulationTrace | SimulationTraceV2) -> tuple[QueueI
     event_index = 0
     per_queue: dict[str, list[QueueInterval]] = {"payment": [], "preparation": []}
 
-    for start_s, end_s in zip(boundaries, boundaries[1:], strict=False):
+    for interval_index, (start_s, end_s) in enumerate(
+        zip(boundaries, boundaries[1:], strict=False)
+    ):
+        if interval_index % 256 == 0:
+            check_execution()
         while event_index < len(trace.events) and trace.events[event_index].time_s <= start_s:
+            if event_index % 256 == 0:
+                check_execution()
             _apply_queue_event(states, trace.events[event_index])
             event_index += 1
         counts = {
             "payment": (0, 0),
             "preparation": (0, 0),
         }
-        for state, person_count in states.values():
+        for state_index, (state, person_count) in enumerate(states.values()):
+            if state_index % 256 == 0:
+                check_execution()
             if state == "waiting_payment":
                 orders, people = counts["payment"]
                 counts["payment"] = (orders + 1, people + person_count)
@@ -862,14 +901,22 @@ def _resource_usage(trace: SimulationTrace | SimulationTraceV2) -> tuple[Resourc
     )
     event_index = 0
 
-    for start_s, end_s in zip(boundaries, boundaries[1:], strict=False):
+    for interval_index, (start_s, end_s) in enumerate(
+        zip(boundaries, boundaries[1:], strict=False)
+    ):
+        if interval_index % 256 == 0:
+            check_execution()
         while event_index < len(trace.events) and trace.events[event_index].time_s <= start_s:
+            if event_index % 256 == 0:
+                check_execution()
             _apply_resource_event(states, workers, trace.events[event_index])
             event_index += 1
         elapsed_s = end_s - start_s
         if elapsed_s <= 0:
             continue
-        for worker_id, (active, reserved, component) in states.items():
+        for worker_index, (worker_id, (active, reserved, component)) in enumerate(states.items()):
+            if worker_index % 256 == 0:
+                check_execution()
             pool = workers[worker_id]
             if active:
                 pool_active[pool] += elapsed_s
@@ -896,8 +943,8 @@ def _resource_usage(trace: SimulationTrace | SimulationTraceV2) -> tuple[Resourc
                 "total",
                 capacity,
                 horizon_s,
-                pool_active[pool],
-                pool_reserved[pool],
+                pool_active[pool_name],
+                pool_reserved[pool_name],
             )
         )
 

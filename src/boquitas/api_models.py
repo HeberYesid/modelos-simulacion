@@ -39,6 +39,12 @@ class ErrorResponse(APIModel):
     details: dict[str, Any] = Field(default_factory=dict)
 
 
+class ExecutionCancelResponse(APIModel):
+    """Acknowledgement that an execution cancellation signal was recorded."""
+
+    status: Literal["cancel_requested"]
+
+
 class RunRequest(APIModel):
     """One immutable scenario/seed/index tuple to execute or replay."""
 

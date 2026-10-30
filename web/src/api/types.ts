@@ -22,6 +22,52 @@ export type ApiSchema<Name extends keyof components["schemas"]> = components["sc
 // Generated discriminator mappings use string keys; the public JSON version tags are numeric.
 // Keep wire corrections here so generated declarations remain reproducible.
 type NumericContract<T, Version extends 1 | 2> = Omit<T, "contract_version"> & { contract_version: Version };
+
+export interface ArrivalScheduleEntry {
+  start_s: number;
+  end_s: number;
+  orders_per_hour: number;
+}
+
+export interface ArrivalScheduleEntryDraft {
+  start_s: number | null;
+  end_s: number | null;
+  orders_per_hour: number | null;
+}
+
+export type ProductVisualKind = "fruit_salad" | "ice_cream" | "slush";
+
+export interface MenuProduct {
+  product_id: string;
+  display_name: string;
+  visual_kind: ProductVisualKind;
+  preparation_s: number;
+}
+
+export interface MenuBasketItem {
+  product_id: string;
+  quantity: number;
+}
+
+export interface MenuBasket {
+  probability: number;
+  items: MenuBasketItem[];
+}
+
+export interface MenuConfiguration {
+  products: MenuProduct[];
+  baskets: MenuBasket[];
+}
+
+export interface MenuConfigurationDraft {
+  products: Array<Omit<MenuProduct, "preparation_s"> & { preparation_s: number | null }>;
+  baskets: Array<{ probability: number | null; items: Array<{ product_id: string; quantity: number | null }> }>;
+}
+
+type ScenarioOptionalInputs = {
+  arrival_schedule?: ArrivalScheduleEntry[];
+  menu?: MenuConfiguration | null;
+};
 export type ApiResponse<
   Path extends keyof paths,
   Method extends Methods<Path>,
@@ -32,8 +78,14 @@ export type ApiJsonBody<
   Method extends Methods<Path>,
 > = JsonBody<Operation<Path, Method>>;
 
-export type ScenarioV1 = NumericContract<ApiSchema<"Scenario">, 1>;
-export type ScenarioV2 = NumericContract<ApiSchema<"ScenarioV2">, 2>;
+export type ScenarioV1 = NumericContract<
+  Omit<ApiSchema<"Scenario">, "arrival_schedule" | "menu"> & ScenarioOptionalInputs,
+  1
+>;
+export type ScenarioV2 = NumericContract<
+  Omit<ApiSchema<"ScenarioV2">, "arrival_schedule" | "menu"> & ScenarioOptionalInputs,
+  2
+>;
 export type Scenario = ScenarioV1 | ScenarioV2;
 export type InitialOrder = ApiSchema<"InitialOrder">;
 export type TimeDistribution = ApiSchema<"ConstantTime"> | ApiSchema<"TriangularTime"> | ApiSchema<"ExponentialTime">;
@@ -95,6 +147,7 @@ export interface EngineConfigDraft {
 
 export interface InitialOrderDraft {
   payment_method?: "cash" | "transfer" | null;
+  items?: InitialOrder["items"];
   order_id: string;
   person_ids: string[];
   arrival_s?: number | null;
@@ -115,6 +168,10 @@ export interface ScenarioDraft {
   engine_config: EngineConfigDraft;
   initial_state: InitialOrderDraft[];
   interarrival: TimeDistributionDraft;
+  arrival_schedule?: ArrivalScheduleEntryDraft[];
+  arrival_schedule_enabled?: boolean;
+  menu?: MenuConfigurationDraft | MenuConfiguration | null;
+  menu_enabled?: boolean;
   group_sizes: Array<{ size: number | null; probability: number | null }>;
   payment_active: TimeDistributionDraft;
   preparation: TimeDistributionDraft;

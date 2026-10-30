@@ -4,13 +4,15 @@ from __future__ import annotations
 
 import math
 import re
-from collections.abc import Generator, Sequence
+from collections.abc import Generator, Iterable, Sequence
 from dataclasses import dataclass
-from typing import NoReturn, overload
+from typing import NoReturn, cast, overload
 
 import simpy
 
+from .execution import check_execution
 from .models import (
+    CashierInterruption,
     EngineConfig,
     EngineConfigV2,
     EventData,
@@ -21,11 +23,20 @@ from .models import (
     InputValidationError,
     InputValidationIssue,
     OrderInput,
+    OrderItem,
     SimulationEvent,
     SimulationEventV2,
     SimulationTrace,
     SimulationTraceV2,
     WorkerState,
+)
+from .work_limits import (
+    MAX_GROUP_SIZE,
+    MAX_INITIAL_ORDERS,
+    MAX_NEW_ORDERS,
+    MAX_PEOPLE_PER_RUN,
+    MAX_WORKERS_PER_POOL,
+    bounded_tuple,
 )
 
 _TIME_EPSILON = 1e-9
@@ -35,6 +46,7 @@ _TIME_EPSILON = 1e-9
 class _Order:
     order_id: str
     person_ids: tuple[str, ...]
+    items: tuple[OrderItem, ...]
     source_sequence: int
     source_kind: str
     arrival_s: float | None
@@ -96,21 +108,198 @@ def simulate(
 
 def simulate(
     config: EngineConfig | EngineConfigV2,
-    demand: Sequence[OrderInput],
-    initial_state: Sequence[InitialOrder],
+    demand: Iterable[OrderInput],
+    initial_state: Iterable[InitialOrder],
 ) -> SimulationTrace | SimulationTraceV2:
     """Run an explicit deterministic workload in virtual simulation time."""
 
+    check_execution()
     if isinstance(config, EngineConfigV2):
         # Pydantic models may be copied with validation disabled. Reconstruct
         # the V2 config before trusting its literal fields or scripted entries.
-        config = EngineConfigV2(**config.model_dump(mode="python"))
+        try:
+            interruptions = bounded_tuple(
+                config.cashier_interruptions,
+                limit=MAX_INITIAL_ORDERS + MAX_NEW_ORDERS,
+                name="config.cashier_interruptions",
+            )
+        except (TypeError, ValueError) as error:
+            raise InputValidationError(
+                (
+                    InputValidationIssue(
+                        path="config.cashier_interruptions",
+                        code="input_limit_exceeded",
+                        message=str(error),
+                    ),
+                )
+            ) from error
+        try:
+            interruption_data = tuple(
+                {
+                    field_name: getattr(interruption, field_name)
+                    for field_name in CashierInterruption.model_fields
+                }
+                if isinstance(interruption, CashierInterruption)
+                else interruption
+                for interruption in interruptions
+            )
+        except AttributeError as error:
+            raise InputValidationError(
+                (
+                    InputValidationIssue(
+                        path="config.cashier_interruptions",
+                        code="invalid_interruption",
+                        message="Each interruption must contain validated script fields.",
+                    ),
+                )
+            ) from error
+        config_data = {
+            field_name: getattr(config, field_name)
+            for field_name in EngineConfigV2.model_fields
+        }
+        config_data["cashier_interruptions"] = interruption_data
+        config = EngineConfigV2(**config_data)
     _validate_config(config)
+    demand, initial_state = _normalize_workload_inputs(demand, initial_state)
     _validate_input_identities(demand, initial_state)
     if isinstance(config, EngineConfigV2):
         _validate_script_references(config, demand, initial_state)
     _validate_initial_state(config, initial_state)
     return _Coordinator(config, demand, initial_state).run()
+
+
+def _normalize_workload_inputs(
+    demand: Iterable[OrderInput],
+    initial_state: Iterable[InitialOrder],
+) -> tuple[tuple[OrderInput, ...], tuple[InitialOrder, ...]]:
+    try:
+        demand_items = bounded_tuple(demand, limit=MAX_NEW_ORDERS, name="demand")
+    except (TypeError, ValueError) as error:
+        raise InputValidationError(
+            (
+                InputValidationIssue(
+                    path="demand",
+                    code="input_limit_exceeded",
+                    message=str(error),
+                ),
+            )
+        ) from error
+    try:
+        initial_items = bounded_tuple(
+            initial_state,
+            limit=MAX_INITIAL_ORDERS,
+            name="initial_state",
+        )
+    except (TypeError, ValueError) as error:
+        raise InputValidationError(
+            (
+                InputValidationIssue(
+                    path="initial_state",
+                    code="input_limit_exceeded",
+                    message=str(error),
+                ),
+            )
+        ) from error
+
+    initial_people = _bounded_people_by_order(initial_items, "initial_state")
+    initial_people_count = sum(map(len, initial_people))
+    demand_people = _bounded_people_by_order(
+        demand_items,
+        "demand",
+        people_so_far=initial_people_count,
+    )
+
+    normalized_demand = tuple(
+        cast(OrderInput, _revalidate_order(order, OrderInput, people, f"demand[{index}]"))
+        for index, (order, people) in enumerate(zip(demand_items, demand_people, strict=True))
+    )
+    normalized_initial = tuple(
+        cast(
+            InitialOrder,
+            _revalidate_order(order, InitialOrder, people, f"initial_state[{index}]"),
+        )
+        for index, (order, people) in enumerate(zip(initial_items, initial_people, strict=True))
+    )
+    return normalized_demand, normalized_initial
+
+
+def _bounded_people_by_order(
+    orders: Sequence[OrderInput | InitialOrder],
+    collection_name: str,
+    *,
+    people_so_far: int = 0,
+) -> tuple[tuple[str, ...], ...]:
+    grouped_people: list[tuple[str, ...]] = []
+    for index, order in enumerate(orders):
+        check_execution()
+        expected_type = InitialOrder if collection_name == "initial_state" else OrderInput
+        if not isinstance(order, expected_type):
+            raise InputValidationError(
+                (
+                    InputValidationIssue(
+                        path=f"{collection_name}[{index}]",
+                        code="invalid_order",
+                        message=f"Expected {expected_type.__name__} input.",
+                    ),
+                )
+            )
+        try:
+            people = bounded_tuple(
+                order.person_ids,
+                limit=MAX_GROUP_SIZE,
+                name=f"{collection_name}[{index}].person_ids",
+            )
+        except (TypeError, ValueError) as error:
+            raise InputValidationError(
+                (
+                    InputValidationIssue(
+                        path=f"{collection_name}[{index}].person_ids",
+                        code="group_size_limit_exceeded",
+                        message=str(error),
+                    ),
+                )
+            ) from error
+        people_so_far += len(people)
+        if people_so_far > MAX_PEOPLE_PER_RUN:
+            raise InputValidationError(
+                (
+                    InputValidationIssue(
+                        path=collection_name,
+                        code="people_limit_exceeded",
+                        message=(
+                            "Combined initial and new orders exceed the "
+                            f"{MAX_PEOPLE_PER_RUN}-person run limit."
+                        ),
+                    ),
+                )
+            )
+        grouped_people.append(people)
+    return tuple(grouped_people)
+
+
+def _revalidate_order(
+    order: OrderInput | InitialOrder,
+    order_type: type[OrderInput] | type[InitialOrder],
+    people: tuple[str, ...],
+    path: str,
+) -> OrderInput | InitialOrder:
+    try:
+        data = {
+            field_name: getattr(order, field_name)
+            for field_name in order_type.model_fields
+        }
+        data["person_ids"] = people
+        return order_type(**data)
+    except (TypeError, ValueError) as error:
+        raise InputValidationError(
+            (
+                InputValidationIssue(
+                    path=path,
+                    code="invalid_order",
+                    message=str(error),
+                ),
+            )
+        ) from error
 
 
 class _Coordinator:
@@ -131,6 +320,7 @@ class _Coordinator:
         self._script_index = 0
         self._all_initial_order_ids = tuple(order.order_id for order in initial_state)
         for source_sequence, initial in enumerate(initial_state):
+            check_execution()
             if initial.stage == "payment_active":
                 payment_active_s = initial.remaining_s or 0.0
             else:
@@ -151,6 +341,7 @@ class _Coordinator:
             order = _Order(
                 order_id=initial.order_id,
                 person_ids=initial.person_ids,
+                items=initial.items,
                 source_sequence=source_sequence,
                 source_kind="initial",
                 arrival_s=initial.arrival_s,
@@ -210,23 +401,23 @@ class _Coordinator:
             )
             order.stage_start_seq = len(self.events) - 1
         self._arrival_index = 0
-        self._arrivals = sorted(
-            (
-                (order.arrival_s, index, order)
-                for index, order in enumerate(demand)
-                if order.arrival_s < config.horizon_s
-            ),
-            key=lambda item: (item[0], item[1]),
-        )
-        self._all_new_order_ids = tuple(
-            order.order_id for order in demand if order.arrival_s < config.horizon_s
-        )
+        self._arrivals: list[tuple[float, int, OrderInput]] = []
+        all_new_order_ids: list[str] = []
+        for index, order_input in enumerate(demand):
+            check_execution()
+            if order_input.arrival_s < config.horizon_s:
+                self._arrivals.append((order_input.arrival_s, index, order_input))
+                all_new_order_ids.append(order_input.order_id)
+        self._arrivals.sort(key=lambda item: (item[0], item[1]))
+        self._all_new_order_ids = tuple(all_new_order_ids)
         self.admissions_closed = False
         self.last_terminal_s = config.horizon_s
 
     def run(self) -> SimulationTrace | SimulationTraceV2:
+        check_execution()
         run_process = self.env.process(self._run())
         self.env.run(until=run_process)
+        check_execution()
         self._emit("run_finished", time_s=self.last_terminal_s)
         ordered_orders = sorted(
             self.orders.values(),
@@ -273,6 +464,7 @@ class _Coordinator:
 
     def _run(self) -> Generator[simpy.events.Event, object]:
         while True:
+            check_execution()
             self._settle_current_time()
             if (
                 self.admissions_closed
@@ -289,6 +481,7 @@ class _Coordinator:
             self.current_time_s = next_time
 
     def _settle_current_time(self) -> None:
+        check_execution()
         self._finish_due_stages()
         self._admit_due_orders()
         if not self.admissions_closed and self.current_time_s >= self.config.horizon_s:
@@ -311,6 +504,7 @@ class _Coordinator:
                 )
 
         while True:
+            check_execution()
             started = self._dispatch()
             finished = self._finish_due_stages()
             if not started and not finished:
@@ -490,17 +684,18 @@ class _Coordinator:
 
     def _finish_due_stages(self) -> bool:
         now = self.current_time_s
-        due_orders = sorted(
-            (
-                order
-                for order in self.orders.values()
-                if order.status in {"payment_active", "payment_pending", "preparing"}
+        due_orders: list[_Order] = []
+        for order in self.orders.values():
+            check_execution()
+            if (
+                order.status in {"payment_active", "payment_pending", "preparing"}
                 and order.stage_due_s is not None
                 and order.stage_due_s <= now
-            ),
-            key=lambda order: (order.stage_due_s or 0.0, order.stage_start_seq),
-        )
+            ):
+                due_orders.append(order)
+        due_orders.sort(key=lambda order: (order.stage_due_s or 0.0, order.stage_start_seq))
         for order in due_orders:
+            check_execution()
             if order.status == "payment_active":
                 self._finish_payment(order)
             elif order.status == "payment_pending":
@@ -512,6 +707,7 @@ class _Coordinator:
     def _admit_due_orders(self) -> None:
         now = self.current_time_s
         while self._arrival_index < len(self._arrivals):
+            check_execution()
             arrival_s, source_sequence, order_input = self._arrivals[self._arrival_index]
             if arrival_s > now:
                 break
@@ -519,6 +715,7 @@ class _Coordinator:
             order = _Order(
                 order_id=order_input.order_id,
                 person_ids=order_input.person_ids,
+                items=order_input.items,
                 source_sequence=source_sequence,
                 source_kind="new",
                 arrival_s=order_input.arrival_s,
@@ -545,12 +742,14 @@ class _Coordinator:
             )
 
     def _dispatch(self) -> bool:
+        check_execution()
         started = False
         if self.config.mode == "regular":
             integrated_workers = [
                 worker for worker in self.workers.values() if worker.pool == "integrated"
             ]
             for worker in integrated_workers:
+                check_execution()
                 if worker.reserved:
                     continue
                 if isinstance(self.config, EngineConfigV2):
@@ -582,6 +781,7 @@ class _Coordinator:
 
         cashiers = [worker for worker in self.workers.values() if worker.pool == "cashier"]
         for worker in cashiers:
+            check_execution()
             if worker.reserved:
                 continue
             order = self._oldest_waiting_payment()
@@ -592,6 +792,7 @@ class _Coordinator:
 
         preparers = [worker for worker in self.workers.values() if worker.pool == "preparer"]
         for worker in preparers:
+            check_execution()
             if worker.reserved:
                 continue
             order = self._oldest_paid_order()
@@ -602,7 +803,11 @@ class _Coordinator:
         return started
 
     def _oldest_waiting_payment(self) -> _Order | None:
-        candidates = [order for order in self.orders.values() if order.status == "waiting_payment"]
+        candidates: list[_Order] = []
+        for order in self.orders.values():
+            check_execution()
+            if order.status == "waiting_payment":
+                candidates.append(order)
         if not candidates:
             return None
         return min(
@@ -617,9 +822,11 @@ class _Coordinator:
         )
 
     def _oldest_paid_order(self) -> _Order | None:
-        candidates = [
-            order for order in self.orders.values() if order.status == "waiting_preparation"
-        ]
+        candidates: list[_Order] = []
+        for order in self.orders.values():
+            check_execution()
+            if order.status == "waiting_preparation":
+                candidates.append(order)
         if not candidates:
             return None
         return min(
@@ -795,6 +1002,7 @@ class _Coordinator:
         )
 
     def _next_event_time(self) -> float:
+        check_execution()
         candidates: list[float] = []
         if not self.admissions_closed:
             candidates.append(self.config.horizon_s)
@@ -805,36 +1013,35 @@ class _Coordinator:
             and self._script_index < len(self.config.cashier_interruptions)
         ):
             candidates.append(self.config.cashier_interruptions[self._script_index].at_s)
-        candidates.extend(
-            order.stage_due_s
-            for order in self.orders.values()
-            if order.stage_due_s is not None
-        )
-        candidates.extend(
-            order.patience_deadline_s
-            for order in self.orders.values()
-            if order.status == "waiting_payment" and order.patience_deadline_s is not None
-        )
+        for order in self.orders.values():
+            check_execution()
+            if order.stage_due_s is not None:
+                candidates.append(order.stage_due_s)
+            if order.status == "waiting_payment" and order.patience_deadline_s is not None:
+                candidates.append(order.patience_deadline_s)
         if not candidates:
             raise RuntimeError("No future event remains before the simulation has drained.")
         return min(candidates)
 
     def _expire_waiting_orders(self) -> None:
-        expired = sorted(
-            (
-                order
-                for order in self.orders.values()
-                if order.status == "waiting_payment"
+        expired: list[_Order] = []
+        for order in self.orders.values():
+            check_execution()
+            if (
+                order.status == "waiting_payment"
                 and order.patience_deadline_s is not None
                 and order.patience_deadline_s <= self.current_time_s
-            ),
+            ):
+                expired.append(order)
+        expired.sort(
             key=lambda order: (
                 order.patience_deadline_s or 0.0,
                 order.arrival_s if order.arrival_s is not None else -math.inf,
                 order.source_sequence,
-            ),
+            )
         )
         for order in expired:
+            check_execution()
             order.status = "abandoned"
             order.terminal_s = self.current_time_s
             self.last_terminal_s = max(self.config.horizon_s, order.terminal_s)
@@ -850,7 +1057,11 @@ class _Coordinator:
             )
 
     def _all_orders_terminal(self) -> bool:
-        return all(order.status in {"completed", "abandoned"} for order in self.orders.values())
+        for order in self.orders.values():
+            check_execution()
+            if order.status not in {"completed", "abandoned"}:
+                return False
+        return True
 
     def _final_order(self, order: _Order) -> FinalOrderState:
         return FinalOrderState(
@@ -859,6 +1070,7 @@ class _Coordinator:
             state=order.status,
             arrival_s=order.arrival_s,
             worker_id=order.worker_id,
+            items=order.items,
         )
 
     def _emit(
@@ -926,6 +1138,32 @@ class _Coordinator:
 
 def _validate_config(config: EngineConfig | EngineConfigV2) -> None:
     issues: list[InputValidationIssue] = []
+    for pool, capacity in (
+        ("cashiers", config.cashiers),
+        ("preparers", config.preparers),
+        ("integrated_workers", config.integrated_workers),
+    ):
+        if capacity is None:
+            continue
+        if isinstance(capacity, bool) or not isinstance(capacity, int):
+            issues.append(
+                InputValidationIssue(
+                    path=f"config.{pool}",
+                    code="capacity_integer",
+                    message="Worker capacity must be an integer.",
+                )
+            )
+        elif capacity > MAX_WORKERS_PER_POOL:
+            issues.append(
+                InputValidationIssue(
+                    path=f"config.{pool}",
+                    code="capacity_maximum",
+                    message=f"Worker capacity must not exceed {MAX_WORKERS_PER_POOL}.",
+                )
+            )
+    if any(issue.code in {"capacity_integer", "capacity_maximum"} for issue in issues):
+        raise InputValidationError(tuple(issues))
+
     active_pools = (
         (("cashiers", config.cashiers), ("preparers", config.preparers))
         if config.mode == "tuesday"
@@ -988,6 +1226,7 @@ def _validate_input_identities(
     ] = (("initial_state", initial_state), ("demand", demand))
     for collection_name, orders in collections_to_check:
         for order_index, order in enumerate(orders):
+            check_execution()
             order_path = f"{collection_name}[{order_index}]"
             if not order.order_id.strip():
                 issues.append(
@@ -1009,6 +1248,7 @@ def _validate_input_identities(
                 seen_order_ids[order.order_id] = f"{order_path}.order_id"
 
             for person_index, person_id in enumerate(order.person_ids):
+                check_execution()
                 person_path = f"{order_path}.person_ids[{person_index}]"
                 if not person_id.strip():
                     issues.append(
@@ -1042,6 +1282,7 @@ def _validate_script_references(
     demand_by_id = {order.order_id: order for order in demand}
     issues: list[InputValidationIssue] = []
     for index, entry in enumerate(config.cashier_interruptions):
+        check_execution()
         for field, order_id in (
             ("suspended_order_id", entry.suspended_order_id),
             ("cashier_order_id", entry.cashier_order_id),
@@ -1104,6 +1345,7 @@ def _validate_initial_state(
     }
 
     for index, initial in enumerate(initial_state):
+        check_execution()
         path = f"initial_state[{index}]"
         stage = initial.stage
         for field_name in required_fields[stage]:

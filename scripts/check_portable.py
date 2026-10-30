@@ -15,10 +15,12 @@ import re
 import signal
 import socket
 import subprocess
+import threading
 import time
 from pathlib import Path
-from urllib.error import URLError
+from urllib.error import HTTPError, URLError
 from urllib.request import ProxyHandler, Request, build_opener
+from uuid import uuid4
 
 REFERENCE_SHA256 = "8bbe6b117f59dde367816d8ed63bb013b0ad624d916a57159c084fcff4051dd7"
 HTTP = build_opener(ProxyHandler({}))
@@ -51,6 +53,57 @@ def clean_environment() -> dict[str, str]:
     environment = {key: value for key, value in os.environ.items() if key.lower() in names}
     environment["PATH"] = str(Path(os.environ["SystemRoot"]) / "System32")
     return environment
+
+
+def verify_execution_guards(base: str, scenario: dict) -> dict[str, str]:
+    """Exercise bounded inputs and real cancellation through the shipped API."""
+
+    def post(path: str, payload: object | None = None, **headers: str) -> tuple[int, dict]:
+        data = b"" if payload is None else json.dumps(payload).encode("utf-8")
+        request_headers = {"Content-Type": "application/json", **headers}
+        outgoing = Request(base + path, data=data, headers=request_headers)
+        try:
+            with HTTP.open(outgoing, timeout=10) as response:
+                return response.status, json.loads(response.read())
+        except HTTPError as error:
+            return error.code, json.loads(error.read())
+
+    payload = {"scenario": scenario, "root_seed": 20261020, "replication_index": 0}
+    excessive_staff = json.loads(json.dumps(payload))
+    excessive_staff["scenario"]["engine_config"]["preparers"] = 33
+    assert post("/api/v1/runs", excessive_staff)[0] == 422
+    excessive_group = json.loads(json.dumps(payload))
+    excessive_group["scenario"]["group_sizes"] = [{"size": 51, "probability": 1}]
+    assert post("/api/v1/runs", excessive_group)[0] == 422
+
+    execution_id = str(uuid4())
+    cancellable = json.loads(json.dumps(payload))
+    cancellable["scenario"]["engine_config"]["horizon_s"] = 6000
+    cancellable["scenario"]["interarrival"] = {"kind": "constant", "value_s": 1}
+    cancellable["scenario"]["group_sizes"] = [{"size": 1, "probability": 1}]
+    stopped: list[tuple[int, dict]] = []
+    failures: list[BaseException] = []
+
+    def run() -> None:
+        try:
+            stopped.append(post(
+                "/api/v1/runs", cancellable, **{"X-Boquitas-Execution-Id": execution_id}
+            ))
+        except BaseException as error:
+            failures.append(error)
+
+    worker = threading.Thread(target=run, daemon=True)
+    worker.start()
+    time.sleep(0.1)
+    status, acknowledgement = post(f"/api/v1/executions/{execution_id}/cancel")
+    assert status == 202 and acknowledgement["status"] == "cancel_requested"
+    worker.join(timeout=5)
+    assert not worker.is_alive(), "The executable kept calculating after cancellation"
+    assert not failures, f"Cancellation request failed: {failures}"
+    assert stopped and stopped[0][0] == 409
+    assert stopped[0][1]["code"] == "execution_cancelled"
+    assert post("/api/v1/runs", payload)[0] == 200, "Cancelled work did not release its slot"
+    return {"bounded_staff_and_groups": "passed", "server_cancellation_and_recovery": "passed"}
 
 
 def verify_manifest(bundle: Path) -> int:
@@ -93,6 +146,7 @@ def verify_http(base: str, bundle: Path) -> dict:
         assert request(base + asset), asset
 
     demo = json.loads(request(base + "/api/v1/demo"))
+    execution_guards = verify_execution_guards(base, demo["scenario"])
     payload = {"scenario": demo["scenario"], "root_seed": 20261020, "replication_index": 0}
     run_bytes = request(base + "/api/v1/runs", payload)
     digest = hashlib.sha256(run_bytes).hexdigest()
@@ -153,6 +207,7 @@ def verify_http(base: str, bundle: Path) -> dict:
     imported = upload(base + "/api/v1/observations/import", "synthetic.csv", observations)
     assert len(imported["raw_rows"]) == 2 and imported["policy_status"] == "none"
     return {
+        **execution_guards,
         "local_assets": len(assets), "v1_api_sha256": digest,
         "v1_reference_sha256": REFERENCE_SHA256,
         "payment_methods_without_confirmation_wait": "passed",

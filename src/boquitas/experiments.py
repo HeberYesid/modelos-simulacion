@@ -8,8 +8,9 @@ from typing import Annotated, Literal, cast, overload
 
 from pydantic import Field, model_validator
 
-from .demand import generate_demand
+from .demand import _generate_prepared_demand, _prepare_scenario_workload
 from .engine import simulate
+from .execution import ExecutionCancelled, ExecutionTimedOut, check_execution
 from .metrics import summarize
 from .metrics_models import MetricSummary, RunMetrics, RunMetricsV2, RunMetricsVersion
 from .models import (
@@ -21,6 +22,7 @@ from .models import (
 )
 from .scenarios import Scenario, ScenarioV2, ScenarioVersion
 from .statistics import MeanInterval, mean_confidence_interval
+from .work_limits import ExperimentWorkBudget, ExperimentWorkloadLimitExceeded, bounded_tuple
 
 MAX_REPLICATIONS = 200
 MAX_SCENARIOS = 8
@@ -212,14 +214,40 @@ def run_scenario(
 ) -> RunResult | RunResultV2:
     """Run one selected tape and retain everything needed for later replay."""
 
+    return _run_scenario(
+        scenario,
+        root_seed=root_seed,
+        replication_index=replication_index,
+        work_budget=None,
+    )
+
+
+def _run_scenario(
+    scenario: Scenario | ScenarioV2,
+    *,
+    root_seed: int | None,
+    replication_index: int,
+    work_budget: ExperimentWorkBudget | None,
+) -> RunResult | RunResultV2:
+    check_execution()
     seed = scenario.default_root_seed if root_seed is None else root_seed
     _require_nonnegative_integer(seed, "root_seed")
     _require_nonnegative_integer(replication_index, "replication_index")
-    demand = generate_demand(
+    scenario = _prepare_scenario_workload(scenario)
+    demand = _generate_prepared_demand(
         scenario,
         root_seed=seed,
         replication_index=replication_index,
     )
+    check_execution()
+    if work_budget is not None:
+        initial_people = sum(len(order.person_ids) for order in scenario.initial_state)
+        demand_people = sum(len(order.person_ids) for order in demand)
+        work_budget.charge(
+            order_count=len(scenario.initial_state) + len(demand),
+            person_count=initial_people + demand_people,
+        )
+    check_execution()
     if isinstance(scenario, ScenarioV2):
         trace_v2 = simulate(
             scenario.engine_config,
@@ -301,7 +329,12 @@ def run_experiment(
         raise ValueError(f"replications must be between 1 and {MAX_REPLICATIONS}.")
     if not math.isfinite(confidence_level) or not 0 < confidence_level < 1:
         raise ValueError("confidence_level must be finite and strictly between 0 and 1.")
-    scenarios = tuple(scenarios)
+    try:
+        scenarios = bounded_tuple(scenarios, limit=MAX_SCENARIOS, name="scenarios")
+    except (TypeError, ValueError) as error:
+        raise ValueError(
+            f"scenarios must contain between 1 and {MAX_SCENARIOS} entries."
+        ) from error
     if not 1 <= len(scenarios) <= MAX_SCENARIOS:
         raise ValueError(f"scenarios must contain between 1 and {MAX_SCENARIOS} entries.")
     scenario_ids = [scenario.scenario_id for scenario in scenarios]
@@ -309,6 +342,7 @@ def run_experiment(
         raise ValueError("Scenario IDs must be unique within an experiment.")
 
     has_version2 = any(isinstance(scenario, ScenarioV2) for scenario in scenarios)
+    work_budget = ExperimentWorkBudget()
     records: list[ReplicationResult | ReplicationResultV2] = []
     all_issues: list[ExperimentIssue] = []
     tapes_by_candidate: dict[str, list[bool | None]] = {
@@ -321,14 +355,19 @@ def run_experiment(
     }
 
     for replication_index in range(replications):
+        check_execution()
         reference_tape: tuple[OrderInput, ...] | None = None
         for scenario_index, scenario in enumerate(scenarios):
+            check_execution()
             try:
-                run = run_scenario(
+                run = _run_scenario(
                     scenario,
                     root_seed=root_seed,
                     replication_index=replication_index,
+                    work_budget=work_budget,
                 )
+            except (ExecutionCancelled, ExecutionTimedOut, ExperimentWorkloadLimitExceeded):
+                raise
             except Exception as error:
                 issue = _make_issue(scenario.scenario_id, replication_index, error)
                 all_issues.append(issue)
@@ -556,7 +595,11 @@ def _generation_assumptions(scenario: Scenario | ScenarioV2) -> tuple[object, ..
     return (
         scenario.engine_config.horizon_s,
         scenario.interarrival.model_dump(mode="json"),
+        tuple(period.model_dump(mode="json") for period in scenario.arrival_schedule)
+        if scenario.arrival_schedule
+        else None,
         tuple(group.model_dump(mode="json") for group in scenario.group_sizes),
+        scenario.menu.model_dump(mode="json") if scenario.menu is not None else None,
         scenario.payment_active.model_dump(mode="json"),
         scenario.preparation.model_dump(mode="json"),
         scenario.transfer_probability,

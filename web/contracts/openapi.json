@@ -1,6 +1,58 @@
 {
   "components": {
     "schemas": {
+      "ArrivalPeriod": {
+        "additionalProperties": false,
+        "description": "One half-open simulation interval with a constant arrival rate.",
+        "properties": {
+          "end_s": {
+            "exclusiveMinimum": 0.0,
+            "title": "End S",
+            "type": "number"
+          },
+          "orders_per_hour": {
+            "minimum": 0.0,
+            "title": "Orders Per Hour",
+            "type": "number"
+          },
+          "start_s": {
+            "minimum": 0.0,
+            "title": "Start S",
+            "type": "number"
+          }
+        },
+        "required": [
+          "start_s",
+          "end_s",
+          "orders_per_hour"
+        ],
+        "title": "ArrivalPeriod",
+        "type": "object"
+      },
+      "BasketItem": {
+        "additionalProperties": false,
+        "description": "One product selection and quantity in a generated order basket.",
+        "properties": {
+          "product_id": {
+            "maxLength": 100,
+            "minLength": 1,
+            "title": "Product Id",
+            "type": "string"
+          },
+          "quantity": {
+            "maximum": 50.0,
+            "minimum": 1.0,
+            "title": "Quantity",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "product_id",
+          "quantity"
+        ],
+        "title": "BasketItem",
+        "type": "object"
+      },
       "Body_import_observation_upload_api_v1_observations_import_post": {
         "properties": {
           "correction_policy": {
@@ -495,6 +547,7 @@
           "cashiers": {
             "anyOf": [
               {
+                "maximum": 32.0,
                 "type": "integer"
               },
               {
@@ -518,6 +571,7 @@
           "integrated_workers": {
             "anyOf": [
               {
+                "maximum": 32.0,
                 "type": "integer"
               },
               {
@@ -543,6 +597,7 @@
           "preparers": {
             "anyOf": [
               {
+                "maximum": 32.0,
                 "type": "integer"
               },
               {
@@ -564,6 +619,7 @@
             "items": {
               "$ref": "#/components/schemas/CashierInterruption"
             },
+            "maxItems": 11000,
             "title": "Cashier Interruptions",
             "type": "array"
           },
@@ -922,6 +978,22 @@
         "title": "ExcludedObservation",
         "type": "object"
       },
+      "ExecutionCancelResponse": {
+        "additionalProperties": false,
+        "description": "Acknowledgement that an execution cancellation signal was recorded.",
+        "properties": {
+          "status": {
+            "const": "cancel_requested",
+            "title": "Status",
+            "type": "string"
+          }
+        },
+        "required": [
+          "status"
+        ],
+        "title": "ExecutionCancelResponse",
+        "type": "object"
+      },
       "ExperimentIssue": {
         "additionalProperties": false,
         "description": "An explicit diagnostic retained from a failed scenario replication.",
@@ -1249,6 +1321,14 @@
             ],
             "title": "Arrival S"
           },
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/OrderItem"
+            },
+            "maxItems": 24,
+            "title": "Items",
+            "type": "array"
+          },
           "order_id": {
             "title": "Order Id",
             "type": "string"
@@ -1320,6 +1400,7 @@
             "type": "number"
           },
           "size": {
+            "maximum": 50.0,
             "minimum": 1.0,
             "title": "Size",
             "type": "integer"
@@ -1330,6 +1411,19 @@
           "probability"
         ],
         "title": "GroupWeight",
+        "type": "object"
+      },
+      "HTTPValidationError": {
+        "properties": {
+          "detail": {
+            "items": {
+              "$ref": "#/components/schemas/ValidationError"
+            },
+            "title": "Detail",
+            "type": "array"
+          }
+        },
+        "title": "HTTPValidationError",
         "type": "object"
       },
       "HealthResponse": {
@@ -1527,6 +1621,14 @@
             ],
             "title": "Arrival S"
           },
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/OrderItem"
+            },
+            "maxItems": 24,
+            "title": "Items",
+            "type": "array"
+          },
           "order_id": {
             "title": "Order Id",
             "type": "string"
@@ -1574,6 +1676,7 @@
             "items": {
               "type": "string"
             },
+            "maxItems": 50,
             "title": "Person Ids",
             "type": "array"
           },
@@ -1745,6 +1848,76 @@
           "n_valid"
         ],
         "title": "MeanInterval",
+        "type": "object"
+      },
+      "MenuConfig": {
+        "additionalProperties": false,
+        "description": "Explicit menu products and weighted complete order baskets.",
+        "properties": {
+          "baskets": {
+            "items": {
+              "$ref": "#/components/schemas/OrderBasket"
+            },
+            "maxItems": 32,
+            "minItems": 1,
+            "title": "Baskets",
+            "type": "array"
+          },
+          "products": {
+            "items": {
+              "$ref": "#/components/schemas/MenuProduct"
+            },
+            "maxItems": 24,
+            "minItems": 1,
+            "title": "Products",
+            "type": "array"
+          }
+        },
+        "required": [
+          "products",
+          "baskets"
+        ],
+        "title": "MenuConfig",
+        "type": "object"
+      },
+      "MenuProduct": {
+        "additionalProperties": false,
+        "description": "A selectable product with an explicit, per-unit preparation assumption.",
+        "properties": {
+          "display_name": {
+            "maxLength": 100,
+            "minLength": 1,
+            "title": "Display Name",
+            "type": "string"
+          },
+          "preparation_s": {
+            "minimum": 0.0,
+            "title": "Preparation S",
+            "type": "number"
+          },
+          "product_id": {
+            "maxLength": 100,
+            "minLength": 1,
+            "title": "Product Id",
+            "type": "string"
+          },
+          "visual_kind": {
+            "enum": [
+              "fruit_salad",
+              "ice_cream",
+              "slush"
+            ],
+            "title": "Visual Kind",
+            "type": "string"
+          }
+        },
+        "required": [
+          "product_id",
+          "display_name",
+          "visual_kind",
+          "preparation_s"
+        ],
+        "title": "MenuProduct",
         "type": "object"
       },
       "MetricEstimate": {
@@ -2156,6 +2329,33 @@
         "title": "ObservationRow",
         "type": "object"
       },
+      "OrderBasket": {
+        "additionalProperties": false,
+        "description": "One weighted, complete product basket for a generated shared order.",
+        "properties": {
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/BasketItem"
+            },
+            "maxItems": 24,
+            "minItems": 1,
+            "title": "Items",
+            "type": "array"
+          },
+          "probability": {
+            "maximum": 1.0,
+            "minimum": 0.0,
+            "title": "Probability",
+            "type": "number"
+          }
+        },
+        "required": [
+          "probability",
+          "items"
+        ],
+        "title": "OrderBasket",
+        "type": "object"
+      },
       "OrderInput": {
         "additionalProperties": false,
         "description": "One newly arriving shared order with its individual members.",
@@ -2164,6 +2364,14 @@
             "minimum": 0.0,
             "title": "Arrival S",
             "type": "number"
+          },
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/OrderItem"
+            },
+            "maxItems": 24,
+            "title": "Items",
+            "type": "array"
           },
           "order_id": {
             "title": "Order Id",
@@ -2205,6 +2413,7 @@
             "items": {
               "type": "string"
             },
+            "maxItems": 50,
             "title": "Person Ids",
             "type": "array"
           },
@@ -2228,6 +2437,47 @@
           "preparation_s"
         ],
         "title": "OrderInput",
+        "type": "object"
+      },
+      "OrderItem": {
+        "additionalProperties": false,
+        "description": "Immutable product metadata attached to one shared order for replay.",
+        "properties": {
+          "display_name": {
+            "maxLength": 100,
+            "minLength": 1,
+            "title": "Display Name",
+            "type": "string"
+          },
+          "product_id": {
+            "maxLength": 100,
+            "minLength": 1,
+            "title": "Product Id",
+            "type": "string"
+          },
+          "quantity": {
+            "maximum": 50.0,
+            "minimum": 1.0,
+            "title": "Quantity",
+            "type": "integer"
+          },
+          "visual_kind": {
+            "enum": [
+              "fruit_salad",
+              "ice_cream",
+              "slush"
+            ],
+            "title": "Visual Kind",
+            "type": "string"
+          }
+        },
+        "required": [
+          "product_id",
+          "display_name",
+          "visual_kind",
+          "quantity"
+        ],
+        "title": "OrderItem",
         "type": "object"
       },
       "OrderMetric": {
@@ -3729,6 +3979,14 @@
         "additionalProperties": false,
         "description": "A versioned, immutable set of hypothetical simulation inputs.",
         "properties": {
+          "arrival_schedule": {
+            "items": {
+              "$ref": "#/components/schemas/ArrivalPeriod"
+            },
+            "maxItems": 48,
+            "title": "Arrival Schedule",
+            "type": "array"
+          },
           "assumptions": {
             "default": [],
             "items": {
@@ -3760,6 +4018,7 @@
             "items": {
               "$ref": "#/components/schemas/GroupWeight"
             },
+            "maxItems": 50,
             "title": "Group Sizes",
             "type": "array"
           },
@@ -3768,11 +4027,22 @@
             "items": {
               "$ref": "#/components/schemas/InitialOrder"
             },
+            "maxItems": 1000,
             "title": "Initial State",
             "type": "array"
           },
           "interarrival": {
             "$ref": "#/components/schemas/TimeDistribution"
+          },
+          "menu": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/MenuConfig"
+              },
+              {
+                "type": "null"
+              }
+            ]
           },
           "patience": {
             "anyOf": [
@@ -3831,6 +4101,14 @@
         "additionalProperties": false,
         "description": "A version-2 scenario with explicit scripted scheduling assumptions.",
         "properties": {
+          "arrival_schedule": {
+            "items": {
+              "$ref": "#/components/schemas/ArrivalPeriod"
+            },
+            "maxItems": 48,
+            "title": "Arrival Schedule",
+            "type": "array"
+          },
           "assumptions": {
             "default": [],
             "items": {
@@ -3862,6 +4140,7 @@
             "items": {
               "$ref": "#/components/schemas/GroupWeight"
             },
+            "maxItems": 50,
             "title": "Group Sizes",
             "type": "array"
           },
@@ -3870,11 +4149,22 @@
             "items": {
               "$ref": "#/components/schemas/InitialOrder"
             },
+            "maxItems": 1000,
             "title": "Initial State",
             "type": "array"
           },
           "interarrival": {
             "$ref": "#/components/schemas/TimeDistribution"
+          },
+          "menu": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/MenuConfig"
+              },
+              {
+                "type": "null"
+              }
+            ]
           },
           "patience": {
             "anyOf": [
@@ -4487,6 +4777,46 @@
         "title": "ValidatedFileResponse",
         "type": "object"
       },
+      "ValidationError": {
+        "properties": {
+          "ctx": {
+            "title": "Context",
+            "type": "object"
+          },
+          "input": {
+            "title": "Input"
+          },
+          "loc": {
+            "items": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "integer"
+                }
+              ]
+            },
+            "title": "Location",
+            "type": "array"
+          },
+          "msg": {
+            "title": "Message",
+            "type": "string"
+          },
+          "type": {
+            "title": "Error Type",
+            "type": "string"
+          }
+        },
+        "required": [
+          "loc",
+          "msg",
+          "type"
+        ],
+        "title": "ValidationError",
+        "type": "object"
+      },
       "WorkerState": {
         "additionalProperties": false,
         "description": "Public current state of a declared worker.",
@@ -4580,9 +4910,78 @@
         "summary": "Get Demo"
       }
     },
+    "/api/v1/executions/{execution_id}/cancel": {
+      "post": {
+        "operationId": "cancel_execution_api_v1_executions__execution_id__cancel_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "execution_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Execution Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "202": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ExecutionCancelResponse"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Conflict"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Cancel Execution"
+      }
+    },
     "/api/v1/experiments": {
       "post": {
         "operationId": "create_experiment_api_v1_experiments_post",
+        "parameters": [
+          {
+            "in": "header",
+            "name": "X-Boquitas-Execution-Id",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "format": "uuid",
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Boquitas-Execution-Id"
+            }
+          }
+        ],
         "requestBody": {
           "content": {
             "application/json": {
@@ -4618,6 +5017,26 @@
               }
             },
             "description": "Successful Response"
+          },
+          "408": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Request Timeout"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Conflict"
           },
           "422": {
             "content": {
@@ -4828,6 +5247,25 @@
     "/api/v1/runs": {
       "post": {
         "operationId": "create_run_api_v1_runs_post",
+        "parameters": [
+          {
+            "in": "header",
+            "name": "X-Boquitas-Execution-Id",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "format": "uuid",
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Boquitas-Execution-Id"
+            }
+          }
+        ],
         "requestBody": {
           "content": {
             "application/json": {
@@ -4863,6 +5301,26 @@
               }
             },
             "description": "Successful Response"
+          },
+          "408": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Request Timeout"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Conflict"
           },
           "422": {
             "content": {

@@ -17,9 +17,11 @@ from boquitas.scenarios import (
     ScenarioV2,
     demo_scenario,
 )
+from boquitas.work_limits import public_limits
 
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
 CONTRACT_PATH = PROJECT_ROOT / "web" / "contracts" / "openapi.json"
+WORK_LIMITS_PATH = PROJECT_ROOT / "web" / "contracts" / "work-limits.json"
 FIXTURE_DIR = PROJECT_ROOT / "web" / "contracts" / "fixtures"
 
 
@@ -152,7 +154,11 @@ def _compact_json(payload: str) -> str:
 
 
 def documents_to_sync() -> dict[Path, str]:
-    return {CONTRACT_PATH: render_contract(), **render_fixtures()}
+    return {
+        CONTRACT_PATH: render_contract(),
+        WORK_LIMITS_PATH: json.dumps(public_limits(), indent=2, sort_keys=True) + "\n",
+        **render_fixtures(),
+    }
 
 
 def main() -> int:

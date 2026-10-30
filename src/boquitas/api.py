@@ -3,12 +3,15 @@
 import json
 import logging
 import re
+from collections import OrderedDict
 from collections.abc import Mapping, Sequence
 from pathlib import Path
-from typing import Literal
-from uuid import uuid4
+from threading import Condition
+from time import monotonic
+from typing import Annotated, Literal
+from uuid import UUID, uuid4
 
-from fastapi import FastAPI, Form, UploadFile
+from fastapi import FastAPI, Form, Header, UploadFile
 from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse, Response
 from fastapi.staticfiles import StaticFiles
@@ -20,11 +23,19 @@ from .api_models import (
     DemoResponse,
     ErrorIssue,
     ErrorResponse,
+    ExecutionCancelResponse,
     ExperimentRequest,
     RunRequest,
     ValidatedFileResponse,
 )
 from .demand import WorkloadLimitExceeded
+from .execution import (
+    ExecutionCancelled,
+    ExecutionControl,
+    ExecutionTimedOut,
+    check_execution,
+    execution_scope,
+)
 from .experiments import (
     ExperimentResult,
     ExperimentResultV2,
@@ -40,10 +51,133 @@ from .file_limits import MAX_OBSERVATION_BYTES, MAX_SAVED_RESULT_BYTES
 from .models import InputValidationError
 from .observation_import import ImportReport, import_observations
 from .scenarios import Scenario, ScenarioV2, demo_scenario, method_only_scenario
+from .work_limits import ExperimentWorkloadLimitExceeded
 
 MAX_UPLOAD_BYTES = MAX_OBSERVATION_BYTES
 _API_FALLBACK_METHODS = ["GET", "HEAD", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"]
 _LOGGER = logging.getLogger(__name__)
+_EXECUTION_HISTORY_TTL_S = 30.0
+_EXECUTION_HISTORY_LIMIT = 256
+
+
+class _ExecutionRegistry:
+    """Per-app execution slots, active cancellation signals and bounded ID history."""
+
+    def __init__(self, *, timeout_s: float, max_active: int = 1) -> None:
+        self.timeout_s = timeout_s
+        self.max_active = max_active
+        self._condition = Condition()
+        self._active: dict[UUID | None, ExecutionControl] = {}
+        self._recent: OrderedDict[UUID, tuple[str, float]] = OrderedDict()
+
+    @property
+    def active_execution_ids(self) -> frozenset[UUID]:
+        """Return a snapshot used by local diagnostics and lifecycle coordination."""
+
+        with self._condition:
+            return frozenset(
+                execution_id
+                for execution_id in self._active
+                if execution_id is not None
+            )
+
+    def wait_until_active(self, execution_id: UUID, *, timeout_s: float) -> bool:
+        """Wait for one registered ID; useful to coordinate local lifecycle observers."""
+
+        with self._condition:
+            return self._condition.wait_for(lambda: execution_id in self._active, timeout_s)
+
+    def begin(
+        self, execution_id: UUID | None
+    ) -> tuple[ExecutionControl | None, Literal["busy", "cancelled", "reused"] | None]:
+        with self._condition:
+            self._purge_recent()
+            if execution_id is not None:
+                if execution_id in self._active:
+                    return None, "reused"
+                previous = self._recent.get(execution_id)
+                if previous is not None:
+                    if previous[0] == "cancel_requested":
+                        self._remember(execution_id, "cancelled")
+                        return None, "cancelled"
+                    return None, "reused"
+            if len(self._active) >= self.max_active:
+                return None, "busy"
+
+            control = ExecutionControl(timeout_s=self.timeout_s)
+            self._active[execution_id] = control
+            self._condition.notify_all()
+            return control, None
+
+    def cancel(self, execution_id: UUID) -> bool:
+        """Signal an active execution or retain a bounded pre-registration tombstone."""
+
+        with self._condition:
+            self._purge_recent()
+            control = self._active.get(execution_id)
+            if control is not None:
+                control.cancel.set()
+                return True
+            previous = self._recent.get(execution_id)
+            if previous is not None:
+                return previous[0] == "cancel_requested"
+            self._remember(execution_id, "cancel_requested")
+            return True
+
+    def finish(self, execution_id: UUID | None, control: ExecutionControl, state: str) -> None:
+        with self._condition:
+            if self._active.get(execution_id) is control:
+                del self._active[execution_id]
+                if execution_id is not None:
+                    self._remember(execution_id, state)
+                self._condition.notify_all()
+
+    def _purge_recent(self) -> None:
+        now = monotonic()
+        while self._recent:
+            _, (_, expires_at) = next(iter(self._recent.items()))
+            if expires_at > now:
+                break
+            self._recent.popitem(last=False)
+
+    def _remember(self, execution_id: UUID, state: str) -> None:
+        self._recent.pop(execution_id, None)
+        self._recent[execution_id] = (state, monotonic() + _EXECUTION_HISTORY_TTL_S)
+        while len(self._recent) > _EXECUTION_HISTORY_LIMIT:
+            self._recent.popitem(last=False)
+
+
+def _execution_conflict_response(
+    state: Literal["busy", "cancelled", "reused"],
+) -> JSONResponse:
+    if state == "cancelled":
+        return _error_response(
+            409,
+            code="execution_cancelled",
+            message="La ejecución fue cancelada; se conserva el resultado anterior.",
+        )
+    if state == "busy":
+        return _error_response(
+            409,
+            code="execution_busy",
+            message="Ya hay una ejecución activa. Espere a que termine antes de iniciar otra.",
+        )
+    return _error_response(
+        409,
+        code="execution_id_reused",
+        message="El identificador de ejecución ya fue usado. Genere un UUID nuevo.",
+    )
+
+
+def _execution_timeout_response(timeout_s: float) -> JSONResponse:
+    return _error_response(
+        408,
+        code="execution_timed_out",
+        message=(
+            f"La ejecución superó el límite de {timeout_s:g} segundos. Reduzca el horizonte, "
+            "la demanda o el número de réplicas antes de volver a intentarlo."
+        ),
+    )
 
 
 class HealthResponse(BaseModel):
@@ -440,10 +574,16 @@ def _saved_file_issues(
     return tuple(issue for item in issues for issue in _validation_issues(item))
 
 
-def create_app(frontend_dist: str | Path | None = None) -> FastAPI:
+def create_app(
+    frontend_dist: str | Path | None = None,
+    *,
+    execution_timeout_s: float = 60.0,
+) -> FastAPI:
     """Build an app with an optional locally bundled frontend directory."""
 
     app = FastAPI(title="Boquitas Local API", version="1.0.0", docs_url=None, redoc_url=None)
+    execution_registry = _ExecutionRegistry(timeout_s=execution_timeout_s)
+    app.state.execution_registry = execution_registry
 
     @app.exception_handler(RequestValidationError)
     def request_validation_error_handler(
@@ -511,19 +651,59 @@ def create_app(frontend_dist: str | Path | None = None) -> FastAPI:
         )
 
     @app.post(
+        "/api/v1/executions/{execution_id}/cancel",
+        status_code=202,
+        response_model=ExecutionCancelResponse,
+        responses={409: {"model": ErrorResponse}},
+    )
+    def cancel_execution(execution_id: UUID) -> ExecutionCancelResponse | JSONResponse:
+        if not execution_registry.cancel(execution_id):
+            return _error_response(
+                409,
+                code="execution_not_active",
+                message="La ejecución ya terminó y no se puede cancelar.",
+            )
+        return ExecutionCancelResponse(status="cancel_requested")
+
+    @app.post(
         "/api/v1/runs",
         response_model=RunResultVersion,
         response_class=JSONResponse,
-        responses={422: {"model": ErrorResponse}, 500: {"model": ErrorResponse}},
+        responses={
+            408: {"model": ErrorResponse},
+            409: {"model": ErrorResponse},
+            422: {"model": ErrorResponse},
+            500: {"model": ErrorResponse},
+        },
     )
-    def create_run(request: RunRequest) -> Response | JSONResponse:
+    def create_run(
+        request: RunRequest,
+        execution_id: Annotated[UUID | None, Header(alias="X-Boquitas-Execution-Id")] = None,
+    ) -> Response | JSONResponse:
+        control, conflict = execution_registry.begin(execution_id)
+        if conflict is not None:
+            return _execution_conflict_response(conflict)
+        assert control is not None
+        state = "completed"
         try:
-            scenario = method_only_scenario(request.scenario)
-            result = run_scenario(
-                scenario,
-                root_seed=request.root_seed,
-                replication_index=request.replication_index,
-            )
+            with execution_scope(control):
+                check_execution()
+                scenario = method_only_scenario(request.scenario)
+                result = run_scenario(
+                    scenario,
+                    root_seed=request.root_seed,
+                    replication_index=request.replication_index,
+                )
+                check_execution()
+                response = _complete_result_response(result)
+                check_execution()
+                return response
+        except ExecutionCancelled:
+            state = "cancelled"
+            return _execution_conflict_response("cancelled")
+        except ExecutionTimedOut:
+            state = "timed_out"
+            return _execution_timeout_response(execution_registry.timeout_s)
         except WorkloadLimitExceeded:
             return _error_response(
                 422,
@@ -537,7 +717,8 @@ def create_app(frontend_dist: str | Path | None = None) -> FastAPI:
                     ),
                 ),
             )
-        return _complete_result_response(result)
+        finally:
+            execution_registry.finish(execution_id, control, state)
 
     @app.post(
         "/api/v1/observations/import",
@@ -727,16 +908,73 @@ def create_app(frontend_dist: str | Path | None = None) -> FastAPI:
         "/api/v1/experiments",
         response_model=ExperimentResultVersion,
         response_class=JSONResponse,
-        responses={422: {"model": ErrorResponse}, 500: {"model": ErrorResponse}},
+        responses={
+            408: {"model": ErrorResponse},
+            409: {"model": ErrorResponse},
+            422: {"model": ErrorResponse},
+            500: {"model": ErrorResponse},
+        },
     )
     def create_experiment(
         request: ExperimentRequest,
+        execution_id: Annotated[UUID | None, Header(alias="X-Boquitas-Execution-Id")] = None,
     ) -> Response | JSONResponse:
+        control, conflict = execution_registry.begin(execution_id)
+        if conflict is not None:
+            return _execution_conflict_response(conflict)
+        assert control is not None
+        state = "completed"
         try:
-            result = run_experiment(
-                tuple(method_only_scenario(scenario) for scenario in request.scenarios),
-                root_seed=request.root_seed,
-                replications=request.replications,
+            with execution_scope(control):
+                check_execution()
+                result = run_experiment(
+                    tuple(method_only_scenario(scenario) for scenario in request.scenarios),
+                    root_seed=request.root_seed,
+                    replications=request.replications,
+                )
+                check_execution()
+                if result.status == "failed":
+                    return _error_response(
+                        422,
+                        code="experiment_failed",
+                        message="Una o más réplicas no pudieron completarse.",
+                        issues=tuple(
+                            ErrorIssue(
+                                path=f"scenarios.{issue.scenario_id}",
+                                code=issue.code,
+                                message=(
+                                    "La réplica falló; consulte sus detalles en el resultado "
+                                    "parcial."
+                                ),
+                            )
+                            for issue in result.issues
+                        ),
+                        details={"partial_result": result.model_dump(mode="json")},
+                    )
+                response = _complete_result_response(result)
+                check_execution()
+                return response
+        except ExecutionCancelled:
+            state = "cancelled"
+            return _execution_conflict_response("cancelled")
+        except ExecutionTimedOut:
+            state = "timed_out"
+            return _execution_timeout_response(execution_registry.timeout_s)
+        except (ExperimentWorkloadLimitExceeded, WorkloadLimitExceeded):
+            return _error_response(
+                422,
+                code="experiment_workload_limit_exceeded",
+                message=(
+                    "La comparación supera el límite local de trabajo. Reduzca el horizonte, "
+                    "la demanda o el número de réplicas antes de volver a ejecutar."
+                ),
+                issues=(
+                    ErrorIssue(
+                        path="scenarios",
+                        code="experiment_workload_limit_exceeded",
+                        message="Reduzca el horizonte, la demanda o el número de réplicas.",
+                    ),
+                ),
             )
         except ValueError:
             return _error_response(
@@ -751,23 +989,8 @@ def create_app(frontend_dist: str | Path | None = None) -> FastAPI:
                     ),
                 ),
             )
-
-        if result.status == "failed":
-            return _error_response(
-                422,
-                code="experiment_failed",
-                message="Una o más réplicas no pudieron completarse.",
-                issues=tuple(
-                    ErrorIssue(
-                        path=f"scenarios.{issue.scenario_id}",
-                        code=issue.code,
-                        message="La réplica falló; consulte sus detalles en el resultado parcial.",
-                    )
-                    for issue in result.issues
-                ),
-                details={"partial_result": result.model_dump(mode="json")},
-            )
-        return _complete_result_response(result)
+        finally:
+            execution_registry.finish(execution_id, control, state)
 
     @app.post(
         "/api/v1/exports/csv",

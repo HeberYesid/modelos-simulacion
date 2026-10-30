@@ -1,0 +1,10 @@
+{
+  "max_experiment_orders": 30000,
+  "max_experiment_people": 50000,
+  "max_experiment_work_units": 10000000,
+  "max_group_size": 50,
+  "max_initial_orders": 1000,
+  "max_new_orders": 10000,
+  "max_people_per_run": 10000,
+  "max_workers_per_pool": 32
+}
