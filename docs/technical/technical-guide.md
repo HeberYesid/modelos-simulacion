@@ -6,15 +6,27 @@ For the complete Spanish workflow, see the [user manual](../user/MANUAL_USUARIO.
 
 ## Portable presentation package
 
-For a Windows 10/11 x64 destination, build the self-contained release with `./build-portable.ps1` on the build computer. The ZIP is written to `dist/Boquitas-Windows-x64.zip`; existing outputs are preserved. Use `-OutputDirectory <new-directory>` for another build. Only the build computer needs Python 3.13 x64, uv, Node.js and pnpm. The destination needs a compatible browser and the complete extracted package.
+For a Windows 10/11 x64 destination, prepare the presentation-safety revision with `./build-portable.ps1 -OutputDirectory ./dist/presentacion-segura-20261030` on the build computer. Its ZIP path is `dist/presentacion-segura-20261030/Boquitas-Windows-x64.zip`. Older ZIPs are preserved and do not include this revision. Without `-OutputDirectory`, the builder still defaults to `dist` and refuses to overwrite an existing package. Only the build computer needs Python 3.13 x64, uv, Node.js and pnpm. The destination needs a compatible browser and the complete extracted package.
 
 See the [Spanish portable guide](../user/guia-portable.md) and the [observed package verification](../verification/portable-release-2026-10-28.md). To repeat the executable/API check after extracting the ZIP elsewhere, run the build computer's Python with `scripts/check_portable.py <extracted-folder>`. This check strips developer tools from the child process PATH; it does not certify another computer or disable the host network adapter.
+
+The [presentation-safety verification](../verification/presentation-safety-2026-10-30.md) records the current package, computational limits, cancellation checks and remaining destination-hardware rehearsal.
 
 ## Scope and supported environment
 
 Since 2026-10-28, new application runs and experiments normalize transfer confirmation to zero, including opening-state residual confirmation. The scenario editor and downloaded scenarios use the same policy. Payment method is recorded independently as `cash` or `transfer`; it no longer depends on a positive confirmation duration. Saved runs are reopened without normalization, and the direct deterministic engine retains historical confirmation support for reproducibility. Missing methods in older artifacts remain unknown unless their positive transfer wait establishes a transfer.
 
 Boquitas runs a discrete-event simulation for explicitly configured scenarios. It does not infer scenario parameters from imported observations. All example defaults below are synthetic teaching inputs, not estimates of the real shop.
+
+### Optional arrival schedules and menu orders
+
+Both scenario versions accept an optional `arrival_schedule` and `menu`. They are disabled in the existing demonstration. Empty schedules, absent menus and empty order items are omitted from serialized output to preserve legacy payloads.
+
+An arrival schedule contains at most 48 ordered, contiguous `{start_s, end_s, orders_per_hour}` periods covering `[0, horizon_s)`. It requires exponential base interarrivals. Rates count shared orders, not people; zero-rate periods admit no arrivals. Generation inverts the integrated piecewise-constant intensity against indexed unit-exponential draws, carrying remaining intensity across boundaries. This is a nonhomogeneous Poisson process, with no single exponential interarrival mean for the whole day. The original generator path remains active when the schedule is empty. See the [Poisson time-change construction](https://www.randomservices.org/random/poisson/Nonhomogeneous.html).
+
+`menu.products` defines IDs, display names, `visual_kind` (`fruit_salad`, `ice_cream` or `slush`) and fixed assumed `preparation_s` per unit. `menu.baskets` defines weighted product combinations with explicit integer quantities. Limits are 24 products, 32 combinations and 50 total units per order. Selection uses a separate indexed random stream; active payment, group sizes and other existing draws retain their streams. New order preparation is the sum of quantity times per-unit preparation, with one worker holding the complete order. Existing initial-state durations remain explicit. There are no product recipes, parallel product tasks or partial deliveries.
+
+Product metadata is retained on the demand tape, explicit initial orders and trace final orders. Replay projects these immutable items rather than sampling again. Legacy traces retain generic containers. Schedule/menu settings participate in generation-assumption comparisons. These optional extensions do not calibrate inputs or update previously built portable packages.
 
 The supported Python line is pinned to 3.13 by `.python-version`, `pyproject.toml`, and `uv.lock`. The frontend's exact dependency resolution is recorded in `web/pnpm-lock.yaml`. The following versions were observed in the inspected Windows workspace on 2026-10-23; they describe that workspace, not a promise that other machines already have the same tools installed.
 

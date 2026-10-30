@@ -20,3 +20,6 @@ docs/audit-remediation-2026-10-24/playwright-results/
 
 # Inspected pytest fixture directories; retained locally, not historical reports.
 openspec/changes/boquitas-07-preparation-interruptions/review/pytest-*/
+
+# Per-run browser status is local; curated screenshots and reports remain versioned.
+**/browser-results/.last-run.json

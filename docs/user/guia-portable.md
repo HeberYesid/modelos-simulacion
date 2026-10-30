@@ -11,7 +11,9 @@ El paquete incluye Python, las bibliotecas del simulador y la interfaz compilada
 
 ## Preparar y abrir
 
-1. Lleva el ZIP completo `Boquitas-Windows-x64.zip` en la memoria USB y conserva otra copia.
+La revisión de seguridad para la exposición se prepara en `dist/presentacion-segura-20261030/Boquitas-Windows-x64.zip` dentro del proyecto. Los ZIP anteriores se conservan; utiliza el de esta carpeta para incluir las correcciones y la interfaz actuales.
+
+1. Lleva ese ZIP completo `Boquitas-Windows-x64.zip` en la memoria USB y conserva otra copia.
 2. En el computador de la sustentación, copia el ZIP al disco local. Haz clic derecho y selecciona **Extraer todo**. Espera a que termine.
 3. Abre la carpeta extraída y haz doble clic en **INICIAR_BOQUITAS.cmd**. También puedes abrir **Boquitas.exe**.
 4. Mantén abierta la consola. El navegador se abre cuando el servidor está preparado; si no se abre, escribe `http://127.0.0.1:8000` en Edge o Chrome.
@@ -30,6 +32,12 @@ Conserva toda la carpeta, incluido `_internal`; copiar únicamente el ejecutable
 7. Si vas a mostrar una comparación, copia la referencia como candidato, cambia el personal y ejecuta la comparación de réplicas. Conserva la explicación de los supuestos y de las unidades.
 
 La carpeta `ejemplos` contiene entradas sintéticas, no mediciones del negocio. Lleva por separado los archivos de observaciones y resultados que estés autorizado a mostrar. El paquete no incluye las fuentes de campo. La importación de observaciones no calibra automáticamente el modelo. Las pruebas de software no establecen validación empírica.
+
+## Pruebas extremas y cancelación
+
+Los controles admiten hasta 32 trabajadores por equipo y 50 personas por pedido. Una réplica admite como máximo 10.000 personas y 1.000 órdenes iniciales. Son protecciones del programa; no describen la capacidad real de la heladería.
+
+Durante un cálculo, pulsa **Cancelar ejecución** y espera la confirmación antes de volver a ejecutar. Se conservan el borrador y el resultado anterior. Las comparaciones que superan el presupuesto de trabajo se rechazan con un aviso para reducir las réplicas, la demanda o el horario; una solicitud que supera 60 segundos se detiene. Guarda un JSON antes de recargar o cerrar la página si necesitas conservar el resultado.
 
 ## Si aparece un problema
 

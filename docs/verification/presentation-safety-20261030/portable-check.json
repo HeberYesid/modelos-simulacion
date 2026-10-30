@@ -1,0 +1,19 @@
+{
+  "manifest_files": 310,
+  "developer_tools_on_path": false,
+  "bounded_staff_and_groups": "passed",
+  "server_cancellation_and_recovery": "passed",
+  "local_assets": 2,
+  "v1_api_sha256": "b33f2210f681a098cc346fc13af0b2ced1a56d0344dae09b628ce9e0a07e24db",
+  "v1_reference_sha256": "8bbe6b117f59dde367816d8ed63bb013b0ad624d916a57159c084fcff4051dd7",
+  "payment_methods_without_confirmation_wait": "passed",
+  "v1_v2_save_reopen": "passed",
+  "regular_run": "passed",
+  "experiment_replications": 60,
+  "csv_export": "passed",
+  "synthetic_observation_import": "passed",
+  "start_stop_cycles": 2,
+  "occupied_port_preserved": true,
+  "status": "passed",
+  "limitation": "Relocated bundle on build host; destination hardware not tested."
+}

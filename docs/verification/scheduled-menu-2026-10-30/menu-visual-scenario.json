@@ -1,0 +1,87 @@
+{
+  "contract_version": 1,
+  "scenario_id": "menu-visual-synthetic",
+  "display_name": "Ensalada, helado y granizado",
+  "engine_config": {
+    "contract_version": 1,
+    "mode": "regular",
+    "opening_time": "15:00:00",
+    "horizon_s": 10.0,
+    "cashiers": 0,
+    "preparers": 0,
+    "integrated_workers": 1
+  },
+  "initial_state": [],
+  "interarrival": {
+    "kind": "constant",
+    "value_s": 6.0
+  },
+  "menu": {
+    "products": [
+      {
+        "product_id": "fruit",
+        "display_name": "Ensalada de frutas",
+        "visual_kind": "fruit_salad",
+        "preparation_s": 180.0
+      },
+      {
+        "product_id": "ice",
+        "display_name": "Helado",
+        "visual_kind": "ice_cream",
+        "preparation_s": 60.0
+      },
+      {
+        "product_id": "slush",
+        "display_name": "Granizado",
+        "visual_kind": "slush",
+        "preparation_s": 90.0
+      }
+    ],
+    "baskets": [
+      {
+        "probability": 1.0,
+        "items": [
+          {
+            "product_id": "fruit",
+            "quantity": 1
+          },
+          {
+            "product_id": "ice",
+            "quantity": 1
+          },
+          {
+            "product_id": "slush",
+            "quantity": 1
+          }
+        ]
+      }
+    ]
+  },
+  "group_sizes": [
+    {
+      "size": 2,
+      "probability": 1.0
+    }
+  ],
+  "payment_active": {
+    "kind": "constant",
+    "value_s": 2.0
+  },
+  "preparation": {
+    "kind": "triangular",
+    "low_s": 60.0,
+    "mode_s": 120.0,
+    "high_s": 180.0
+  },
+  "transfer_probability": 0.0,
+  "transfer_confirmation": {
+    "kind": "constant",
+    "value_s": 0.0
+  },
+  "patience": null,
+  "provenance": "user_assumptions",
+  "assumptions": [
+    "Synthetic visual review only; product times are editable examples, not measured business values."
+  ],
+  "default_root_seed": 20261020
+}
