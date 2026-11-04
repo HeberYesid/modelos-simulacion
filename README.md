@@ -7,6 +7,7 @@ Local academic discrete-event simulation of an ice cream shop. The Python backen
 - [Spanish quick guide](docs/user/guia-de-uso.md)
 - [Spanish user manual](docs/user/MANUAL_USUARIO.md)
 - [Technical guide: installation, startup and verification](docs/technical/technical-guide.md)
+- [Public deployment: complete application with synthetic examples](docs/technical/deployment.md)
 - [Documentation index](docs/README.md)
 - [Requirements and implementation roadmap](openspec/README.md)
 - [Verification evidence index](docs/verification/README.md)

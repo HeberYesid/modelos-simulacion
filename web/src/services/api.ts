@@ -14,6 +14,7 @@ import type {
   CsvExportResponse,
 } from "../api/types";
 import { issueMessage, serviceErrorMessage } from "../domain/errors";
+import { serviceName } from "../deployment";
 import {
   MAX_OBSERVATION_BYTES,
   MAX_SAVED_RESULT_BYTES,
@@ -64,7 +65,7 @@ export class ServiceError extends Error {
       : null;
     const fallbackMessage = serviceErrorMessage(code) ?? (
       issues.length > 0
-        ? "El servicio local encontró datos que deben corregirse. El resultado anterior sigue disponible."
+        ? `El ${serviceName()} encontró datos que deben corregirse. El resultado anterior sigue disponible.`
         : status === 413
           ? code === "saved_file_too_large"
             ? SAVED_FILE_TOO_LARGE_MESSAGE
@@ -74,8 +75,8 @@ export class ServiceError extends Error {
           : code === "result_too_large"
             ? RESULT_TOO_LARGE_MESSAGE
           : status === 422
-            ? "El servicio local no aceptó estos datos. Revisa las indicaciones antes de intentarlo de nuevo."
-            : "No se pudo completar la solicitud al servicio local. Verifica que la aplicación siga activa e inténtalo de nuevo.");
+            ? `El ${serviceName()} no aceptó estos datos. Revisa las indicaciones antes de intentarlo de nuevo.`
+            : `No se pudo completar la solicitud al ${serviceName()}. Verifica que la aplicación siga activa e inténtalo de nuevo.`);
     const serverMessage = typeof problem.message === "string" ? problem.message : null;
     const message = serverMessage ?? fallbackMessage;
     super(message);

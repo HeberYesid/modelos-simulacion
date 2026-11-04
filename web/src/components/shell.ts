@@ -1,3 +1,5 @@
+import { processingDisclosure, serviceStatusMessage } from "../deployment";
+
 export type MainView = "observations" | "scenario" | "results";
 
 export function renderShell(): void {
@@ -48,7 +50,7 @@ export function renderShell(): void {
               <span>Modo oscuro</span>
             </button>
             <span id="service-status" class="service-status" data-state="checking">
-              <span class="status-dot" aria-hidden="true"></span><span>Comprobando servicio local…</span>
+              <span class="status-dot" aria-hidden="true"></span><span>${serviceStatusMessage("checking")}</span>
             </span>
             <span id="scenario-dirty" class="dirty-indicator" hidden>Escenario con cambios sin ejecutar</span>
           </div>
@@ -59,7 +61,7 @@ export function renderShell(): void {
         </main>
 
         <footer class="app-footer">
-          <span>Procesamiento local · sin envío externo</span>
+          <span>${processingDisclosure()}</span>
           <span>Observaciones y escenarios se manejan por separado</span>
         </footer>
       </div>

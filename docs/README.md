@@ -6,6 +6,7 @@
 - [Spanish portable presentation guide](user/guia-portable.md)
 - [Spanish user manual](user/MANUAL_USUARIO.md)
 - [Technical guide](technical/technical-guide.md)
+- [Public deployment](technical/deployment.md)
 - [Frontend development and checks](../web/README.md)
 
 ## Academic work and field evidence

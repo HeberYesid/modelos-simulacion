@@ -1,0 +1,25 @@
+# Allow only application/build inputs into the Docker build context.
+**
+!Dockerfile
+!pyproject.toml
+!uv.lock
+!src/
+!src/**
+!web/
+!web/package.json
+!web/pnpm-lock.yaml
+!web/index.html
+!web/tsconfig.json
+!web/vite.config.ts
+!web/contracts/
+!web/contracts/work-limits.json
+!web/src/
+!web/src/**
+!web/public/
+!web/public/**
+
+# The public build resolves this import to the empty public archive.
+web/src/replay/observed-visits.json
+**/__pycache__/
+**/*.pyc
+**/.env*

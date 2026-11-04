@@ -1,6 +1,7 @@
 import type { ImportReport, ObservationRow } from "../api/types";
 import { escapeHtml, formatNumber } from "../domain/format";
 import { correctionReason, qualityFlagLabel, translateEnum, translatePolicy, validationMessage } from "../domain/errors";
+import { isPublicDemo } from "../deployment";
 
 export type ObservationSourceMode = "file" | "paste";
 
@@ -185,7 +186,7 @@ export function renderObservationsView(options: {
       </section>` : ""}
     <div class="import-layout ${firstUse ? "first-use" : ""}">
       <section class="work-surface input-surface" aria-labelledby="source-title">
-        <div class="surface-heading"><div><h2 id="source-title">Revisar una fuente</h2><p>CSV/TXT en UTF-8 · hasta 10 MiB · procesamiento local.</p></div></div>
+        <div class="surface-heading"><div><h2 id="source-title">Revisar una fuente</h2><p>CSV/TXT en UTF-8 · hasta 10 MiB · ${isPublicDemo() ? "el archivo se procesa en el servidor." : "procesamiento local."}</p></div></div>
         <form id="observations-form" novalidate>
           <div class="input-mode-row">
             <div class="segmented-control" role="group" aria-label="Forma de cargar observaciones">

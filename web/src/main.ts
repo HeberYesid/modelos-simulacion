@@ -34,6 +34,7 @@ import {
   validateInitialPersonLimits,
 } from "./components/scenario-editor";
 import { renderShell, setActiveView, setDirty, announce, type MainView } from "./components/shell";
+import { isPublicDemo, serviceName, serviceReference, serviceStatusMessage } from "./deployment";
 import type { ApiSchema, CsvExportRequest, ExperimentRequest, RunRequest } from "./api/types";
 import { fieldLabel, systemAssumption } from "./domain/errors";
 import { ANALYSIS_OBJECTIVES, type AnalysisObjective } from "./domain/scenario-analysis";
@@ -105,7 +106,7 @@ interface AppState {
 }
 
 const state: AppState = {
-  view: "observations",
+  view: isPublicDemo() ? "scenario" : "observations",
   scenarios: [],
   activeScenarioIndex: 0,
   replications: 30,
@@ -210,7 +211,7 @@ function renderScenarioUnavailable(): string {
   return `
     <div class="page-intro"><h1>Escenarios</h1></div>
     <div class="alert-box" role="alert"><h2>No se pudo cargar el escenario de demostración</h2>
-      <p>Inicia el servicio local y vuelve a cargar. El navegador no crea valores de reemplazo.</p>
+      <p>Inicia ${serviceReference()} y vuelve a cargar. El navegador no crea valores de reemplazo.</p>
       ${state.scenarioError ? `<p>${escapeHtml(state.scenarioError)}</p>` : ""}
       <div class="inline-actions" style="margin-top:0.8rem"><button type="button" class="secondary-button" data-reload-demo>Volver a cargar</button></div>
     </div>`;
@@ -286,7 +287,7 @@ function renderCurrentView(focusRoot = false): void {
       error: state.observationError,
       measuredReplayMarkup: renderObservedSection(),
     });
-    activeObservedSection = mountObservedSection(root);
+    if (!isPublicDemo()) activeObservedSection = mountObservedSection(root);
   } else if (state.view === "scenario") {
     const scenario = activeScenario();
     const comparisonIssue = state.scenarioIssues.some((issue) => issue.path.startsWith("scenarios."));
@@ -382,14 +383,14 @@ function markActiveScenario(next: ScenarioDraft): void {
 
 function handleHealth(): void {
   void checkHealth().then(
-    () => setServiceStatus("ok", "Servicio local disponible"),
-    () => setServiceStatus("error", "Servicio local sin conexión"),
+    () => setServiceStatus("ok", serviceStatusMessage("ok")),
+    () => setServiceStatus("error", serviceStatusMessage("error")),
   );
 }
 
 async function loadDemoScenario(): Promise<void> {
   state.scenarioError = null;
-  setServiceStatus("checking", "Comprobando servicio local…");
+  setServiceStatus("checking", serviceStatusMessage("checking"));
   renderCurrentView();
   try {
     const response = await loadDemo();
@@ -406,10 +407,10 @@ async function loadDemoScenario(): Promise<void> {
     state.scenarioFileBytes = null;
     state.scenarioFileJson = null;
     state.scenarioError = null;
-    setServiceStatus("ok", "Servicio local disponible");
+    setServiceStatus("ok", serviceStatusMessage("ok"));
   } catch (error) {
     state.scenarioError = error instanceof Error ? error.message : "No se pudo cargar la demostración local.";
-    setServiceStatus("error", "Servicio local sin conexión");
+    setServiceStatus("error", serviceStatusMessage("error"));
   }
   renderCurrentView();
 }
@@ -1077,7 +1078,7 @@ async function saveScenario(): Promise<void> {
   try {
     const response = await validateSavedFile(file);
     if (response.kind !== "scenario" || !isSupportedVersion(response.value)) {
-      throw new Error("El servicio local no confirmó un escenario V1 o V2 completo. No se descargó el archivo.");
+      throw new Error(`El ${serviceName()} no confirmó un escenario V1 o V2 completo. No se descargó el archivo.`);
     }
     downloadText(file.name, json, "application/json");
     state.scenarioFileBytes = new TextEncoder().encode(json).buffer as ArrayBuffer;
@@ -1116,7 +1117,7 @@ async function exportCurrentCsv(selectedRunOnly = false): Promise<void> {
   const label = selectedRunOnly
     ? "Tablas de la réplica seleccionada"
     : state.completed.kind === "run" ? "Tablas de esta réplica" : "Tablas del experimento";
-  setPending("csv", `El servicio local está preparando ${label.toLowerCase()}.`);
+  setPending("csv", `El ${serviceName()} está preparando ${label.toLowerCase()}.`);
   try {
     const response = await exportCsv(request);
     clearCsvFiles();
@@ -1166,7 +1167,7 @@ async function selectExperimentReplication(): Promise<void> {
     if (result.scenario.scenario_id !== identity.scenarioId
       || result.root_seed !== experiment.root_seed
       || result.replication_index !== identity.replicationIndex) {
-      throw new Error("El servicio local respondió con otra identidad de réplica. El resultado anterior se mantiene.");
+      throw new Error(`El ${serviceName()} respondió con otra identidad de réplica. El resultado anterior se mantiene.`);
     }
     state.selectedRun = result;
     state.selection = identity;

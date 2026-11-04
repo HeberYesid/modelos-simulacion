@@ -2,6 +2,8 @@ import { escapeHtml, formatClockFromOpening } from "../domain/format";
 import { advance_playback_clock, create_playback_clock, pause, play, restart, seek, set_speed, type PlaybackSpeed } from "../replay/clock";
 import { observedEvents, observedSceneState, observedSceneTrace, observedTimeSeconds, observedVisits, observedWarnings, projectObservedVisit, type ObservedRecord, type ObservedVisit } from "../replay/observed";
 import { createShopScene, type ShopScene } from "../replay/scene";
+import { isPublicDemo } from "../deployment";
+import { renderPublicObservedDisclosure } from "./public-observed-disclosure";
 
 const memories = new Map<string, { time: number; record: string }>();
 let selectedVisitId: string | null = null;
@@ -12,6 +14,8 @@ const localClock = (visit: ObservedVisit, time: number): string => formatClockFr
 export interface ObservedSectionHandle { dispose(): void }
 
 export function renderObservedSection(): string {
+  if (isPublicDemo()) return renderPublicObservedDisclosure();
+
   return `<section class="work-surface results-surface observed-surface" aria-labelledby="observed-title">
     <div class="surface-heading"><div><h2 id="observed-title">Reproducir días medidos en 3D</h2>
       <p>Visitas del 20 y 23 de octubre de 2026. Sus registros ya están incluidos; no necesitas importar un archivo.</p></div></div>

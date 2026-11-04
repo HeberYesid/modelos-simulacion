@@ -1,0 +1,10 @@
+services:
+  - type: web
+    name: boquitas-simulacion
+    runtime: docker
+    plan: free
+    region: virginia
+    dockerfilePath: ./Dockerfile
+    dockerContext: .
+    healthCheckPath: /api/v1/health
+    autoDeployTrigger: "off"

@@ -1,4 +1,5 @@
 import type { ImportIssue } from "../api/types";
+import { serviceName } from "../deployment";
 
 const FIELD_LABELS: Record<string, string> = {
   "engine_config.cashiers": "cajeros",
@@ -77,7 +78,6 @@ const ISSUE_LABELS: Record<string, string> = {
 const SERVICE_ERROR_MESSAGES: Record<string, string> = {
   execution_cancelled: "La ejecución fue cancelada. El resultado anterior se conserva.",
   execution_timed_out: "La ejecución superó el tiempo disponible. Reduce la carga y vuelve a intentarlo.",
-  execution_busy: "El servicio local está atendiendo otra ejecución. Espera a que termine e inténtalo de nuevo.",
   experiment_workload_limit_exceeded: "La comparación supera el límite computacional. Reduce la cantidad de escenarios, réplicas o demanda.",
 };
 
@@ -137,6 +137,9 @@ export function issueMessage(code: string, path: string): string {
 }
 
 export function serviceErrorMessage(code: string | null): string | null {
+  if (code === "execution_busy") {
+    return `El ${serviceName()} está atendiendo otra ejecución. Espera a que termine e inténtalo de nuevo.`;
+  }
   return code ? SERVICE_ERROR_MESSAGES[code] ?? null : null;
 }
 
