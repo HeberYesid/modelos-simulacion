@@ -2,7 +2,7 @@
 
 Esta guía resume cómo preparar y usar la aplicación local. Para instrucciones detalladas de cada formulario y control, consulta el [manual completo en español](MANUAL_USUARIO.md). La [guía técnica](../technical/technical-guide.md) reúne instalación, comandos y versiones fijadas.
 
-Boquitas permite probar escenarios hipotéticos de llegada, pago, espera, preparación y entrega. **Los valores iniciales son sintéticos y no están calibrados con el negocio.**
+Boquitas permite analizar los registros de las dos visitas y probar escenarios hipotéticos de llegada, pago, espera, preparación y entrega. **Los escenarios iniciales son exploratorios y no están calibrados con el negocio.**
 
 Las operaciones V2 descritas aquí completaron la aceptación de ingeniería de las 28 tareas de Spec07, según su [informe de verificación](../../openspec/changes/boquitas-07-preparation-interruptions/verification-report.md). La calibración y validación empírica siguen pendientes.
 
@@ -36,6 +36,12 @@ El botón **Modo oscuro** de la barra superior cambia entre los temas claro y os
 
 ## Importar observaciones
 
+Las dos visitas ya están incluidas en **Datos observados → Visitas precargadas**: martes 20 de octubre (119 registros corregidos) y viernes 23 de octubre (16 registros). El informe del martes aparece al abrir la página. Selecciona un día para cambiar el informe y la reproducción, sin cargar archivos. Se conservan los tres retiros del martes, las correcciones y las advertencias de calidad.
+
+En **Escenarios → Escenarios de las visitas**, elige el martes o el viernes. Ambos quedan cargados al iniciar y conservan sus ediciones al cambiar de selección. Cada caso usa la ventana observada y el personal reportado. Las medias de llegadas, pago y preparación se calculan descriptivamente de los registros; la forma exponencial de las llegadas, los tiempos constantes de servicio, los grupos de una persona, el estado inicial vacío y la ausencia de retiros son supuestos de exploración. Los intervalos de servicio incluyen esperas o pausas desconocidas: no equivalen a trabajo activo. Ejecutar un caso genera una nueva simulación, no una reproducción exacta de la visita.
+
+Para revisar una fuente adicional:
+
 1. Abre **Datos observados** y selecciona un archivo CSV/TXT en UTF-8 de hasta 10 MiB, o pega el texto completo.
 2. Usa **Sin correcciones** para fuentes no reconocidas. El perfil aprobado se usa solo con sus archivos de referencia; no vuelvas a aplicar una corrección que ya esté reflejada en el archivo.
 3. Revisa conteos, campos desconocidos, exclusiones y conflictos antes de interpretar los registros.
@@ -59,7 +65,7 @@ La reproducción usa las marcas originales de la ventana observada: martes 16:45
 
 Todos estos valores son entradas sintéticas para aprender a usar el simulador:
 
-Para probarla sin cargar datos, en **Datos observados** pulsa **Preparar mi primera simulación**. La importación sigue disponible para revisar fuentes por separado.
+Para probarla, en **Escenarios** pulsa **Añadir demostración sintética**. La importación sigue disponible para revisar fuentes por separado.
 
 | Parámetro | Valor inicial |
 | --- | --- |

@@ -2,8 +2,6 @@ import { escapeHtml, formatClockFromOpening } from "../domain/format";
 import { advance_playback_clock, create_playback_clock, pause, play, restart, seek, set_speed, type PlaybackSpeed } from "../replay/clock";
 import { observedEvents, observedSceneState, observedSceneTrace, observedTimeSeconds, observedVisits, observedWarnings, projectObservedVisit, type ObservedRecord, type ObservedVisit } from "../replay/observed";
 import { createShopScene, type ShopScene } from "../replay/scene";
-import { isPublicDemo } from "../deployment";
-import { renderPublicObservedDisclosure } from "./public-observed-disclosure";
 
 const memories = new Map<string, { time: number; record: string }>();
 let selectedVisitId: string | null = null;
@@ -14,8 +12,6 @@ const localClock = (visit: ObservedVisit, time: number): string => formatClockFr
 export interface ObservedSectionHandle { dispose(): void }
 
 export function renderObservedSection(): string {
-  if (isPublicDemo()) return renderPublicObservedDisclosure();
-
   return `<section class="work-surface results-surface observed-surface" aria-labelledby="observed-title">
     <div class="surface-heading"><div><h2 id="observed-title">Reproducir días medidos en 3D</h2>
       <p>Visitas del 20 y 23 de octubre de 2026. Sus registros ya están incluidos; no necesitas importar un archivo.</p></div></div>
@@ -210,7 +206,7 @@ function mountPlayer(root: HTMLElement, visit: ObservedVisit): ObservedSectionHa
   return { dispose() { disposed = true; stop(); save(); abort.abort(); scene?.dispose(); scene = null; } };
 }
 
-export function mountObservedSection(root: HTMLElement): ObservedSectionHandle {
+export function mountObservedSection(root: HTMLElement, visitId?: string | null): ObservedSectionHandle {
   const surface = root.querySelector<HTMLElement>(".observed-surface")!;
   const slot = surface.querySelector<HTMLElement>("[data-observed-player]")!;
   const abort = new AbortController();
@@ -227,7 +223,7 @@ export function mountObservedSection(root: HTMLElement): ObservedSectionHandle {
     const visit = observedVisits.find((entry) => entry.visit_id === button?.dataset.observedVisit);
     if (visit) open(visit, true);
   }, { signal: abort.signal });
-  const selected = observedVisits.find((visit) => visit.visit_id === selectedVisitId);
+  const selected = observedVisits.find((visit) => visit.visit_id === (visitId ?? selectedVisitId));
   if (selected) open(selected, false);
   return { dispose() { abort.abort(); player?.dispose(); } };
 }

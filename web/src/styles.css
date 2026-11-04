@@ -794,6 +794,9 @@ a { color: var(--raspberry-ink); }
 .queue-model-table:focus-visible { outline: 2px solid var(--grape); outline-offset: 2px; }
 .queue-model-table .data-table { min-width: 32rem; }
 .queue-model-table tbody th { position: sticky; inset-inline-start: 0; white-space: normal; min-width: 11rem; }
+.visit-data-surface { padding: 1.4rem; margin-bottom: 1.5rem; }
+.visit-data-surface .button-row { justify-content: flex-start; gap: 0.65rem; }
+.visit-data-surface [aria-pressed="true"] { border-color: var(--grape-ink); }
 .observed-surface { margin-top: 1.5rem; min-width: 0; }
 .observed-surface h3 { margin-top: 1.2rem; }
 .observed-clock { display: grid; gap: 0.5rem; margin: 1rem 0; }

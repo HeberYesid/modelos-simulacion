@@ -5,6 +5,10 @@ import type { CompletedResult, ReplaySelection } from "./components/results";
 import { renderResultsView, renderExperimentChartForSelection, runFilename, experimentFilename, updateReplayTimeline } from "./components/results";
 import { renderObservationsView, type ObservationSourceMode } from "./components/observations";
 import { renderObservedSection, mountObservedSection, type ObservedSectionHandle } from "./components/observed-replay";
+import { preloadedVisitReport, renderVisitDataPicker, renderVisitScenarioPicker } from "./components/visit-data";
+import { observedVisits } from "./replay/observed";
+import { buildVisitScenario } from "./domain/visit-scenarios";
+import visitTemplate from "../contracts/fixtures/demo-scenario.json";
 import { renderObjectiveAnalysisContent } from "./components/scenario-analysis";
 import {
   addArrivalScheduleWindow,
@@ -34,7 +38,7 @@ import {
   validateInitialPersonLimits,
 } from "./components/scenario-editor";
 import { renderShell, setActiveView, setDirty, announce, type MainView } from "./components/shell";
-import { isPublicDemo, serviceName, serviceReference, serviceStatusMessage } from "./deployment";
+import { serviceName, serviceReference, serviceStatusMessage } from "./deployment";
 import type { ApiSchema, CsvExportRequest, ExperimentRequest, RunRequest } from "./api/types";
 import { fieldLabel, systemAssumption } from "./domain/errors";
 import { ANALYSIS_OBJECTIVES, type AnalysisObjective } from "./domain/scenario-analysis";
@@ -84,6 +88,7 @@ interface AppState {
   cleanReplications: number;
   observationMode: ObservationSourceMode;
   observations: ApiSchema<"ImportReport"> | null;
+  preloadedVisitId: string | null;
   observationFailureReport: ApiSchema<"ImportReport"> | null;
   observationError: string | null;
   scenarioError: string | null;
@@ -105,19 +110,22 @@ interface AppState {
   scenarioFileJson: string | null;
 }
 
+const initialVisitScenarios = observedVisits.map(visit => scenarioToDraft(buildVisitScenario(visit, visitTemplate as Scenario)));
+
 const state: AppState = {
-  view: isPublicDemo() ? "scenario" : "observations",
-  scenarios: [],
+  view: "observations",
+  scenarios: initialVisitScenarios,
   activeScenarioIndex: 0,
   replications: 30,
   advancedOptionsOpen: null,
   comparisonOptionsOpen: null,
   modelHelpOpen: null,
   resetDisclosureCapture: false,
-  cleanScenarioJson: [],
+  cleanScenarioJson: initialVisitScenarios.map(scenario => scenarioWireJson(scenario)!),
   cleanReplications: 30,
   observationMode: "file",
-  observations: null,
+  observations: preloadedVisitReport(observedVisits[0].visit_id),
+  preloadedVisitId: observedVisits[0].visit_id,
   observationFailureReport: null,
   observationError: null,
   scenarioError: null,
@@ -286,8 +294,9 @@ function renderCurrentView(focusRoot = false): void {
       pending: state.pending === "import",
       error: state.observationError,
       measuredReplayMarkup: renderObservedSection(),
+      preloadedVisitsMarkup: renderVisitDataPicker(state.preloadedVisitId, state.pending !== null),
     });
-    if (!isPublicDemo()) activeObservedSection = mountObservedSection(root);
+    activeObservedSection = mountObservedSection(root, state.preloadedVisitId);
   } else if (state.view === "scenario") {
     const scenario = activeScenario();
     const comparisonIssue = state.scenarioIssues.some((issue) => issue.path.startsWith("scenarios."));
@@ -306,7 +315,10 @@ function renderCurrentView(focusRoot = false): void {
       error: state.scenarioError ?? state.jsonError,
       failedFields: state.scenarioIssues,
     }) : renderScenarioUnavailable();
-    if (scenario) bindScenarioDisclosureState(root);
+    if (scenario) {
+      root.querySelector(".page-intro")?.insertAdjacentHTML("afterend", renderVisitScenarioPicker(state.pending !== null));
+      bindScenarioDisclosureState(root);
+    }
   } else {
     root.innerHTML = renderResultsView({
       completed: state.completed,
@@ -388,22 +400,28 @@ function handleHealth(): void {
   );
 }
 
-async function loadDemoScenario(): Promise<void> {
+async function loadDemoScenario(append = false): Promise<void> {
   state.scenarioError = null;
   setServiceStatus("checking", serviceStatusMessage("checking"));
   renderCurrentView();
   try {
     const response = await loadDemo();
     const demo = formatSystemScenario(response.scenario);
-    state.scenarios = [demo];
-    state.activeScenarioIndex = 0;
-    state.replications = response.replications;
+    if (append) {
+      const index = state.scenarios.findIndex(scenario => scenario.scenario_id === demo.scenario_id);
+      if (index < 0) state.scenarios.push(demo);
+      state.activeScenarioIndex = index < 0 ? state.scenarios.length - 1 : index;
+    } else {
+      state.scenarios = [demo];
+      state.activeScenarioIndex = 0;
+      state.replications = response.replications;
+      state.cleanScenarioJson = [scenarioWireJson(demo) ?? JSON.stringify(response.scenario)];
+      state.cleanReplications = response.replications;
+    }
     state.advancedOptionsOpen = null;
     state.comparisonOptionsOpen = null;
     state.modelHelpOpen = null;
     state.resetDisclosureCapture = true;
-    state.cleanScenarioJson = [scenarioWireJson(demo) ?? JSON.stringify(response.scenario)];
-    state.cleanReplications = response.replications;
     state.scenarioFileBytes = null;
     state.scenarioFileJson = null;
     state.scenarioError = null;
@@ -957,6 +975,7 @@ async function importSource(event: SubmitEvent): Promise<void> {
       state.observationError = "La fuente produjo diagnósticos, pero no se aceptó una vista normalizada para interpretación.";
     } else {
       state.observations = report;
+      state.preloadedVisitId = null;
       state.observationFailureReport = null;
       state.observationError = null;
     }
@@ -1402,6 +1421,29 @@ function handleClick(event: MouseEvent): void {
       renderCurrentView();
       document.querySelector<HTMLButtonElement>(`[data-source-mode="${mode}"]`)?.focus();
     }
+  } else if (button.matches("[data-visit-report], [data-observed-visit]")) {
+    if (state.pending) return;
+    const visitId = button.dataset.visitReport ?? button.dataset.observedVisit ?? "";
+    const report = preloadedVisitReport(visitId);
+    if (!report) return;
+    state.observations = report;
+    state.preloadedVisitId = visitId;
+    state.observationError = null;
+    state.observationFailureReport = null;
+    renderCurrentView();
+  } else if (button.matches("[data-visit-scenario]")) {
+    if (state.pending) return;
+    const visit = observedVisits.find(item => item.visit_id === button.dataset.visitScenario);
+    if (!visit) return;
+    const preset = scenarioToDraft(buildVisitScenario(visit, visitTemplate as Scenario));
+    let index = state.scenarios.findIndex(scenario => scenario.scenario_id === preset.scenario_id);
+    if (index < 0) {
+      state.scenarios.push(preset);
+      index = state.scenarios.length - 1;
+    }
+    chooseScenarioTab(index);
+  } else if (button.matches("[data-load-synthetic]")) {
+    if (!state.pending) void loadDemoScenario(true);
   } else if (button.matches("[data-cancel-execution]")) {
     void cancelActiveExecution();
   } else if (button.matches("[data-run-scenario]")) {
@@ -1673,7 +1715,6 @@ function startApp(): void {
   document.addEventListener("submit", handleSubmit);
   document.addEventListener("change", handleFileChange);
   handleHealth();
-  void loadDemoScenario();
 }
 
 startApp();

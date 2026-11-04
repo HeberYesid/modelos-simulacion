@@ -1,6 +1,6 @@
 # Boquitas
 
-Local academic discrete-event simulation of an ice cream shop. The Python backend runs scenarios and experiments; the TypeScript web interface displays results and trace-driven 3D replay. Default inputs are synthetic teaching examples. Software verification does not establish calibration or empirical validation.
+Local academic discrete-event simulation of an ice cream shop. The Python backend runs scenarios and experiments; the TypeScript web interface displays results and trace-driven 3D replay. The application preloads both measured visits and editable exploratory scenarios with explicit assumptions. Software verification does not establish calibration or empirical validation.
 
 ## Start here
 

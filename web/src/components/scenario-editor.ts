@@ -1009,7 +1009,7 @@ export function renderScenarioView(options: {
   return `
     <div class="page-intro">
       <h1>Escenarios</h1>
-      <p>Una réplica ejecuta esta configuración una vez. Los valores son sintéticos y no están calibrados con la tienda.</p>
+      <p>Una réplica ejecuta esta configuración una vez. Revisa su procedencia y sus supuestos; los escenarios no están calibrados con la tienda.</p>
       <p class="help-text">Límites de cómputo: ${WORK_LIMITS.max_workers_per_pool} personas por equipo, ${WORK_LIMITS.max_group_size} por grupo, ${WORK_LIMITS.max_initial_orders} órdenes iniciales y ${WORK_LIMITS.max_new_orders} órdenes nuevas por réplica. La carga real también se limita a ${WORK_LIMITS.max_people_per_run} personas por ejecución. No representan la capacidad de la tienda.</p>
     </div>
     ${errorPanel}

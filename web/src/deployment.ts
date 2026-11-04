@@ -21,7 +21,7 @@ export function serviceStatusMessage(status: ServiceStatus): string {
 
 export function processingDisclosure(): string {
   if (isPublicDemo()) {
-    return "Demostración pública · escenarios sintéticos; las simulaciones y los archivos importados se procesan en el servidor.";
+    return "Demostración pública · visitas medidas y escenarios exploratorios sin calibrar; las simulaciones y los archivos importados se procesan en el servidor.";
   }
   return "Procesamiento local · sin envío externo";
 }

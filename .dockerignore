@@ -13,13 +13,14 @@
 !web/vite.config.ts
 !web/contracts/
 !web/contracts/work-limits.json
+!web/contracts/fixtures/
+!web/contracts/fixtures/demo-scenario.json
 !web/src/
 !web/src/**
 !web/public/
 !web/public/**
 
-# The public build resolves this import to the empty public archive.
-web/src/replay/observed-visits.json
+# The public application includes the two authorized measured visits.
 **/__pycache__/
 **/*.pyc
 **/.env*

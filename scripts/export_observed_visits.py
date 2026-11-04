@@ -4,6 +4,7 @@ import argparse
 import csv
 import hashlib
 import json
+from io import StringIO
 from pathlib import Path
 from typing import Any
 
@@ -141,6 +142,10 @@ def main() -> int:
     )
     parser.add_argument("--evidence", type=Path, default=DEFAULT_EVIDENCE)
     parser.add_argument("--output", type=Path, default=DEFAULT_OUTPUT)
+    parser.add_argument(
+        "--reports-output", type=Path,
+        help="also export native import reports for both visits",
+    )
     parser.add_argument("--check", action="store_true", help="fail if output differs; do not write")
     args = parser.parse_args()
 
@@ -148,15 +153,37 @@ def main() -> int:
     exported = build_export(evidence)
     total_records = sum(len(visit["records"]) for visit in exported["visits"])
     content = json.dumps(exported, ensure_ascii=False, indent=2) + "\n"
-    if args.check:
-        if not args.output.exists() or args.output.read_text(encoding="utf-8") != content:
-            raise SystemExit(f"Observed replay data is stale: {args.output}")
-        print(f"Verified {total_records} source records and {args.output}")
-        return 0
+    outputs = [(args.output, content)]
+    if args.reports_output:
+        from boquitas.observation_import import APPROVED_CORRECTION_PROFILE, import_observations
 
-    args.output.parent.mkdir(parents=True, exist_ok=True)
-    args.output.write_text(content, encoding="utf-8", newline="\n")
-    print(f"Exported {total_records} source records to {args.output}")
+        visits = []
+        for visit in exported["visits"]:
+            buffer = StringIO(newline="")
+            writer = csv.DictWriter(buffer, fieldnames=RAW_FIELDS, lineterminator="\n")
+            writer.writeheader()
+            writer.writerows(record["raw_fields"] for record in visit["records"])
+            policy = APPROVED_CORRECTION_PROFILE if visit["date"] == "2026-10-20" else "none"
+            report = import_observations(
+                buffer.getvalue().encode("utf-8"),
+                source_name=f"Visita {visit['date']} · {visit['label']}",
+                correction_policy=policy,
+            )
+            if report.fatal_error or len(report.normalized_rows) != len(visit["records"]):
+                raise ValueError(f"Visit audit failed for {visit['visit_id']}")
+            visits.append({"visit_id": visit["visit_id"], "report": report.model_dump(mode="json")})
+        reports_content = json.dumps({"visits": visits}, ensure_ascii=False, indent=2) + "\n"
+        outputs.append((args.reports_output, reports_content))
+
+    for path, output in outputs:
+        if args.check:
+            if not path.exists() or path.read_text(encoding="utf-8") != output:
+                raise SystemExit(f"Observed visit export is stale: {path}")
+        else:
+            path.parent.mkdir(parents=True, exist_ok=True)
+            path.write_text(output, encoding="utf-8", newline="\n")
+    action = "Verified" if args.check else "Exported"
+    print(f"{action} {total_records} source records and {len(outputs)} artifacts")
     return 0
 
 

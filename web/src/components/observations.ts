@@ -169,15 +169,16 @@ export function renderObservationsView(options: {
   pending: boolean;
   error: string | null;
   measuredReplayMarkup?: string;
+  preloadedVisitsMarkup?: string;
 }): string {
   const panelFile = options.mode === "file";
   const firstUse = options.report === null && options.failureReport === null;
   return `
     <div class="page-intro">
       <h1>Datos observados</h1>
-      <p>Importa registros de caja o entrega. Se revisan sin convertirlos en parámetros del modelo.</p>
+      <p>Analiza las visitas precargadas o importa registros de caja y entrega. Los informes descriptivos se mantienen separados de las simulaciones.</p>
     </div>
-    ${options.measuredReplayMarkup ?? ""}
+    ${options.preloadedVisitsMarkup ?? ""}
     ${firstUse ? `
       <section class="work-surface observations-starter" aria-labelledby="first-run-title">
         <div><h2 id="first-run-title">¿Primera vez? Empieza con una simulación</h2>
@@ -230,5 +231,6 @@ export function renderObservationsView(options: {
         ${options.failureReport ? renderReport(options.failureReport) : ""}
         ${options.report ? renderReport(options.report) : ""}
       </div>
-    </div>`;
+    </div>
+    ${options.measuredReplayMarkup ?? ""}`;
 }
