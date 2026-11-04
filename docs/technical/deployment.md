@@ -5,6 +5,9 @@ application together in one container. It uses synthetic demonstration scenarios
 it does not imply calibration or empirical validation. It is a working application,
 not a static recording of results.
 
+Live instance: [Boquitas](https://boquitas-simulacion.onrender.com).
+See the [publication verification record](../verification/public-deployment-2026-11-03.md).
+
 ## Build and runtime
 
 `Dockerfile` installs the locked Python and frontend dependencies in separate build
@@ -55,6 +58,12 @@ results; unsaved browser state is lost when the page is refreshed.
 `render.yaml` declares one Docker web service on the Free plan in Virginia, with
 `/api/v1/health` as its HTTP health check. Automatic redeploys are disabled so a
 future Git push does not itself publish another version.
+
+The current service was created through the Render integration, whose create
+operation does not expose `healthCheckPath` and does not automatically apply the
+Blueprint. Its platform health check therefore uses the default configuration;
+the public `/api/v1/health` endpoint was separately verified with HTTP 200.
+Use the Blueprint workflow when configuring that HTTP path on a new service.
 
 After local acceptance and explicit confirmation of the Render workspace and
 Git publication operation, publish the reviewed deployment files to the approved

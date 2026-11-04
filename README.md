@@ -4,6 +4,7 @@ Local academic discrete-event simulation of an ice cream shop. The Python backen
 
 ## Start here
 
+- [Public application with synthetic examples](https://boquitas-simulacion.onrender.com)
 - [Spanish quick guide](docs/user/guia-de-uso.md)
 - [Spanish user manual](docs/user/MANUAL_USUARIO.md)
 - [Technical guide: installation, startup and verification](docs/technical/technical-guide.md)
