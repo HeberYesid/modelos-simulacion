@@ -39,9 +39,12 @@ describe("finite-run stage performance", () => {
     expect(report.stages).toHaveLength(2);
     expect(report.stages[0]).toMatchObject({ id: "payment", L: 0.8, Lq: 0.2,
       WSeconds: 4, WqSeconds: 1, rho: 0.6, timeSamples: 2, waitSamples: 2 });
+    expect(report.stages[0]).toMatchObject({ pOccupied: 0.6, pEmpty: 0.4 });
     expect(report.stages[1]).toMatchObject({ id: "preparation", L: 1.1, Lq: 0.2,
       WSeconds: 7.5, WqSeconds: 2.5, rho: 0.9, timeSamples: 2, waitSamples: 2 });
+    expect(report.stages[1]).toMatchObject({ pOccupied: 0.9, pEmpty: 0.1 });
     expect(report.total).toMatchObject({ L: 1.9, Lq: 0.4, WSeconds: 11.5, WqSeconds: 3.5 });
+    expect(report.total).toMatchObject({ pOccupied: 1, pEmpty: 0 });
   });
 
   it("keeps Friday as one integrated stage including payment and preparation", () => {
@@ -52,6 +55,7 @@ describe("finite-run stage performance", () => {
     expect(report.stages).toHaveLength(1);
     expect(report.stages[0]).toMatchObject({ id: "integrated", L: 1.9, Lq: 0.2,
       WSeconds: 11.5, WqSeconds: 1, rho: 0.8, timeSamples: 2 });
+    expect(report.stages[0]).toMatchObject({ pOccupied: 1, pEmpty: 0 });
   });
 
   it("shows absent completion times as unavailable while retaining occupancy and withdrawals", () => {

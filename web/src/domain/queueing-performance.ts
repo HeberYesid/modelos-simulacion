@@ -8,6 +8,8 @@ export interface SimulatedQueueMeasures {
   WSeconds: number | null;
   WqSeconds: number | null;
   rho: number | null;
+  pOccupied: number | null;
+  pEmpty: number | null;
   timeSamples: number;
   waitSamples: number;
 }
@@ -35,6 +37,8 @@ export function calculateQueuePerformance(run: RunResult): {
   const waiting = { ...counts };
   const area = { ...counts };
   const queueArea = { ...counts };
+  const emptyArea = { ...counts };
+  let systemEmptyArea = 0;
   const present = new Map<string, Presence>();
   const update = (orderId: string, next: Presence | null): void => {
     const previous = present.get(orderId);
@@ -53,7 +57,9 @@ export function calculateQueuePerformance(run: RunResult): {
     for (const id of ids) {
       area[id] += counts[id] * (end - cursor);
       queueArea[id] += waiting[id] * (end - cursor);
+      if (counts[id] === 0) emptyArea[id] += end - cursor;
     }
+    if (ids.every((id) => counts[id] === 0)) systemEmptyArea += end - cursor;
     cursor = end;
   };
   if (validWindow) {
@@ -115,6 +121,8 @@ export function calculateQueuePerformance(run: RunResult): {
       id, L: validWindow ? area[id] / horizon : null, Lq: validWindow ? queueArea[id] / horizon : null,
       WSeconds: mean(times), WqSeconds: mean(waits),
       rho: fraction != null && Number.isFinite(fraction) && fraction >= 0 && fraction <= 1 ? fraction : null,
+      pOccupied: validWindow ? 1 - emptyArea[id] / horizon : null,
+      pEmpty: validWindow ? emptyArea[id] / horizon : null,
       timeSamples: times.length, waitSamples: waits.length,
     };
   });
@@ -126,6 +134,8 @@ export function calculateQueuePerformance(run: RunResult): {
       id: "total", L: validWindow ? ids.reduce((sum, id) => sum + area[id], 0) / horizon : null,
       Lq: validWindow ? ids.reduce((sum, id) => sum + queueArea[id], 0) / horizon : null,
       WSeconds: mean(totalTimes), WqSeconds: mean(totalWaits), rho: null,
+      pOccupied: validWindow ? 1 - systemEmptyArea / horizon : null,
+      pEmpty: validWindow ? systemEmptyArea / horizon : null,
       timeSamples: totalTimes.length, waitSamples: totalWaits.length,
     },
   };

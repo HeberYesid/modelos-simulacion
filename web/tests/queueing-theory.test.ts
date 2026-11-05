@@ -79,6 +79,29 @@ describe("calculateMmQueue", () => {
 });
 
 describe("analyzeQueueScenario", () => {
+  it("estimates nominal stability without applying M/M formulas to non-exponential service", () => {
+    const stages = analyzeQueueScenario(scenario({
+      interarrival: constant(60),
+      payment_active: constant(60),
+      preparation: constant(30),
+      transfer_probability: 0.5,
+      transfer_confirmation: constant(60),
+    }));
+    expect(stages[0]).toMatchObject({ nominalRho: 1, measures: null });
+    expect(stages[1]).toMatchObject({ nominalRho: 0.5, measures: null });
+  });
+
+  it("keeps a short overloaded band visible even when average demand fits", () => {
+    const [payment] = analyzeQueueScenario(scenario({
+      payment_active: constant(60),
+      arrival_schedule: [
+        { start_s: 0, end_s: 3600, orders_per_hour: 100 },
+        { start_s: 3600, end_s: 28800, orders_per_hour: 20 },
+      ],
+    }));
+    expect(payment).toMatchObject({ nominalRho: 0.5, measures: null });
+    expect(payment?.peakRho).toBeCloseTo(5 / 3);
+  });
   it("analyzes Tuesday payment and preparation as separate stages", () => {
     const stages = analyzeQueueScenario(scenario());
     expect(stages.map(({ id, servers, applicability }) => [id, servers, applicability])).toEqual([

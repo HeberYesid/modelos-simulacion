@@ -9,6 +9,19 @@ test("both visits are ready for audit and independent exploratory simulations", 
   await expect(page.getByRole("heading", { name: "Visitas precargadas", exact: true })).toBeVisible();
   await expect(page.locator(".audit-result")).toContainText("119");
   await expect(page.locator(".audit-result")).toContainText("6 intervalos de entrega coinciden");
+  const metrics = page.locator(".observed-visit-metrics");
+  await expect(metrics).toHaveCount(2);
+  for (const [index, day] of ["Martes", "Viernes"].entries()) {
+    const visitMetrics = metrics.nth(index);
+    await expect(visitMetrics.locator("summary")).toContainText(day);
+    await visitMetrics.locator("summary").click();
+    const stations = visitMetrics.locator("[data-observed-station]");
+    await expect(stations).toHaveCount(2);
+    for (const station of await stations.all()) {
+      await expect(station.locator("dt")).toHaveText([/^Lq ·/, /^L ·/, /^Wq ·/, /^W ·/, /^P\(ocupada\)/, /^P\(vacía\)/]);
+      await expect(station.locator("dd").first()).toBeVisible();
+    }
+  }
   await page.locator('[data-visit-report="visit_2026-10-23_regular"]').click();
   await expect(page.locator(".audit-result")).toContainText("16");
   await expect(page.locator(".audit-result")).toContainText("2026-10-23");

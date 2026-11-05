@@ -537,7 +537,7 @@ a { color: var(--raspberry-ink); }
 .form-footer-copy .help-text { margin: 0; }
 .form-footer .inline-actions { margin-left: auto; }
 #scenario-form { scroll-padding-top: 9rem; }
-#scenario-form :is(input, select, textarea, summary) { scroll-margin-top: 9rem; }
+#scenario-form :is(input, select, textarea, summary, .live-simulation, [data-open-live-result]) { scroll-margin-top: 9rem; }
 .assumption-list { margin: 0.5rem 0 0; padding-left: 1.1rem; color: var(--muted); font-size: 0.84rem; line-height: 1.55; }
 .side-surface { padding: 1rem; }
 .side-surface h2 { margin: 0; font-family: var(--display); font-size: 1rem; }
@@ -830,3 +830,18 @@ a { color: var(--raspberry-ink); }
   .menu-product-name { padding-bottom: 0; }
   .arrival-window { padding-right: 0.65rem; padding-left: 0.65rem; }
 }
+
+.live-simulation h2 { margin: 0 0 0.6rem; }
+.live-simulation p { margin: 0.55rem 0; }
+.live-metrics-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 11rem), 1fr));
+  gap: 0.5rem;
+  margin: 0.75rem 0;
+}
+.live-metrics-grid > div {
+  padding: 0.5rem 0.65rem;
+  border-inline-start: 2px solid var(--grape);
+}
+.live-metrics-grid dt { color: var(--muted); }
+.live-metrics-grid dd { margin: 0; font-weight: 650; }

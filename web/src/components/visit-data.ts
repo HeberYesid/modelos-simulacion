@@ -1,7 +1,8 @@
 import type { ImportReport } from "../api/types";
 import reports from "../replay/visit-import-reports.json";
 import { observedVisits } from "../replay/observed";
-import { escapeHtml } from "../domain/format";
+import { escapeHtml, formatNumber } from "../domain/format";
+import { calculateObservedQueueMeasures } from "../domain/observed-queue-metrics";
 
 const archive = reports as unknown as { visits: Array<{ visit_id: string; report: ImportReport }> };
 
@@ -15,6 +16,30 @@ export function visitShortLabel(date: string): string {
 }
 
 export function renderVisitDataPicker(selectedVisitId: string | null, pending: boolean): string {
+  const visitMetrics = observedVisits.map((visit) => {
+    const measures = calculateObservedQueueMeasures(visit);
+    const value = (number: number | null, suffix = "") => number === null
+      ? "No disponible"
+      : `${formatNumber(number, 2)}${suffix}`;
+    const stations = measures.map((measure) => `<div class="queue-model-stage" data-observed-station="${measure.station}">
+      <h4>${measure.station === "caja" ? "Caja" : "Entrega"}</h4>
+      <dl class="event-detail">
+        <div><dt>Lq · promedio esperando</dt><dd>${value(measure.Lq, " órdenes")}</dd></div>
+        <div><dt>L · promedio en la estación</dt><dd>${value(measure.L, " órdenes")}</dd></div>
+        <div><dt>Wq · espera media observada</dt><dd>${value(measure.WqSeconds, " s")}</dd></div>
+        <div><dt>W · tiempo medio registrado</dt><dd>${value(measure.WSeconds, " s")}</dd></div>
+        <div><dt>P(ocupada) · alguna orden registrada</dt><dd>${value(measure.pOccupied === null ? null : measure.pOccupied * 100, " %")}</dd></div>
+        <div><dt>P(vacía) · ninguna orden registrada</dt><dd>${value(measure.pEmpty === null ? null : measure.pEmpty * 100, " %")}</dd></div>
+      </dl>
+      <p class="help-text">W y Wq usan ${measure.completedOrders} registros con llegada, inicio y fin conocidos.</p>
+    </div>`).join("");
+    return `<details class="details-block observed-visit-metrics">
+      <summary>Indicadores observados · ${escapeHtml(visitShortLabel(visit.date))}</summary>
+      <div class="queue-model-list">${stations}</div>
+      <p class="provenance-line">L y Lq se calculan durante el intervalo observado. P(ocupada) mide el porcentaje de tiempo con alguna orden registrada en la estación, en fila o en servicio. Los valores describen los registros disponibles.</p>
+      <p class="provenance-line">ρ y estabilidad del negocio: no estimables con estas visitas. Faltan datos de capacidad efectiva, trabajo activo y cobertura de las llegadas. El martes había una fila inicial sin conteo y hay marcas superpuestas en entrega. El viernes se registró una pausa durante la preparación.</p>
+    </details>`;
+  }).join("");
   return `<section class="work-surface visit-data-surface" aria-labelledby="visit-data-title">
     <div class="surface-heading"><div><h2 id="visit-data-title">Visitas precargadas</h2>
       <p>Los registros de las dos visitas ya están listos para analizar. Elige un día para consultar su informe.</p></div></div>
@@ -22,6 +47,7 @@ export function renderVisitDataPicker(selectedVisitId: string | null, pending: b
       ${observedVisits.map(visit => `<button type="button" class="secondary-button" data-visit-report="${escapeHtml(visit.visit_id)}" aria-pressed="${visit.visit_id === selectedVisitId}" ${pending ? "disabled" : ""}>${visitShortLabel(visit.date)} · ${visit.records.length} registros</button>`).join("")}
     </div>
     <p class="help-text">Son registros de estación, no cantidades de personas. Los informes conservan los retiros, correcciones y advertencias de calidad.</p>
+    ${visitMetrics}
     <button type="button" class="quiet-button" data-go-view="scenario">Ver escenarios de las visitas</button>
   </section>`;
 }

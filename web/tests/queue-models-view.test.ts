@@ -48,8 +48,12 @@ describe("queue model presentation", () => {
     expect(document.querySelector('[data-queue-stage="preparation"] [data-model-reference]')?.textContent).toContain("M/M/1");
     expect(document.querySelectorAll('[data-queue-stage="total"]')).toHaveLength(1);
     expect(document.body.textContent).toContain("Lq · órdenes esperando");
+    expect(document.body.textContent).toContain("P(etapa de pago con órdenes)");
+    expect(document.body.textContent).toContain("P(sistema sin órdenes)");
+    expect(document.querySelector("[data-system-load-status]")?.textContent).toContain("Estable");
+    expect(document.querySelector('[data-queue-stage="payment"] [data-load-status]')?.textContent).toContain("ρ nominal");
     expect(document.body.textContent).toContain("vaciado después del cierre");
-    expect(document.querySelectorAll('th[scope="row"]')).toHaveLength(14);
+    expect(document.querySelectorAll('th[scope="row"]')).toHaveLength(20);
     expect(document.querySelectorAll('[role="region"][tabindex="0"]')).toHaveLength(3);
   });
 

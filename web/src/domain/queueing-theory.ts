@@ -25,6 +25,8 @@ export interface QueueStageTheory {
   lambdaPerHour: number | null;
   muPerHour: number | null;
   rateNotes: string[];
+  nominalRho: number | null;
+  peakRho: number | null;
   measures: QueueMeasures | null;
 }
 
@@ -172,6 +174,15 @@ function stage(
   const reasons = [...(options.reasons ?? [])];
   const rateNotes = [...(options.rateNotes ?? [])];
   const muPerHour = rateFromMeanSeconds(serviceMeanSeconds);
+  const load = (rate: number | null): number | null => {
+    if (rate === null || options.forceUnavailableReason) return null;
+    const rho = rate / SECONDS_PER_HOUR * (serviceMeanSeconds / servers);
+    return Number.isFinite(rho) && rho >= 0 ? rho : null;
+  };
+  const nominalRho = load(lambda);
+  const peakRho = scenario.arrival_schedule?.length
+    ? load(Math.max(...scenario.arrival_schedule.map((period) => period.orders_per_hour)))
+    : null;
   if (scenario.patience) rateNotes.push("La paciencia puede reducir las llegadas efectivas a las etapas posteriores por abandono.");
   if (id === "preparation") rateNotes.push("λ corresponde a la demanda externa nominal; las llegadas a preparación dependen de las salidas de pago.");
   if (muPerHour === null) rateNotes.push("μ no se puede calcular porque la media de servicio no es finita y positiva.");
@@ -198,19 +209,19 @@ function stage(
   if (disqualifying || options.forceUnavailableReason || measures === null || measures.status === "invalid") {
     return {
       id, label, model: servers === 1 ? "M/M/1" : "M/M/s", servers,
-      applicability: "unavailable", reasons, lambdaPerHour: lambda, muPerHour, rateNotes, measures: null,
+      applicability: "unavailable", reasons, lambdaPerHour: lambda, muPerHour, rateNotes, nominalRho, peakRho, measures: null,
     };
   }
   if (options.approximation) {
     reasons.push("Se muestra como referencia M/M; el servicio agregado combina componentes y no es exponencial.");
     return {
       id, label, model: servers === 1 ? "M/M/1" : "M/M/s", servers,
-      applicability: "approximation", reasons, lambdaPerHour: lambda, muPerHour, rateNotes, measures,
+      applicability: "approximation", reasons, lambdaPerHour: lambda, muPerHour, rateNotes, nominalRho, peakRho, measures,
     };
   }
   return {
     id, label, model: servers === 1 ? "M/M/1" : "M/M/s", servers,
-    applicability: "applicable", reasons, lambdaPerHour: lambda, muPerHour, rateNotes, measures,
+    applicability: "applicable", reasons, lambdaPerHour: lambda, muPerHour, rateNotes, nominalRho, peakRho, measures,
   };
 }
 
@@ -278,4 +289,15 @@ export function analyzeQueueScenario(scenario: Scenario): QueueStageTheory[] {
     "integrated", "Atención integrada", workers, lambda, serviceMean, combinedExponential, scenario,
     { approximation: !combinedExponential, aggregateService: true, reasons: stageReasons, rateNotes: arrival.notes },
   )];
+}
+
+export function queueLoadStatus(stages: QueueStageTheory[]): string {
+  if (stages.some((stage) => stage.nominalRho !== null && stage.nominalRho >= 1)) return "Inestable";
+  if (stages.some((stage) => stage.peakRho !== null && stage.peakRho >= 1)) return "Inestable en alguna franja";
+  if (stages.some((stage) => stage.nominalRho === null)) return "Estabilidad no estimable";
+  return "Estable";
+}
+
+export function queueStageLoadStatus(stage: QueueStageTheory): string {
+  return queueLoadStatus([stage]);
 }

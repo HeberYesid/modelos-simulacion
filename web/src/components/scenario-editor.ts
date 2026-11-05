@@ -20,8 +20,8 @@ const WORK_LIMITS = workLimits;
 export type DistributionKey = "interarrival" | "payment_active" | "preparation" | "transfer_confirmation" | "patience";
 
 const DISTRIBUTIONS: Array<{ key: Exclude<DistributionKey, "patience">; title: string; note: string }> = [
-  { key: "interarrival", title: "Tiempo entre llegadas", note: "Primera llegada después de la apertura" },
-  { key: "payment_active", title: "Pago", note: "Un cobro por orden" },
+  { key: "interarrival", title: "Tiempo entre llegadas", note: "Segundos entre órdenes nuevas. Un intervalo menor trae más órdenes." },
+  { key: "payment_active", title: "Pago", note: "Segundos que una persona del equipo dedica a cobrar una orden." },
   { key: "preparation", title: "Preparación", note: "Un tiempo completo por orden; no depende del tamaño del grupo" },
 ];
 
@@ -739,9 +739,11 @@ function staffMarkup(scenario: ScenarioDraft): string {
   return `
     <div class="field-grid">
       <div class="field"><label for="cashiers">Cajeros</label>
-        <input id="cashiers" type="number" min="1" max="${WORK_LIMITS.max_workers_per_pool}" step="1" required name="cashiers" data-integer-field data-scenario-field="engine_config.cashiers" value="${inputValue(config.cashiers, 0)}"></div>
+        <input id="cashiers" type="number" min="1" max="${WORK_LIMITS.max_workers_per_pool}" step="1" required name="cashiers" data-integer-field data-scenario-field="engine_config.cashiers" value="${inputValue(config.cashiers, 0)}">
+        <p class="help-text">Cuántas órdenes pueden cobrarse al mismo tiempo.</p></div>
       <div class="field"><label for="preparers">Preparadores</label>
-        <input id="preparers" type="number" min="1" max="${WORK_LIMITS.max_workers_per_pool}" step="1" required name="preparers" data-integer-field data-scenario-field="engine_config.preparers" value="${inputValue(config.preparers, 0)}"></div>
+        <input id="preparers" type="number" min="1" max="${WORK_LIMITS.max_workers_per_pool}" step="1" required name="preparers" data-integer-field data-scenario-field="engine_config.preparers" value="${inputValue(config.preparers, 0)}">
+        <p class="help-text">Cuántas órdenes pueden prepararse al mismo tiempo.</p></div>
     </div>`;
 }
 
@@ -963,9 +965,11 @@ export function renderScenarioView(options: {
             <div class="field-grid">
               <div class="field"><label for="scenario-id">Identificador</label>
                 <input id="scenario-id" type="text" required maxlength="100" name="scenario_id" data-scenario-field="scenario_id" value="${escapeHtml(scenario.scenario_id)}">
+                <p class="help-text">Código para distinguir este escenario en archivos y comparaciones.</p>
               </div>
               <div class="field"><label for="scenario-name">Nombre visible</label>
                 <input id="scenario-name" type="text" required maxlength="120" name="display_name" data-scenario-field="display_name" value="${escapeHtml(scenario.display_name)}">
+                <p class="help-text">Nombre que aparece en pantalla y en los resultados.</p>
               </div>
             </div>
             <p class="help-text">Procedencia: <strong>${escapeHtml(translateEnum(scenario.provenance))}</strong>. Los cambios son supuestos.</p>
@@ -1026,6 +1030,19 @@ export function renderScenarioView(options: {
           </div>
         </div>
 
+        <section class="scenario-section live-simulation" aria-labelledby="live-simulation-title">
+          <h2 id="live-simulation-title">Simulación en vivo</h2>
+          <label class="checkbox-row" for="live-simulation-enabled">
+            <input id="live-simulation-enabled" type="checkbox" data-live-toggle aria-describedby="live-simulation-help">
+            <span>Actualizar simulación en vivo</span>
+          </label>
+          <p id="live-simulation-help" class="help-text">Cada cambio válido vuelve a ejecutar la réplica con la semilla del escenario. Puedes seguir editando mientras se calcula.</p>
+          <div data-live-load></div>
+          <p class="help-text" data-live-status role="status"></p>
+          <div data-live-metrics></div>
+          <button class="secondary-button" type="button" data-open-live-result disabled>Ver resultado y reproducción</button>
+        </section>
+
         <fieldset class="scenario-section">
           <legend>Modo y capacidad</legend>
           ${modeMarkup(scenario)}
@@ -1043,6 +1060,7 @@ export function renderScenarioView(options: {
 
         <fieldset class="scenario-section">
           <legend>Tiempos del sistema</legend>
+          <p class="help-text">Constante usa siempre la misma duración. Exponencial usa una media y admite duraciones largas. Triangular usa un mínimo, un valor más probable y un máximo.</p>
           <div class="distribution-list">${distributionRows}</div>
           ${arrivalScheduleMarkup(scenario)}
           <div class="field-grid transfer-settings">
@@ -1071,7 +1089,7 @@ export function renderScenarioView(options: {
             <li>El tamaño del grupo no cambia el tiempo de preparación.</li>
             <li>La paciencia solo cuenta antes de empezar el pago.</li>
             <li>El estado vacío al abrir es una decisión explícita.</li>
-            <li>Los tiempos de confianza describen variación entre simulaciones, no incertidumbre de los datos reales.</li>
+            <li>Los intervalos de confianza describen la variación entre simulaciones.</li>
           </ul>
         </details>
         <section class="work-surface side-surface">

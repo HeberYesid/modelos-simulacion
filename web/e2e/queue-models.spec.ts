@@ -51,6 +51,8 @@ for (const [cashiers, preparers] of [[1, 1], [1, 2], [2, 1], [2, 2]]) {
 test("non-exponential Tuesday services retain rates without claiming unstable payment", async ({ page }, testInfo) => {
   await page.goto("/");
   await page.getByRole("tab", { name: "Escenarios", exact: true }).click();
+  await page.locator("[data-load-synthetic]").click();
+  await expect(page.locator("#dist-interarrival-mean")).toHaveValue("180");
   const response = page.waitForResponse((item) => item.url().endsWith("/api/v1/runs") && item.request().method() === "POST");
   await page.getByRole("button", { name: "Ejecutar una réplica", exact: true }).click();
   expect((await response).status()).toBe(200);
@@ -78,6 +80,8 @@ test("non-exponential Tuesday services retain rates without claiming unstable pa
 test("Friday has one integrated M/M/1 reference with aggregate-service qualification", async ({ page }, testInfo) => {
   await page.goto("/");
   await page.getByRole("tab", { name: "Escenarios", exact: true }).click();
+  await page.locator("[data-load-synthetic]").click();
+  await expect(page.locator("#dist-interarrival-mean")).toHaveValue("180");
   await page.locator('[data-mode="regular"]').check();
   const response = page.waitForResponse((item) => item.url().endsWith("/api/v1/runs") && item.request().method() === "POST");
   await page.getByRole("button", { name: "Ejecutar una réplica", exact: true }).click();
@@ -90,4 +94,57 @@ test("Friday has one integrated M/M/1 reference with aggregate-service qualifica
   await expect(panel).toContainText("Aproximación");
   await panel.scrollIntoViewIfNeeded();
   await page.screenshot({ path: testInfo.outputPath("queue-models-friday.png") });
+});
+
+test("live editing reruns the latest valid scenario and opens its replay", async ({ page }, testInfo) => {
+  await page.goto("/");
+  await page.getByRole("tab", { name: "Escenarios", exact: true }).click();
+  await expect(page.locator("[data-live-load]")).toContainText("Estable");
+  await page.getByRole("checkbox", { name: "Actualizar simulación en vivo" }).check();
+  await expect(page.locator("[data-live-status]")).toHaveText("Réplica actualizada.");
+  const interval = page.locator("#dist-interarrival-mean");
+  await interval.fill("");
+  await expect(page.locator("[data-live-status]")).toContainText("Revisa");
+  await expect(page.locator("[data-open-live-result]")).toBeDisabled();
+  await interval.fill("20");
+  await expect(interval).toBeFocused();
+  await expect(page.locator("[data-live-load]")).toContainText("Inestable");
+  await expect(page.locator("[data-live-status]")).toHaveText("Réplica actualizada.");
+  await expect(page.locator("[data-live-metrics]")).toContainText("Lq");
+  await expect(page.locator("[data-live-metrics]")).toContainText("P(vacío)");
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.locator(".live-simulation").evaluate((panel) => panel.scrollIntoView({ block: "start" }));
+  expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true);
+  await page.screenshot({ path: testInfo.outputPath("live-simulation-mobile.png") });
+  await page.locator("[data-open-live-result]").click();
+  await expect(page.locator("#queue-models-title")).toBeVisible();
+});
+
+test("live simulation queues edits while a run occupies the engine", async ({ page }) => {
+  await page.goto("/");
+  await page.getByRole("tab", { name: "Escenarios", exact: true }).click();
+  let releaseFirst!: () => void;
+  const firstRun = new Promise<void>((resolve) => { releaseFirst = resolve; });
+  let requests = 0;
+  await page.route("**/api/v1/runs", async (route) => {
+    if (++requests === 1) await firstRun;
+    await route.continue();
+  });
+
+  const submitted = page.waitForRequest((request) => request.url().endsWith("/api/v1/runs"));
+  await page.getByRole("checkbox", { name: "Actualizar simulación en vivo" }).check();
+  await submitted;
+  const manual = page.getByRole("button", { name: "Ejecutar una réplica", exact: true });
+  try {
+    await expect(manual).toBeDisabled();
+    await page.locator("#dist-interarrival-mean").fill("20");
+    await expect(page.locator("[data-open-live-result]")).toBeDisabled();
+  } finally {
+    releaseFirst();
+  }
+  const latest = await page.waitForRequest((request) =>
+    request.url().endsWith("/api/v1/runs") && request.postDataJSON().scenario.interarrival.mean_s === 20);
+  expect(latest.postDataJSON().scenario.interarrival).toEqual({ kind: "exponential", mean_s: 20 });
+  await expect(page.locator("[data-live-status]")).toHaveText("Réplica actualizada.");
+  await expect(manual).toBeEnabled();
 });

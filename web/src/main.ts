@@ -8,6 +8,8 @@ import { renderObservedSection, mountObservedSection, type ObservedSectionHandle
 import { preloadedVisitReport, renderVisitDataPicker, renderVisitScenarioPicker } from "./components/visit-data";
 import { observedVisits } from "./replay/observed";
 import { buildVisitScenario } from "./domain/visit-scenarios";
+import { analyzeQueueScenario, queueLoadStatus } from "./domain/queueing-theory";
+import { calculateQueuePerformance } from "./domain/queueing-performance";
 import visitTemplate from "../contracts/fixtures/demo-scenario.json";
 import { renderObjectiveAnalysisContent } from "./components/scenario-analysis";
 import {
@@ -148,6 +150,12 @@ const state: AppState = {
 };
 
 const interacted = new WeakSet<Element>();
+let liveEnabled = false;
+let liveTimer: number | undefined;
+let liveRequestPending = false;
+let liveScenarioKey: string | null = null;
+let livePreview: { key: string; result: RunResult } | null = null;
+let liveFailure: { key: string; message: string } | null = null;
 let activeReplayHost: ReplayHostHandle | null = null;
 let activeObservedSection: ObservedSectionHandle | null = null;
 let replayMemoryRun: RunResult | null = null;
@@ -357,6 +365,7 @@ function renderCurrentView(focusRoot = false): void {
       }
     }
   }
+  refreshLiveScenario();
   if (focusRoot) root.focus({ preventScroll: true });
 }
 
@@ -763,8 +772,119 @@ function clearPending(): void {
   state.pendingMessage = null;
 }
 
+function percent(value: number | null): string {
+  return value === null ? "No disponible" : `${formatNumber(value * 100, 2)} %`;
+}
+
+function refreshLiveScenario(): void {
+  window.clearTimeout(liveTimer);
+  liveScenarioKey = null;
+  // The local engine accepts one execution at a time, including manual runs.
+  document.querySelectorAll<HTMLButtonElement>("[data-run-scenario], [data-run-experiment], [data-select-replication]")
+    .forEach((button) => {
+      if (liveRequestPending && !button.disabled) {
+        button.disabled = true;
+        button.dataset.liveBlocked = "";
+      } else if (!liveRequestPending && button.dataset.liveBlocked !== undefined) {
+        button.disabled = false;
+        delete button.dataset.liveBlocked;
+      }
+    });
+  const panel = document.querySelector<HTMLElement>(".live-simulation");
+  const form = document.querySelector<HTMLFormElement>("#scenario-form");
+  const current = activeScenario();
+  if (state.view !== "scenario" || !panel || !form || !current) return;
+
+  const toggle = panel.querySelector<HTMLInputElement>("[data-live-toggle]")!;
+  const load = panel.querySelector<HTMLElement>("[data-live-load]")!;
+  const status = panel.querySelector<HTMLElement>("[data-live-status]")!;
+  const metrics = panel.querySelector<HTMLElement>("[data-live-metrics]")!;
+  const open = panel.querySelector<HTMLButtonElement>("[data-open-live-result]")!;
+  toggle.checked = liveEnabled;
+  toggle.disabled = state.pending !== null;
+  open.disabled = true;
+  metrics.hidden = true;
+  if (state.pending) {
+    status.textContent = "Hay otra operación en curso.";
+    return;
+  }
+
+  const draft = collectScenarioDraft(form, current).scenario;
+  const scenario = setScenarioTimeValidity(form) && !form.querySelector(":invalid")
+    ? scenarioDraftToWire(draft)
+    : null;
+  if (!scenario) {
+    load.textContent = "";
+    status.textContent = "Revisa los campos del escenario para calcular la estabilidad y la réplica.";
+    return;
+  }
+  const stages = analyzeQueueScenario(scenario);
+  const diagnosis = queueLoadStatus(stages);
+  load.innerHTML = `<p><strong>${diagnosis}</strong> según la carga configurada.</p>
+    <p class="help-text">${stages.map((stage) => `${stage.label} · ρ ${percent(stage.nominalRho)}${stage.peakRho === null ? "" : ` (máx. ${percent(stage.peakRho)})`}`).join(" / ")}</p>
+    <p class="help-text">ρ compara la demanda de trabajo con la capacidad del equipo. Si llega al 100 % o lo supera, el equipo no tiene margen para absorber la cola.</p>`;
+  if (!liveEnabled) {
+    status.textContent = liveRequestPending ? "Terminando la réplica iniciada…" : "La actualización automática está desactivada.";
+    return;
+  }
+
+  const key = JSON.stringify(scenario);
+  liveScenarioKey = key;
+  if (livePreview?.key === key) {
+    status.textContent = "Réplica actualizada.";
+    const result = calculateQueuePerformance(livePreview.result).total;
+    const amount = (value: number | null, unit: string): string =>
+      value === null ? "No disponible" : `${formatNumber(value, 2)} ${unit}`;
+    metrics.innerHTML = `<dl class="live-metrics-grid">
+      <div><dt>L · órdenes presentes</dt><dd>${amount(result.L, "órdenes")}</dd></div>
+      <div><dt>Lq · órdenes en fila</dt><dd>${amount(result.Lq, "órdenes")}</dd></div>
+      <div><dt>W · tiempo total</dt><dd>${amount(result.WSeconds, "s")}</dd></div>
+      <div><dt>Wq · tiempo en fila</dt><dd>${amount(result.WqSeconds, "s")}</dd></div>
+      <div><dt>P(ocupado) · alguna orden</dt><dd>${percent(result.pOccupied)}</dd></div>
+      <div><dt>P(vacío) · ninguna orden</dt><dd>${percent(result.pEmpty)}</dd></div>
+    </dl><p class="help-text">L, Lq y las probabilidades usan el horario de admisión. W y Wq son promedios de las órdenes nuevas completadas.</p>`;
+    metrics.hidden = false;
+    open.disabled = false;
+  } else if (liveFailure?.key === key) {
+    status.textContent = `${liveFailure.message} Para reintentar, desactiva y vuelve a activar la actualización.`;
+  } else {
+    status.textContent = "Calculando la réplica…";
+    if (!liveRequestPending) liveTimer = window.setTimeout(() => { void runLiveScenario(scenario, key); }, 500);
+  }
+}
+
+async function runLiveScenario(scenario: Scenario, key: string): Promise<void> {
+  if (liveScenarioKey !== key || liveRequestPending || state.pending) return;
+  liveRequestPending = true;
+  refreshLiveScenario();
+  try {
+    const result = await executeRun({ scenario, root_seed: scenario.default_root_seed, replication_index: 0 });
+    replayProjectorFor(result);
+    if (liveScenarioKey === key) livePreview = { key, result };
+  } catch (error) {
+    if (liveScenarioKey === key) liveFailure = { key, message: apiErrorMessage(error) };
+  } finally {
+    liveRequestPending = false;
+    refreshLiveScenario();
+  }
+}
+
+function showRunResult(result: RunResult): void {
+  state.completed = {
+    kind: "run",
+    value: result,
+    jsonText: cleanResultText(result),
+    label: result.scenario.display_name,
+  };
+  state.completedBytes = null;
+  state.selectedRun = result;
+  state.selection = { scenarioId: result.scenario.scenario_id, replicationIndex: result.replication_index };
+  clearCsvFiles();
+  state.resultError = null;
+}
+
 async function runSingle(): Promise<void> {
-  if (state.pending) return;
+  if (state.pending || liveRequestPending) return;
   const draft = collectCurrentScenario();
   if (!draft) return;
   const submitted = snapshot(draft.scenario);
@@ -786,22 +906,12 @@ async function runSingle(): Promise<void> {
   try {
     const result = await executeRun(request, execution.id);
     replayProjectorFor(result);
-    state.completed = {
-      kind: "run",
-      value: result,
-      jsonText: cleanResultText(result),
-      label: result.scenario.display_name,
-    };
-    state.completedBytes = null;
-    state.selectedRun = result;
-    state.selection = { scenarioId: result.scenario.scenario_id, replicationIndex: result.replication_index };
+    showRunResult(result);
     if (state.scenarios[submittedIndex]
       && scenarioWireJson(state.scenarios[submittedIndex]) === JSON.stringify(submitted)) {
       state.scenarios[submittedIndex] = scenarioToDraft(result.scenario);
     }
     state.cleanScenarioJson[submittedIndex] = JSON.stringify(result.scenario);
-    clearCsvFiles();
-    state.resultError = null;
     state.scenarioError = null;
     state.scenarioIssues = [];
     state.view = "results";
@@ -848,7 +958,7 @@ function duplicateScenarioIds(scenarios: ScenarioDraft[]): boolean {
 }
 
 async function runBatch(): Promise<void> {
-  if (state.pending) return;
+  if (state.pending || liveRequestPending) return;
   const draft = collectCurrentScenario();
   if (!draft) return;
   if (state.scenarios.length < 2) {
@@ -1156,7 +1266,7 @@ async function exportCurrentCsv(selectedRunOnly = false): Promise<void> {
 }
 
 async function selectExperimentReplication(): Promise<void> {
-  if (state.pending || state.completed?.kind !== "experiment") return;
+  if (state.pending || liveRequestPending || state.completed?.kind !== "experiment") return;
   const scenarioId = document.querySelector<HTMLSelectElement>("[data-selected-scenario]")?.value;
   const indexValue = document.querySelector<HTMLSelectElement>("[data-selected-replication]")?.value;
   const replicationIndex = indexValue == null ? NaN : Number(indexValue);
@@ -1221,7 +1331,7 @@ function chooseScenarioTab(index: number): void {
 function handleInput(event: Event): void {
   const target = event.target;
   if (!(target instanceof HTMLInputElement || target instanceof HTMLTextAreaElement || target instanceof HTMLSelectElement)) return;
-  if (target.matches("[data-source-mode]")) return;
+  if (target.matches("[data-source-mode], [data-live-toggle]")) return;
   if (target.matches("[data-mode]")) return;
   if (!target.closest("#scenario-form")) return;
   if (target instanceof HTMLInputElement && target.matches("[data-integer-field]")) {
@@ -1446,6 +1556,16 @@ function handleClick(event: MouseEvent): void {
     if (!state.pending) void loadDemoScenario(true);
   } else if (button.matches("[data-cancel-execution]")) {
     void cancelActiveExecution();
+  } else if (button.matches("[data-open-live-result]")) {
+    if (!state.pending && livePreview && livePreview.key === liveScenarioKey) {
+      const result = livePreview.result;
+      const scenarioIndex = state.activeScenarioIndex;
+      state.scenarios[scenarioIndex] = scenarioToDraft(result.scenario);
+      state.cleanScenarioJson[scenarioIndex] = JSON.stringify(result.scenario);
+      state.partialExperiment = null;
+      showRunResult(result);
+      goToView("results");
+    }
   } else if (button.matches("[data-run-scenario]")) {
     void runSingle();
   } else if (button.matches("[data-run-experiment]")) {
@@ -1693,6 +1813,17 @@ function handleFileChange(event: Event): void {
   }
 }
 
+function handleLiveScenarioInput(event: Event): void {
+  const target = event.target;
+  if (!(target instanceof Element) || !target.closest("#scenario-form")) return;
+  if (target instanceof HTMLInputElement && target.matches("[data-live-toggle]")) {
+    if (event.type !== "change") return;
+    liveEnabled = target.checked;
+    liveFailure = null;
+  }
+  refreshLiveScenario();
+}
+
 function startApp(): void {
   renderShell();
   installColorSchemeToggle();
@@ -1706,6 +1837,8 @@ function startApp(): void {
   document.addEventListener("click", handleClick);
   document.addEventListener("input", handleInput);
   document.addEventListener("change", handleChange);
+  document.addEventListener("input", handleLiveScenarioInput);
+  document.addEventListener("change", handleLiveScenarioInput);
   document.addEventListener("blur", syncInvalidState, true);
   document.addEventListener("input", syncInvalidState);
   document.addEventListener("change", syncInvalidState);
