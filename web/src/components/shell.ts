@@ -1,4 +1,4 @@
-import { processingDisclosure, serviceStatusMessage } from "../deployment";
+import { serviceStatusMessage } from "../deployment";
 
 export type MainView = "observations" | "scenario" | "results";
 
@@ -18,7 +18,7 @@ export function renderShell(): void {
             <circle cx="28.5" cy="7.5" r="3" fill="#B93867" />
             <path d="M28.5 5.5c-.8-2 0-3.6 1.7-4.5" fill="none" stroke="#4E835D" stroke-linecap="round" stroke-width="1.6" />
           </svg>
-          <span class="brand-copy"><strong>Boquitas</strong><span>modelo de atención</span></span>
+          <span class="brand-copy"><strong>Boquitas</strong></span>
         </a>
 
         <nav id="view-nav" class="view-nav" aria-label="Vistas principales" aria-orientation="vertical" role="tablist">
@@ -42,7 +42,6 @@ export function renderShell(): void {
 
       <div class="app-workspace">
         <header class="topbar">
-          <span class="topbar-label">Simulación de atención</span>
           <div class="topbar-meta">
             <button class="secondary-button theme-toggle" type="button" data-color-scheme-toggle aria-pressed="false">
               <svg class="theme-icon theme-icon--moon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M20.1 15.6A8.4 8.4 0 0 1 8.4 3.9 8.6 8.6 0 1 0 20.1 15.6Z" /></svg>
@@ -60,10 +59,6 @@ export function renderShell(): void {
           <div id="view-root" class="view-root" role="tabpanel" aria-labelledby="tab-observations" tabindex="-1"></div>
         </main>
 
-        <footer class="app-footer">
-          <span>${processingDisclosure()}</span>
-          <span>Observaciones y escenarios se manejan por separado</span>
-        </footer>
       </div>
     </div>
     <div id="global-announcement" class="visually-hidden" aria-live="polite" aria-atomic="true"></div>

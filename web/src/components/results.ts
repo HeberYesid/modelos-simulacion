@@ -290,7 +290,6 @@ function renderAssumptions(run: RunResult): string {
           <div><dt>Tiempo entre llegadas</dt><dd>${escapeHtml(describeDistribution(scenario.interarrival))}</dd></div>
           <div><dt>Pago</dt><dd>${escapeHtml(describeDistribution(scenario.payment_active))}</dd></div>
           <div><dt>Preparación por orden</dt><dd>${escapeHtml(describeDistribution(scenario.preparation))}</dd></div>
-          <div><dt>Probabilidad de transferencia</dt><dd>${formatNumber(scenario.transfer_probability * 100, 4)} %</dd></div>
           <div><dt>Paciencia</dt><dd>${scenario.patience ? escapeHtml(describeDistribution(scenario.patience)) : "Desactivada"}</dd></div>
           <div><dt>Semilla raíz</dt><dd>${formatNumber(run.root_seed, 0)}</dd></div>
           <div><dt>Pesos de tamaño de grupo</dt><dd>${escapeHtml(groupWeights || "No definidos")}</dd></div>
@@ -670,10 +669,6 @@ export function renderResultsView(options: {
 
   const baseRun = options.completed.kind === "run" ? options.completed.value : options.selectedRun;
   const selectedRun = options.completed.kind === "run" ? options.completed.value : options.selectedRun;
-  const jsonButton = options.completed.kind === "run"
-    ? `<button class="secondary-button" type="button" data-download-result-json>Descargar resultado JSON</button>`
-    : `<button class="secondary-button" type="button" data-download-result-json>Descargar experimento JSON</button>
-       ${selectedRun ? `<button class="secondary-button" type="button" data-download-selected-json>Descargar réplica seleccionada JSON</button>` : ""}`;
   const csvPanel = options.csvFiles.length
     ? `<section class="work-surface results-surface" aria-label="Tablas CSV"><div class="surface-heading"><div><h2>${escapeHtml(options.csvLabel ?? "Tablas CSV listas")}</h2><p>El servicio de exportación conserva columnas, identificadores, unidades y advertencias del contrato.</p></div></div><div class="inline-actions">${options.csvFiles.map((file) => `<a class="secondary-button" href="${escapeHtml(file.url)}" download="${escapeHtml(file.name)}">Descargar ${escapeHtml(file.name)}</a>`).join("")}</div></section>`
     : "";
@@ -692,7 +687,7 @@ export function renderResultsView(options: {
         <div class="toolbar-copy"><h2>${escapeHtml(options.completed.label)}</h2>
           <p>${options.completed.kind === "run" ? `Escenario ${escapeHtml(options.completed.value.scenario.scenario_id)} · semilla ${formatNumber(options.completed.value.root_seed, 0)} · réplica ${formatNumber(options.completed.value.replication_index, 0)}.` : `Comparación de ${formatNumber(options.completed.value.scenarios.length, 0)} escenarios · semilla ${formatNumber(options.completed.value.root_seed, 0)} · ${formatNumber(options.completed.value.n_valid, 0)} de ${formatNumber(options.completed.value.n_requested, 0)} réplicas válidas en todas las alternativas.`}</p>
         </div>
-        <div class="inline-actions">${jsonButton}
+        <div class="inline-actions">
           ${experiment && selectedRun ? `<button class="secondary-button" type="button" data-export-csv="selected-run">Preparar CSV de réplica seleccionada</button>` : ""}
           <button class="primary-button" type="button" data-export-csv="current">${options.completed.kind === "run" ? "Preparar CSV de esta réplica" : "Preparar CSV del experimento"}</button>
         </div>

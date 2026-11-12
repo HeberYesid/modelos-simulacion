@@ -34,17 +34,15 @@ describe("arrival schedule and menu scenario drafts", () => {
     const scenario = scenarioToDraft(structuredClone(demoScenario) as unknown as Scenario);
     const form = render(scenario);
 
-    expect(form.querySelector<HTMLInputElement>("#arrival-schedule-enabled")?.checked).toBe(false);
-    expect(form.querySelector<HTMLInputElement>("#menu-enabled")?.checked).toBe(false);
     expect(form.querySelectorAll("[data-arrival-window]")).toHaveLength(0);
-    expect(form.querySelectorAll("[data-menu-product]")).toHaveLength(0);
+    expect(form.querySelectorAll("[data-menu-product]")).toHaveLength(3);
     const interarrival = form.querySelector<HTMLSelectElement>('[data-distribution-kind="interarrival"]');
     if (interarrival) interarrival.value = scenario.interarrival.kind;
 
     const collected = collectScenarioDraft(form, scenario).scenario;
     expect(collected.interarrival).toEqual({ kind: "exponential", mean_s: 180 });
     expect(collected.arrival_schedule_enabled).toBe(false);
-    expect(collected.menu_enabled).toBe(false);
+    expect(collected.menu_enabled).toBe(true);
   });
 
   it("round-trips scheduled order rates and mixed menu basket quantities", () => {
@@ -67,9 +65,8 @@ describe("arrival schedule and menu scenario drafts", () => {
     const draft = scenarioToDraft(scenario);
     const form = render(draft);
 
-    expect(form.querySelector<HTMLInputElement>("#arrival-schedule-enabled")?.checked).toBe(true);
-    expect(form.querySelectorAll("[data-arrival-window]")).toHaveLength(2);
-    expect(form.querySelector<HTMLInputElement>("#menu-enabled")?.checked).toBe(true);
+    expect(form.querySelector("#arrival-schedule-enabled")).toBeNull();
+    expect(form.querySelectorAll("[data-arrival-window]")).toHaveLength(0);
     expect(form.querySelectorAll("[data-menu-product]")).toHaveLength(2);
     expect(form.querySelectorAll("[data-menu-basket]")).toHaveLength(1);
 
@@ -81,10 +78,7 @@ describe("arrival schedule and menu scenario drafts", () => {
     if (iceQuantity) iceQuantity.value = "1";
 
     const collected = collectScenarioDraft(form, draft).scenario;
-    expect(collected.arrival_schedule).toEqual([
-      { start_s: 0, end_s: 11_700, orders_per_hour: 20 },
-      { start_s: 11_700, end_s: 23_400, orders_per_hour: 14.25 },
-    ]);
+    expect(collected.arrival_schedule).toBeUndefined();
     expect(collected.menu?.baskets).toEqual([
       { probability: 1, items: [{ product_id: "fruit", quantity: 2 }, { product_id: "ice", quantity: 1 }] },
     ]);
@@ -116,19 +110,18 @@ describe("arrival schedule and menu scenario drafts", () => {
 
     const reenabled = enableMenu(enableArrivalSchedule(scheduleOff));
     const form = render(reenabled);
-    expect(form.querySelector<HTMLInputElement>("#menu-enabled")?.checked).toBe(true);
-    expect(form.querySelector<HTMLInputElement>("#arrival-schedule-enabled")?.checked).toBe(true);
+    expect(form.querySelector("#arrival-schedule-enabled")).toBeNull();
     const interarrival = form.querySelector<HTMLSelectElement>('[data-distribution-kind="interarrival"]');
     if (interarrival) interarrival.value = reenabled.interarrival.kind;
     const collected = collectScenarioDraft(form, reenabled).scenario;
     expect(collected.menu).toEqual(scenario.menu);
-    expect(collected.arrival_schedule).toEqual(scenario.arrival_schedule);
+    expect(collected.arrival_schedule).toBeUndefined();
     expect(collected.preparation).toEqual(scenario.preparation);
 
     const wire = scenarioDraftToWire(collected);
     expect(wire, JSON.stringify({ issues: scenarioConfigurationIssues(collected), collected })).not.toBeNull();
     expect(wire?.menu).toEqual(scenario.menu);
-    expect(wire?.arrival_schedule).toEqual(scenario.arrival_schedule);
+    expect(wire).not.toHaveProperty("arrival_schedule");
     expect(wire?.preparation).toEqual(scenario.preparation);
     expect(wire).not.toHaveProperty("menu_enabled");
     expect(wire).not.toHaveProperty("arrival_schedule_enabled");

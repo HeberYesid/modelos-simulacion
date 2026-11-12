@@ -34,7 +34,7 @@ function playerMarkup(visit: ObservedVisit): string {
       <div class="replay-transport">
         <button class="primary-button" type="button" data-observed-play aria-pressed="false">Reproducir datos medidos</button>
         <button class="secondary-button" type="button" data-observed-restart>Volver al inicio del día</button>
-        <div class="field replay-speed"><label for="observed-speed">Velocidad de datos medidos</label><select id="observed-speed"><option value="1">1×</option><option value="5">5×</option><option value="20" selected>20×</option><option value="60">60×</option></select></div>
+        <div class="field replay-speed"><label for="observed-speed">Velocidad de datos medidos</label><input id="observed-speed" type="range" min="1" max="60" step="1" value="20" aria-describedby="observed-speed-value"><output id="observed-speed-value">20×</output></div>
       </div>
       <div class="replay-camera-controls" role="group" aria-label="Cámara de datos medidos">
         <button class="secondary-button" type="button" data-observed-camera="reset">Restablecer cámara</button>
@@ -197,8 +197,14 @@ function mountPlayer(root: HTMLElement, visit: ObservedVisit): ObservedSectionHa
   }, { signal: abort.signal });
   slider.addEventListener("input", () => { clock = seek(clock, Number(slider.value)); paint(true); }, { signal: abort.signal });
   recordSelect.addEventListener("change", updateDetail, { signal: abort.signal });
-  required<HTMLSelectElement>("#observed-speed").addEventListener("change", (event) => {
-    clock = set_speed(clock, Number((event.target as HTMLSelectElement).value) as PlaybackSpeed);
+  required<HTMLInputElement>("#observed-speed").addEventListener("input", (event) => {
+    const requested = Number((event.target as HTMLInputElement).value);
+    const speed = ([1, 5, 20, 60] as const).reduce((closest, candidate) =>
+      Math.abs(candidate - requested) < Math.abs(closest - requested) ? candidate : closest, 20 as PlaybackSpeed);
+    clock = set_speed(clock, speed);
+    const output = required<HTMLOutputElement>("#observed-speed-value");
+    output.value = `${speed}×`;
+    output.textContent = `${speed}×`;
   }, { signal: abort.signal });
   document.addEventListener("visibilitychange", () => { stop(); start(); }, { signal: abort.signal });
   motion.addEventListener("change", () => { scene?.setReducedMotion(motion.matches); scene?.render(); }, { signal: abort.signal });

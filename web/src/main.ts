@@ -2,7 +2,7 @@ import "./styles.css";
 import { installColorSchemeToggle } from "./theme";
 import type { ExperimentResult, RunResult, Scenario, ScenarioDraft } from "./api/types";
 import type { CompletedResult, ReplaySelection } from "./components/results";
-import { renderResultsView, renderExperimentChartForSelection, runFilename, experimentFilename, updateReplayTimeline } from "./components/results";
+import { renderResultsView, renderExperimentChartForSelection, updateReplayTimeline } from "./components/results";
 import { renderObservationsView, type ObservationSourceMode } from "./components/observations";
 import { renderObservedSection, mountObservedSection, type ObservedSectionHandle } from "./components/observed-replay";
 import { preloadedVisitReport, renderVisitDataPicker, renderVisitScenarioPicker } from "./components/visit-data";
@@ -13,20 +13,16 @@ import { calculateQueuePerformance } from "./domain/queueing-performance";
 import visitTemplate from "../contracts/fixtures/demo-scenario.json";
 import { renderObjectiveAnalysisContent } from "./components/scenario-analysis";
 import {
-  addArrivalScheduleWindow,
   addInterruptionScheduleEntry,
   addMenuBasket,
   clearInterruptionSchedule,
   collectScenarioDraft,
-  disableArrivalSchedule,
   disableInterruptionPolicy,
   disableMenu,
-  enableArrivalSchedule,
   enableInterruptionPolicy,
   enableMenu,
   interruptionDraftIssues,
   newInitialOrder,
-  removeArrivalScheduleWindow,
   removeInterruptionScheduleEntry,
   removeMenuBasket,
   renderScenarioView,
@@ -45,7 +41,7 @@ import type { ApiSchema, CsvExportRequest, ExperimentRequest, RunRequest } from 
 import { fieldLabel, systemAssumption } from "./domain/errors";
 import { ANALYSIS_OBJECTIVES, type AnalysisObjective } from "./domain/scenario-analysis";
 import workLimits from "../contracts/work-limits.json";
-import { downloadBytes, downloadText, escapeHtml, formatNumber, readExactJsonFile, safeFileName } from "./domain/format";
+import { escapeHtml, formatNumber, safeFileName } from "./domain/format";
 import {
   checkHealth,
   executeExperiment,
@@ -57,7 +53,6 @@ import {
   loadDemo,
   MAX_FILE_BYTES,
   ServiceError,
-  validateSavedFile,
 } from "./services/api";
 import { mountReplayHost, type ReplayHostHandle } from "./replay/host";
 import { create_replay_projector, ReplayTraceValidationError, type ReplayProjector } from "./replay/project";
@@ -555,19 +550,6 @@ function focusField(path: string): void {
       : field === "suspended_order_id" ? `[data-suspended-order-id="${index}"]`
         : `[data-cashier-order-id="${index}"]`;
     focusControl(selector);
-    return;
-  }
-  if (path === "arrival_schedule_enabled" || path === "arrival_schedule") {
-    focusControl("#arrival-schedule-enabled");
-    return;
-  }
-  const arrival = /^arrival_schedule(?:\[(\d+)\]|\.(\d+))\.(start_s|end_s|orders_per_hour)$/.exec(path);
-  if (arrival) {
-    const index = arrival[1] ?? arrival[2] ?? "0";
-    const field = arrival[3] === "orders_per_hour" ? "rate" : arrival[3] === "start_s" ? "start" : "end";
-    const boundaryIndex = field === "start" ? String(Math.max(0, Number(index) - 1)) : index;
-    focusControl(field === "start" ? `[data-arrival-window-end="${boundaryIndex}"]`
-      : field === "rate" ? `[data-arrival-orders-per-hour="${index}"]` : `[data-arrival-window-end="${index}"]`);
     return;
   }
   if (path.startsWith("menu.products") || path === "menu") {
@@ -1100,141 +1082,6 @@ async function importSource(event: SubmitEvent): Promise<void> {
   }
 }
 
-function installScenarioFile(scenario: Scenario, bytes: ArrayBuffer, text: string): void {
-  state.scenarios = [scenarioToDraft(scenario)];
-  state.activeScenarioIndex = 0;
-  state.cleanScenarioJson = [JSON.stringify(scenario)];
-  state.scenarioFileBytes = bytes.slice(0);
-  state.scenarioFileJson = JSON.stringify(scenario);
-  state.jsonError = null;
-  state.scenarioError = null;
-  state.scenarioIssues = [];
-  state.view = "scenario";
-  state.advancedOptionsOpen = null;
-  state.comparisonOptionsOpen = null;
-  state.modelHelpOpen = null;
-  state.resetDisclosureCapture = true;
-  void text;
-}
-
-function isSupportedVersion(value: unknown): value is Record<string, unknown> {
-  if (!value || typeof value !== "object" || Array.isArray(value)) return false;
-  const version = (value as Record<string, unknown>).contract_version;
-  return version === 1 || version === 2;
-}
-
-async function openSavedFile(input: HTMLInputElement): Promise<void> {
-  const file = input.files?.[0];
-  if (!file || state.pending) return;
-  state.jsonError = null;
-  setPending("file", "Validando el archivo con el contrato local. No se ejecutará de nuevo.");
-  try {
-    const { bytes, text } = await readExactJsonFile(file);
-    const validated = await validateSavedFile(file);
-    if (!isSupportedVersion(validated.value)) {
-      throw new Error("Esta versión de archivo no es compatible o el JSON no contiene un artefacto V1/V2 completo. Los resultados actuales se mantienen.");
-    }
-    if (validated.kind === "scenario") {
-      installScenarioFile(validated.value as Scenario, bytes, text);
-      state.cleanReplications = state.replications;
-      announce("Se abrió un escenario JSON validado.");
-    } else if (validated.kind === "run") {
-      const result = validated.value as RunResult;
-      replayProjectorFor(result);
-      state.completed = { kind: "run", value: result, jsonText: text, label: result.scenario.display_name };
-      state.completedBytes = bytes.slice(0);
-      state.selectedRun = result;
-      state.selection = { scenarioId: result.scenario.scenario_id, replicationIndex: result.replication_index };
-      state.scenarios = [scenarioToDraft(result.scenario)];
-      state.activeScenarioIndex = 0;
-      state.cleanScenarioJson = [JSON.stringify(result.scenario)];
-      state.cleanReplications = state.replications;
-      state.advancedOptionsOpen = null;
-      state.comparisonOptionsOpen = null;
-      state.modelHelpOpen = null;
-      state.resetDisclosureCapture = true;
-      state.jsonError = null;
-      state.view = "results";
-      clearCsvFiles();
-      announce("Se abrió una réplica guardada sin volver a ejecutarla.");
-    } else {
-      const result = validated.value as ExperimentResult;
-      state.completed = {
-        kind: "experiment",
-        value: result,
-        jsonText: text,
-        label: `${formatNumber(result.scenarios.length, 0)} escenarios guardados`,
-      };
-      state.completedBytes = bytes.slice(0);
-      state.selectedRun = null;
-      state.selection = null;
-      state.scenarios = result.scenarios.map(scenarioToDraft);
-      state.activeScenarioIndex = 0;
-      state.replications = result.n_requested;
-      state.cleanScenarioJson = result.scenarios.map((scenario) => JSON.stringify(scenario));
-      state.cleanReplications = result.n_requested;
-      state.advancedOptionsOpen = null;
-      state.comparisonOptionsOpen = null;
-      state.modelHelpOpen = null;
-      state.resetDisclosureCapture = true;
-      state.jsonError = null;
-      state.view = "results";
-      clearCsvFiles();
-      announce("Se abrió un experimento guardado sin volver a ejecutarlo.");
-    }
-  } catch (error) {
-    state.jsonError = apiErrorMessage(error);
-  } finally {
-    clearPending();
-    input.value = "";
-    renderCurrentView();
-    if (state.jsonError) document.querySelector<HTMLElement>("[role='alert']")?.focus();
-  }
-}
-
-async function saveScenario(): Promise<void> {
-  if (state.pending) return;
-  const draft = collectCurrentScenario();
-  if (!draft) return;
-  const json = cleanResultText(draft.scenario);
-  const currentJson = JSON.stringify(draft.scenario);
-  if (state.scenarioFileBytes && state.scenarioFileJson === currentJson) {
-    downloadBytes(`${safeFileName(draft.scenario.scenario_id)}.json`, state.scenarioFileBytes.slice(0), "application/json");
-    return;
-  }
-  const file = new File([json], `${safeFileName(draft.scenario.scenario_id)}.json`, { type: "application/json" });
-  setPending("file", "Validando el escenario antes de descargarlo.");
-  try {
-    const response = await validateSavedFile(file);
-    if (response.kind !== "scenario" || !isSupportedVersion(response.value)) {
-      throw new Error(`El ${serviceName()} no confirmó un escenario V1 o V2 completo. No se descargó el archivo.`);
-    }
-    downloadText(file.name, json, "application/json");
-    state.scenarioFileBytes = new TextEncoder().encode(json).buffer as ArrayBuffer;
-    state.scenarioFileJson = currentJson;
-  } catch (error) {
-    state.scenarioError = apiErrorMessage(error);
-    state.scenarioIssues = apiFieldIssues(error);
-  } finally {
-    clearPending();
-    renderCurrentView();
-  }
-}
-
-function downloadCompletedJson(): void {
-  if (!state.completed) return;
-  const filename = state.completed.kind === "run"
-    ? runFilename(state.completed.value)
-    : experimentFilename(state.completed.value);
-  if (state.completedBytes) downloadBytes(filename, state.completedBytes.slice(0), "application/json");
-  else downloadText(filename, state.completed.jsonText, "application/json");
-}
-
-function downloadSelectedRun(): void {
-  if (!state.selectedRun) return;
-  downloadText(runFilename(state.selectedRun), cleanResultText(state.selectedRun), "application/json");
-}
-
 async function exportCurrentCsv(selectedRunOnly = false): Promise<void> {
   if (!state.completed || state.pending) return;
   const result = selectedRunOnly ? state.selectedRun : state.completed.value;
@@ -1344,18 +1191,6 @@ function handleInput(event: Event): void {
     if (form) setScenarioTimeValidity(form);
     return;
   }
-  if (target instanceof HTMLInputElement && target.matches("[data-arrival-window-end]")) {
-    const index = Number(target.dataset.arrivalWindowEnd);
-    const nextRow = target.closest<HTMLFormElement>("#scenario-form")
-      ?.querySelector<HTMLElement>(`[data-arrival-window="${index + 1}"]`);
-    const minutes = Number(target.value);
-    if (nextRow && target.value.trim() !== "" && Number.isFinite(minutes)) {
-      const start = nextRow.querySelector<HTMLOutputElement>("[data-arrival-start-label]");
-      const hidden = nextRow.querySelector<HTMLInputElement>(`[data-arrival-window-start="${index + 1}"]`);
-      if (start) start.textContent = formatNumber(minutes);
-      if (hidden) hidden.value = String(minutes * 60);
-    }
-  }
   if (target instanceof HTMLTextAreaElement && target.matches('[data-initial-field$=".person_ids"]')) {
     const form = target.closest<HTMLFormElement>("#scenario-form");
     if (form) validateInitialPersonLimits(form);
@@ -1409,20 +1244,14 @@ function handleChange(event: Event): void {
     setDirty(isDirty());
     return;
   }
-  if (target instanceof HTMLInputElement && target.matches("[data-arrival-schedule-enabled], [data-menu-enabled]")) {
+  if (target instanceof HTMLInputElement && target.matches("[data-menu-enabled]")) {
     const current = activeScenario();
     const form = target.closest<HTMLFormElement>("#scenario-form");
     if (!current) return;
     const base = form ? collectScenarioDraft(form, current).scenario : current;
-    if (target.matches("[data-arrival-schedule-enabled]")) {
-      const next = target.checked ? enableArrivalSchedule(base) : disableArrivalSchedule(base);
-      markActiveScenario(addScenarioAssumption(next,
-        "El horario de llegadas por franjas y sus tasas por hora son supuestos del usuario, no valores calibrados."));
-    } else {
-      const next = target.checked ? enableMenu(base) : disableMenu(base);
-      markActiveScenario(addScenarioAssumption(next,
-        "Los tipos de pedido y tiempos por unidad del menú son ejemplos editables, no mediciones del negocio."));
-    }
+    const next = target.checked ? enableMenu(base) : disableMenu(base);
+    markActiveScenario(addScenarioAssumption(next,
+      "Los tipos de pedido y tiempos por unidad del menú son ejemplos editables, no mediciones del negocio."));
     refreshScenarioAfterChange(target.id);
     return;
   }
@@ -1556,16 +1385,6 @@ function handleClick(event: MouseEvent): void {
     if (!state.pending) void loadDemoScenario(true);
   } else if (button.matches("[data-cancel-execution]")) {
     void cancelActiveExecution();
-  } else if (button.matches("[data-open-live-result]")) {
-    if (!state.pending && livePreview && livePreview.key === liveScenarioKey) {
-      const result = livePreview.result;
-      const scenarioIndex = state.activeScenarioIndex;
-      state.scenarios[scenarioIndex] = scenarioToDraft(result.scenario);
-      state.cleanScenarioJson[scenarioIndex] = JSON.stringify(result.scenario);
-      state.partialExperiment = null;
-      showRunResult(result);
-      goToView("results");
-    }
   } else if (button.matches("[data-run-scenario]")) {
     void runSingle();
   } else if (button.matches("[data-run-experiment]")) {
@@ -1600,38 +1419,6 @@ function handleClick(event: MouseEvent): void {
     markActiveScenario(addScenarioAssumption(next as unknown as ScenarioDraft,
       "Los tamaños y pesos de los grupos son supuestos del usuario."));
     refreshScenarioAfterChange("scenario-id");
-  } else if (button.matches("[data-add-arrival-window]")) {
-    const current = activeScenario();
-    if (!current) return;
-    if ((current.arrival_schedule?.length ?? 0) >= 48) {
-      state.scenarioError = "El horario admite como máximo 48 franjas; se conservó la programación.";
-      state.scenarioIssues = [{ path: "arrival_schedule[47].end_s", message: state.scenarioError }];
-      renderCurrentView();
-      focusField("arrival_schedule[47].end_s");
-      return;
-    }
-    const next = addArrivalScheduleWindow(current);
-    const currentWindowCount = current.arrival_schedule?.length ?? 0;
-    const nextWindowCount = next.arrival_schedule?.length ?? 0;
-    const newIndex = nextWindowCount - 1;
-    if (nextWindowCount === currentWindowCount) {
-      state.scenarioError = "Divide una franja con duración positiva para añadir otra. Se conservaron los límites guardados.";
-      state.scenarioIssues = [{ path: "arrival_schedule[0].end_s", message: state.scenarioError }];
-      renderCurrentView();
-      focusField("arrival_schedule[0].end_s");
-      return;
-    }
-    markActiveScenario(addScenarioAssumption(next,
-      "El horario de llegadas por franjas y sus tasas por hora son supuestos del usuario, no valores calibrados."));
-    refreshScenarioAfterChange(`arrival-rate-${newIndex}`);
-  } else if (button.matches("[data-remove-arrival-window]")) {
-    const current = activeScenario();
-    if (!current || (current.arrival_schedule?.length ?? 0) <= 1) return;
-    const index = Number(button.dataset.removeArrivalWindow);
-    const next = removeArrivalScheduleWindow(current, index);
-    markActiveScenario(addScenarioAssumption(next,
-      "El horario de llegadas por franjas y sus tasas por hora son supuestos del usuario, no valores calibrados."));
-    refreshScenarioAfterChange(`arrival-rate-${Math.max(0, Math.min(index, (next.arrival_schedule?.length ?? 1) - 1))}`);
   } else if (button.matches("[data-add-menu-basket]")) {
     const current = activeScenario();
     if (!current) return;
@@ -1725,12 +1512,6 @@ function handleClick(event: MouseEvent): void {
     refreshScenarioAfterChange("scenario-id");
   } else if (button.matches("[data-focus-path]")) {
     focusField(button.dataset.focusPath ?? "");
-  } else if (button.matches("[data-save-scenario]")) {
-    void saveScenario();
-  } else if (button.matches("[data-download-result-json]")) {
-    downloadCompletedJson();
-  } else if (button.matches("[data-download-selected-json]")) {
-    downloadSelectedRun();
   } else if (button.matches("[data-export-csv]")) {
     void exportCurrentCsv(button.dataset.exportCsv === "selected-run");
   } else if (button.matches("[data-select-replication]")) {
@@ -1804,24 +1585,11 @@ function handleSubmit(event: SubmitEvent): void {
 function handleFileChange(event: Event): void {
   const target = event.target;
   if (!(target instanceof HTMLInputElement)) return;
-  if (target.matches("[data-open-json]")) {
-    void openSavedFile(target);
-  } else if (target.id === "observation-file") {
+  if (target.id === "observation-file") {
     const filename = target.files?.[0]?.name ?? "Ningún archivo seleccionado";
     const label = document.querySelector<HTMLElement>("#observation-file-name");
     if (label) label.textContent = filename;
   }
-}
-
-function handleLiveScenarioInput(event: Event): void {
-  const target = event.target;
-  if (!(target instanceof Element) || !target.closest("#scenario-form")) return;
-  if (target instanceof HTMLInputElement && target.matches("[data-live-toggle]")) {
-    if (event.type !== "change") return;
-    liveEnabled = target.checked;
-    liveFailure = null;
-  }
-  refreshLiveScenario();
 }
 
 function startApp(): void {
@@ -1837,8 +1605,6 @@ function startApp(): void {
   document.addEventListener("click", handleClick);
   document.addEventListener("input", handleInput);
   document.addEventListener("change", handleChange);
-  document.addEventListener("input", handleLiveScenarioInput);
-  document.addEventListener("change", handleLiveScenarioInput);
   document.addEventListener("blur", syncInvalidState, true);
   document.addEventListener("input", syncInvalidState);
   document.addEventListener("change", syncInvalidState);

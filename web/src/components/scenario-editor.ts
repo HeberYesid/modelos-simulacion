@@ -1,8 +1,7 @@
 import type {
-  ArrivalScheduleEntry,
-  ArrivalScheduleEntryDraft,
   EngineConfigDraft,
   InitialOrderDraft,
+  ArrivalScheduleEntryDraft,
   InterruptionScheduleEntryDraft,
   MenuConfiguration,
   MenuConfigurationDraft,
@@ -20,9 +19,9 @@ const WORK_LIMITS = workLimits;
 export type DistributionKey = "interarrival" | "payment_active" | "preparation" | "transfer_confirmation" | "patience";
 
 const DISTRIBUTIONS: Array<{ key: Exclude<DistributionKey, "patience">; title: string; note: string }> = [
-  { key: "interarrival", title: "Tiempo entre llegadas", note: "Segundos entre órdenes nuevas. Un intervalo menor trae más órdenes." },
-  { key: "payment_active", title: "Pago", note: "Segundos que una persona del equipo dedica a cobrar una orden." },
-  { key: "preparation", title: "Preparación", note: "Un tiempo completo por orden; no depende del tamaño del grupo" },
+  { key: "interarrival", title: "Tiempo entre llegadas", note: "" },
+  { key: "payment_active", title: "Pago", note: "" },
+  { key: "preparation", title: "Preparación", note: "" },
 ];
 
 const STAGES = ["waiting_payment", "payment_active", "waiting_preparation", "preparing"];
@@ -150,46 +149,6 @@ export function removeMenuBasket(scenario: ScenarioDraft, index: number): Scenar
 
 export function scenarioConfigurationIssues(scenario: ScenarioDraft): Array<{ path: string; message: string }> {
   const issues: Array<{ path: string; message: string }> = [];
-  const scheduleEnabled = scenario.arrival_schedule_enabled ?? Boolean(scenario.arrival_schedule?.length);
-  if (scheduleEnabled) {
-    const schedule = scenario.arrival_schedule ?? [];
-    const horizon = scenario.engine_config.horizon_s;
-    if (scenario.interarrival.kind !== "exponential") {
-      issues.push({
-        path: "interarrival.kind",
-        message: "Las llegadas por franja requieren interarribos exponenciales. Cambia la forma o desactiva el horario; el borrador se conservó.",
-      });
-    }
-    if (schedule.length === 0) {
-      issues.push({ path: "arrival_schedule_enabled", message: "Añade al menos una franja de llegadas." });
-    }
-    if (schedule.length > 48) {
-      issues.push({ path: "arrival_schedule[47].end_s", message: "El horario admite como máximo 48 franjas." });
-    }
-    let previousEnd: number | null = 0;
-    schedule.forEach((entry, index) => {
-      if (!finite(entry.start_s) || !finite(entry.end_s) || !finite(entry.orders_per_hour)) {
-        issues.push({ path: `arrival_schedule[${index}].end_s`, message: `Completa los límites y la tasa de la franja ${index + 1}.` });
-        previousEnd = finite(entry.end_s) ? entry.end_s : null;
-        return;
-      }
-      if (entry.orders_per_hour < 0) {
-        issues.push({ path: `arrival_schedule[${index}].orders_per_hour`, message: "La tasa debe ser cero o mayor y se expresa en órdenes por hora." });
-      }
-      if (entry.end_s <= entry.start_s) {
-        issues.push({ path: `arrival_schedule[${index}].end_s`, message: `La franja ${index + 1} debe durar más de cero segundos.` });
-      }
-      if (entry.start_s !== previousEnd) {
-        issues.push({ path: `arrival_schedule[${index}].start_s`, message: `Las franjas deben ser contiguas y ordenadas; la franja ${index + 1} no continúa la anterior.` });
-      }
-      previousEnd = entry.end_s;
-    });
-    const last = schedule.at(-1);
-    if (!finite(horizon) || !last || !finite(last.end_s) || last.end_s !== horizon) {
-      issues.push({ path: `arrival_schedule[${Math.max(0, schedule.length - 1)}].end_s`, message: "El horario debe terminar exactamente al cierre actual. Ajusta el límite final; el valor guardado no se cambió al editar la ventana." });
-    }
-  }
-
   const menuEnabled = scenario.menu_enabled ?? scenario.menu != null;
   if (!menuEnabled) return issues;
   const menu = scenario.menu;
@@ -283,8 +242,10 @@ function draftIsComplete(draft: ScenarioDraft): boolean {
 export function scenarioToDraft(scenario: Scenario): ScenarioDraft {
   const copy = structuredClone(scenario) as unknown as ScenarioDraft;
   copy.contract_version = String(scenario.contract_version) as ScenarioDraft["contract_version"];
-  copy.arrival_schedule_enabled = Boolean(scenario.arrival_schedule?.length);
-  copy.menu_enabled = scenario.menu != null;
+  copy.arrival_schedule_enabled = false;
+  copy.menu_enabled = true;
+  if (!copy.menu) copy.menu = defaultMenu();
+  copy.transfer_probability = 0;
   return simplifyPayment(copy);
 }
 
@@ -309,20 +270,9 @@ export function scenarioDraftToWire(draft: ScenarioDraft): Scenario | null {
       contract_version: version,
     },
   } as unknown as Record<string, unknown>;
-  const scheduleEnabled = draft.arrival_schedule_enabled ?? Boolean(draft.arrival_schedule?.length);
-  if (scheduleEnabled) {
-    wire.arrival_schedule = structuredClone(draft.arrival_schedule ?? []) as ArrivalScheduleEntry[];
-  } else {
-    delete wire.arrival_schedule;
-  }
-  const menuEnabled = draft.menu_enabled ?? draft.menu != null;
-  if (menuEnabled) {
-    wire.menu = structuredClone(draft.menu) as MenuConfiguration;
-  } else if (Object.prototype.hasOwnProperty.call(draft, "menu")) {
-    wire.menu = null;
-  } else {
-    delete wire.menu;
-  }
+  delete wire.arrival_schedule;
+  wire.menu = structuredClone(draft.menu ?? defaultMenu()) as MenuConfiguration;
+  wire.transfer_probability = 0;
   delete wire.arrival_schedule_enabled;
   delete wire.menu_enabled;
   return wire as unknown as Scenario;
@@ -448,7 +398,7 @@ function distributionMarkup(key: DistributionKey, title: string, note: string, v
         <div class="compact-field"><label for="dist-${key}-high">Máximo (s)</label><input id="dist-${key}-high" name="${key}_high" data-distribution-field="${key}.high_s" type="number" min="0" step="any" required value="${inputValue(record.high_s)}"></div>`;
   return `
     <div class="distribution-row" data-distribution-row="${key}">
-      <div class="distribution-title">${escapeHtml(title)}<small>${escapeHtml(note)}</small></div>
+      <div class="distribution-title">${escapeHtml(title)}${note ? `<small>${escapeHtml(note)}</small>` : ""}</div>
       ${kindSelect}${fields}
     </div>`;
 }
@@ -468,37 +418,6 @@ function groupWeightMarkup(weights: ScenarioDraft["group_sizes"]): string {
         <input id="group-prob-${index}" type="number" min="0" max="1" step="any" required name="group_probability_${index}" data-group-field="probability" value="${inputValue(weight.probability)}"></div>
         <button class="quiet-button remove-weight" type="button" data-remove-group="${index}" aria-label="Quitar tamaño de grupo ${formatNumber(weight.size ?? 0, 0)}">Quitar</button>
     </div>`).join("");
-}
-
-function arrivalScheduleMarkup(scenario: ScenarioDraft): string {
-  const enabled = scenario.arrival_schedule_enabled ?? Boolean(scenario.arrival_schedule?.length);
-  const schedule = scenario.arrival_schedule?.length ? scenario.arrival_schedule : defaultArrivalSchedule(scenario);
-  const horizon = scenario.engine_config.horizon_s;
-  const rows = schedule.map((entry, index) => `
-    <div class="arrival-window" data-arrival-window="${index}">
-      <div class="arrival-window-heading"><strong>Franja ${formatNumber(index + 1, 0)}</strong>
-        <button class="quiet-button" type="button" data-remove-arrival-window="${index}" aria-label="Quitar franja ${formatNumber(index + 1, 0)}" ${schedule.length <= 1 ? "disabled" : ""}>Quitar</button></div>
-      <input type="hidden" data-arrival-window-start="${index}" value="${inputValue(entry.start_s)}">
-      <div class="field-grid three">
-        <div class="compact-field"><label for="arrival-start-${index}">Desde (minutos desde apertura)</label>
-          <output id="arrival-start-${index}" data-arrival-start-label>${finite(entry.start_s) ? formatNumber(entry.start_s / 60) : "—"}</output></div>
-        <div class="compact-field"><label for="arrival-end-${index}">Hasta (minutos desde apertura)</label>
-          <input id="arrival-end-${index}" type="number" min="0" max="${finite(horizon) ? inputValue(horizon / 60) : ""}" step="any" required data-arrival-window-end="${index}" value="${finite(entry.end_s) ? inputValue(entry.end_s / 60) : ""}" aria-describedby="arrival-schedule-help"></div>
-        <div class="compact-field"><label for="arrival-rate-${index}">Órdenes por hora</label>
-          <input id="arrival-rate-${index}" type="number" min="0" step="any" required data-arrival-orders-per-hour="${index}" value="${inputValue(entry.orders_per_hour)}" aria-describedby="arrival-schedule-help"></div>
-      </div>
-    </div>`).join("");
-  return `
-    <div class="field arrival-schedule-control">
-      <label class="checkbox-row" for="arrival-schedule-enabled"><input id="arrival-schedule-enabled" type="checkbox" name="arrival_schedule_enabled" data-arrival-schedule-enabled ${enabled ? "checked" : ""}>
-        <span>Definir llegadas por franja</span></label>
-      <p id="arrival-schedule-help" class="help-text">Las franjas usan minutos desde apertura y se encadenan en orden hasta el cierre. La tasa cuenta órdenes o grupos por hora, no personas. Cada franja usa llegadas exponenciales (Poisson por tramos), sin una media global. Al desactivar el horario vuelve a regir la distribución base guardada.</p>
-    </div>
-    ${enabled ? `<div class="arrival-schedule-editor" data-arrival-schedule>
-      <div class="arrival-window-list">${rows}</div>
-      <div class="button-row"><span class="help-text">El inicio de cada franja sigue el límite anterior. La última debe terminar exactamente al cierre.</span>
-        <button class="secondary-button" type="button" data-add-arrival-window ${schedule.length >= 48 ? "disabled" : ""}>Añadir franja</button></div>
-    </div>` : ""}`;
 }
 
 function productTypeLabel(kind: MenuProduct["visual_kind"]): string {
@@ -550,12 +469,7 @@ function menuMarkup(scenario: ScenarioDraft): string {
   }).join("");
   return `
     <fieldset class="scenario-section menu-section">
-      <legend>Menú para nuevas órdenes</legend>
-      <div class="field">
-        <label class="checkbox-row" for="menu-enabled"><input id="menu-enabled" type="checkbox" name="menu_enabled" data-menu-enabled ${enabled ? "checked" : ""}>
-        <span>Generar órdenes con productos del menú</span></label>
-        <p class="help-text">Tiempos de ejemplo editables, no medidos; este menú no representa toda la oferta del negocio. Un grupo comparte una orden y un pago, y la preparación es una tarea completa según el modo. El tiempo de preparación de la orden es la suma de unidades por tiempo por unidad. Las órdenes que ya estaban al abrir conservan sus tiempos explícitos.</p>
-      </div>
+      <legend>Productos del menú</legend>
       ${enabled && menu ? `<div class="menu-editor" data-menu-editor>
         <div class="menu-products"><h3>Productos del ejemplo</h3><div class="menu-product-list">${productRows}</div></div>
         <div class="menu-baskets"><div class="surface-heading"><div><h3>Tipos de pedido</h3>
@@ -564,7 +478,6 @@ function menuMarkup(scenario: ScenarioDraft): string {
           <div class="button-row"><span class="help-text">Máximo 32 tipos de pedido.</span>
             <button class="secondary-button" type="button" data-add-menu-basket ${baskets.length >= 32 ? "disabled" : ""}>Añadir tipo de pedido</button></div>
         </div>
-        <p class="subtle-note menu-preparation-note">Los pedidos nuevos usan estos productos y la preparación global queda inactiva mientras el menú está encendido. Al apagarlo, se conserva y vuelve a usarse.</p>
       </div>` : ""}
     </fieldset>`;
 }
@@ -740,10 +653,10 @@ function staffMarkup(scenario: ScenarioDraft): string {
     <div class="field-grid">
       <div class="field"><label for="cashiers">Cajeros</label>
         <input id="cashiers" type="number" min="1" max="${WORK_LIMITS.max_workers_per_pool}" step="1" required name="cashiers" data-integer-field data-scenario-field="engine_config.cashiers" value="${inputValue(config.cashiers, 0)}">
-        <p class="help-text">Cuántas órdenes pueden cobrarse al mismo tiempo.</p></div>
+          </div>
       <div class="field"><label for="preparers">Preparadores</label>
         <input id="preparers" type="number" min="1" max="${WORK_LIMITS.max_workers_per_pool}" step="1" required name="preparers" data-integer-field data-scenario-field="engine_config.preparers" value="${inputValue(config.preparers, 0)}">
-        <p class="help-text">Cuántas órdenes pueden prepararse al mismo tiempo.</p></div>
+          </div>
     </div>`;
 }
 
@@ -946,10 +859,10 @@ export function renderScenarioView(options: {
       <div class="field-grid">
         <div class="field"><label for="opening-time">Hora de apertura</label>
           <input id="opening-time" type="time" step="1" required name="opening_time" data-opening-time value="${escapeHtml(scenario.engine_config.opening_time)}">
-          <p class="help-text">Reloj local de la simulación; no usa la hora del navegador.</p></div>
+          </div>
         <div class="field"><label for="closing-time">Cierre de admisiones</label>
           <input id="closing-time" type="time" step="1" required name="closing_time" data-closing-time value="${escapeHtml(closingTime(scenario))}">
-          <p class="help-text">Debe ser posterior a la apertura y del mismo día. El trabajo admitido puede terminar después.</p></div>
+          </div>
       </div>` : `
       <div class="field-grid">
         <div class="field"><label for="opening-time-readonly">Apertura guardada</label><input id="opening-time-readonly" type="text" value="${escapeHtml(scenario.engine_config.opening_time)}" readonly></div>
@@ -1013,8 +926,6 @@ export function renderScenarioView(options: {
   return `
     <div class="page-intro">
       <h1>Escenarios</h1>
-      <p>Una réplica ejecuta esta configuración una vez. Revisa su procedencia y sus supuestos; los escenarios no están calibrados con la tienda.</p>
-      <p class="help-text">Límites de cómputo: ${WORK_LIMITS.max_workers_per_pool} personas por equipo, ${WORK_LIMITS.max_group_size} por grupo, ${WORK_LIMITS.max_initial_orders} órdenes iniciales y ${WORK_LIMITS.max_new_orders} órdenes nuevas por réplica. La carga real también se limita a ${WORK_LIMITS.max_people_per_run} personas por ejecución. No representan la capacidad de la tienda.</p>
     </div>
     ${errorPanel}
     <div class="scenario-layout">
@@ -1022,32 +933,17 @@ export function renderScenarioView(options: {
         <div class="form-footer">
           <div class="form-footer-copy">
             <p class="active-scenario-label">Configurando: <strong data-active-scenario-name>${escapeHtml(scenario.display_name)}</strong></p>
-            <span id="scenario-request-status" class="help-text" role="status" aria-live="polite">${options.pending ? "La ejecución está en curso." : "Descarga JSON para conservar el escenario."}</span>
+            <span id="scenario-request-status" class="help-text" role="status" aria-live="polite">${options.pending ? "La ejecución está en curso." : "La configuración queda disponible en esta sesión."}</span>
           </div>
           <div class="inline-actions">
-            <button class="secondary-button" type="button" data-save-scenario>Descargar escenario JSON</button>
             <button class="primary-button" type="button" data-run-scenario ${options.pending ? "disabled" : ""}>${options.pending ? "Calculando…" : "Ejecutar una réplica"}</button>
           </div>
         </div>
-
-        <section class="scenario-section live-simulation" aria-labelledby="live-simulation-title">
-          <h2 id="live-simulation-title">Simulación en vivo</h2>
-          <label class="checkbox-row" for="live-simulation-enabled">
-            <input id="live-simulation-enabled" type="checkbox" data-live-toggle aria-describedby="live-simulation-help">
-            <span>Actualizar simulación en vivo</span>
-          </label>
-          <p id="live-simulation-help" class="help-text">Cada cambio válido vuelve a ejecutar la réplica con la semilla del escenario. Puedes seguir editando mientras se calcula.</p>
-          <div data-live-load></div>
-          <p class="help-text" data-live-status role="status"></p>
-          <div data-live-metrics></div>
-          <button class="secondary-button" type="button" data-open-live-result disabled>Ver resultado y reproducción</button>
-        </section>
 
         <fieldset class="scenario-section">
           <legend>Modo y capacidad</legend>
           ${modeMarkup(scenario)}
           ${staffMarkup(scenario)}
-          <p class="subtle-note scenario-context-note">El modo cambia el equipo; conserva los demás valores.</p>
           ${scenario.initial_state.some((item) => !allowedStages(scenario).includes(item.stage))
             ? `<p class="alert-box warning-box" role="status">Hay una etapa inicial que no existe en este modo. Se conserva para que puedas corregirla; no se quitará ni se cambiará automáticamente.</p>` : ""}
         </fieldset>
@@ -1055,19 +951,11 @@ export function renderScenarioView(options: {
         <fieldset class="scenario-section">
           <legend>Ventana de simulación</legend>
           ${timeInputs}
-          <p class="subtle-note simulation-window-note">Al cerrar admisiones, no entran más órdenes; las pendientes siguen hasta terminar.</p>
         </fieldset>
 
         <fieldset class="scenario-section">
           <legend>Tiempos del sistema</legend>
-          <p class="help-text">Constante usa siempre la misma duración. Exponencial usa una media y admite duraciones largas. Triangular usa un mínimo, un valor más probable y un máximo.</p>
           <div class="distribution-list">${distributionRows}</div>
-          ${arrivalScheduleMarkup(scenario)}
-          <div class="field-grid transfer-settings">
-            <div class="field"><label for="transfer-probability">Probabilidad de transferencia</label>
-              <input id="transfer-probability" type="number" min="0" max="1" step="any" required name="transfer_probability" data-scenario-field="transfer_probability" value="${inputValue(scenario.transfer_probability)}">
-              <p class="help-text">Valor entre 0 y 1. Las demás órdenes pagan en efectivo.</p></div>
-          </div>
           <div class="field patience-field">
             <label class="checkbox-row" for="patience-enabled"><input id="patience-enabled" type="checkbox" name="patience_enabled" data-patience-enabled ${patience ? "checked" : ""}>
               <span>Aplicar paciencia mientras se espera el primer pago</span></label>
@@ -1082,24 +970,6 @@ export function renderScenarioView(options: {
       </form>
 
       <aside class="scenario-side" aria-label="Notas del modelo y archivos">
-        <details class="work-surface side-surface scenario-help" data-model-help ${options.helpOpen ? "open" : ""}>
-          <summary>Ayuda del modelo</summary>
-          <ul class="assumption-list">
-            <li>Una orden compartida tiene un pago y una preparación.</li>
-            <li>El tamaño del grupo no cambia el tiempo de preparación.</li>
-            <li>La paciencia solo cuenta antes de empezar el pago.</li>
-            <li>El estado vacío al abrir es una decisión explícita.</li>
-            <li>Los intervalos de confianza describen la variación entre simulaciones.</li>
-          </ul>
-        </details>
-        <section class="work-surface side-surface">
-          <h2>Reabrir un archivo</h2>
-          <p>Abre un escenario, réplica o experimento sin volver a ejecutarlo.</p>
-          <div class="scenario-io">
-            <label class="secondary-button" for="saved-json-file">Elegir JSON guardado</label>
-            <input class="visually-hidden" id="saved-json-file" type="file" accept="application/json,.json" data-open-json>
-          </div>
-        </section>
       </aside>
     </div>`;
 }
@@ -1170,35 +1040,11 @@ export function collectScenarioDraft(
     if (definition) next[definition.key] = value as unknown as TimeDistributionDraft;
   }
 
-  const scheduleEnabled = data.get("arrival_schedule_enabled") === "on";
-  next.arrival_schedule_enabled = scheduleEnabled;
-  if (scheduleEnabled) {
-    const baseSchedule = base.arrival_schedule ?? [];
-    const rows = [...form.querySelectorAll<HTMLElement>("[data-arrival-window]")];
-    if (rows.length > 0) {
-      next.arrival_schedule = rows.map((row, index) => {
-        const start = readNumber(row.querySelector<HTMLInputElement>(`[data-arrival-window-start="${index}"]`)?.value ?? "");
-        const endMinutes = readNumber(row.querySelector<HTMLInputElement>(`[data-arrival-window-end="${index}"]`)?.value ?? "");
-        const rate = readNumber(row.querySelector<HTMLInputElement>(`[data-arrival-orders-per-hour="${index}"]`)?.value ?? "");
-        const previousBaseEnd = baseSchedule[index - 1]?.end_s;
-        const previousEndInput = rows[index - 1]?.querySelector<HTMLInputElement>(`[data-arrival-window-end="${index - 1}"]`);
-        const editedPreviousEnd = previousEndInput ? readNumber(previousEndInput.value) : null;
-        const previousEndSeconds = editedPreviousEnd == null ? null : editedPreviousEnd * 60;
-        const previousBoundaryChanged = index > 0 && finite(previousBaseEnd) && finite(previousEndSeconds)
-          && Math.abs(previousBaseEnd - previousEndSeconds) > 1e-7;
-        return {
-          start_s: previousBoundaryChanged ? previousEndSeconds : start,
-          end_s: endMinutes == null ? null : endMinutes * 60,
-          orders_per_hour: rate,
-        };
-      });
-    } else {
-      next.arrival_schedule = base.arrival_schedule?.length ? base.arrival_schedule : defaultArrivalSchedule(next);
-    }
-  }
+  next.arrival_schedule_enabled = false;
+  delete next.arrival_schedule;
 
-  const menuEnabled = data.get("menu_enabled") === "on";
-  next.menu_enabled = menuEnabled;
+  const menuEnabled = true;
+  next.menu_enabled = true;
   if (menuEnabled) {
     const baseMenu = base.menu ?? defaultMenu();
     const productRows = [...form.querySelectorAll<HTMLElement>("[data-menu-product]")];
@@ -1230,6 +1076,7 @@ export function collectScenarioDraft(
     }
   }
 
+  next.transfer_probability = 0;
   if (data.get("patience_enabled") === "on") {
     const patienceRow = form.querySelector<HTMLElement>('[data-distribution-row="patience"]');
     if (patienceRow) {

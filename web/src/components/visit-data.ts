@@ -55,11 +55,10 @@ export function renderVisitDataPicker(selectedVisitId: string | null, pending: b
 export function renderVisitScenarioPicker(pending: boolean): string {
   return `<section class="work-surface visit-data-surface" aria-labelledby="visit-scenarios-title">
     <div class="surface-heading"><div><h2 id="visit-scenarios-title">Escenarios de las visitas</h2>
-      <p>Cada visita tiene una configuración exploratoria editable con su ventana observada, personal reportado y promedios de los registros. Esa ventana no representa el horario completo del negocio.</p></div></div>
+      </div></div>
     <div class="button-row" role="group" aria-label="Preparar escenario de una visita">
       ${observedVisits.map(visit => `<button type="button" class="secondary-button" data-visit-scenario="${escapeHtml(visit.visit_id)}" ${pending ? "disabled" : ""}>${visitShortLabel(visit.date)}</button>`).join("")}
       <button type="button" class="quiet-button" data-load-synthetic ${pending ? "disabled" : ""}>Añadir demostración sintética</button>
     </div>
-    <p class="subtle-note">Escenarios sin calibrar: los intervalos observados no separan trabajo activo, esperas externas y pausas. Se suponen grupos de una persona, estado inicial vacío y ausencia de retiros; revisa estos supuestos antes de interpretar resultados. La simulación genera nuevas llegadas, no reproduce las marcas exactas de las visitas.</p>
   </section>`;
 }
