@@ -64,3 +64,31 @@ The separately rejected third-party guidance downloader was not retried or used.
 The five browser workflows used an isolated loopback server on port 8013, not
 the deployed service. Docker image execution and live-site verification remain
 pending for a separately authorized publication.
+
+## Authorized publication and live verification
+
+On 2026-11-04 the user-authorized publication was verified in Render workspace
+Heber (`tea-d4fsj5ufu37c739i8mo0`), service `boquitas-simulacion`
+(`srv-dblam10n74is739imqlg`). Deploy `dep-dblj2nm417fc738mc350` reached `live`
+at 13:22:29 UTC for commit `3c908ef7586a47be6dbe96cab782f47bc589b396`.
+GitHub `main` was independently checked against that same SHA. This continuation
+observed the existing deployment and did not trigger a duplicate deployment.
+
+Live checks at https://boquitas-simulacion.onrender.com:
+
+- Tuesday opens automatically with 119 station records (61 cashier, 58 delivery),
+  three withdrawals and visible overlap diagnostics.
+- Friday selection displays 16 station records (8 cashier, 8 delivery) and the
+  corresponding measured replay options without uploading files.
+- Both preloaded exploratory scenarios executed through the public UI; both
+  `/api/v1/runs` responses were HTTP 200 and rendered results for the selected day.
+- `/api/v1/health` returned HTTP 200, `status: ok`, `contract_version: 1`.
+- Render returned no error-level logs between deployment completion and the
+  verification query. Desktop captures were inspected; the checked result view
+  had no horizontal overflow.
+
+One browser wait timed out because its expected heading was not the application's
+actual heading. Subsequent inspection confirmed the Tuesday result, and both
+successful HTTP responses were verified directly. No application failure was
+observed. This was a deployment smoke check, not a production load test or
+empirical model validation; the full local suites above were not rerun.

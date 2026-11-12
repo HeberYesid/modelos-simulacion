@@ -15,6 +15,11 @@ export interface ReplaySelection {
   replicationIndex: number;
 }
 
+export interface ComparisonReplayRuns {
+  reference: RunResult;
+  candidate: RunResult;
+}
+
 const METRIC_LABELS: Record<string, string> = {
   "count.admitted.orders.new": "Órdenes admitidas en la ventana",
   "count.admitted.people.new": "Personas admitidas en la ventana",
@@ -365,9 +370,9 @@ function eventGroupDetailMarkup(
   return `<p class="help-text">${formatNumber(events.length, 0)} eventos registrados${at ? ` ${at}` : " en este instante"}; se conserva su orden de secuencia.</p>${events.map(eventDetailFor).join("")}`;
 }
 
-export function updateReplayPlaybackReadout(run: RunResult, offset: number, settledEvents: number): void {
+export function updateReplayPlaybackReadout(run: RunResult, offset: number, settledEvents: number, root: ParentNode = document, idPrefix = ""): void {
   const current = Math.min(Math.max(0, offset), run.trace.drain_end_s);
-  const readout = document.querySelector<HTMLElement>("#replay-readout");
+  const readout = root.querySelector<HTMLElement>(`#${idPrefix}replay-readout`);
   if (readout) {
     readout.textContent = `${formatClockFromOpening(run.trace.config.opening_time, current)} · ${formatNumber(settledEvents, 0)} de ${formatNumber(run.trace.events.length, 0)} eventos asentados`;
   }
@@ -376,21 +381,24 @@ export function updateReplayPlaybackReadout(run: RunResult, offset: number, sett
 export function updateReplayLatestEvent(
   event: RunResult["trace"]["events"][number] | null,
   sameInstantEvents?: ReadonlyArray<RunResult["trace"]["events"][number]>,
+  root: ParentNode = document,
+  idPrefix = "",
 ): void {
-  const detail = document.querySelector<HTMLElement>("#replay-event-detail");
+  const detail = root.querySelector<HTMLElement>(`#${idPrefix}replay-event-detail`);
   const events = sameInstantEvents ?? (event ? [event] : []);
   if (detail) detail.innerHTML = sameInstantEvents ? eventGroupDetailMarkup(events) : eventDetailFor(event);
 }
 
-export function updateReplayTimeline(run: RunResult, offset: number): void {
+export function updateReplayTimeline(run: RunResult, offset: number, root: ParentNode = document, idPrefix = ""): void {
   const current = Math.min(Math.max(0, offset), run.trace.drain_end_s);
   const count = run.trace.events.filter((event) => event.time_s <= current).length;
-  updateReplayPlaybackReadout(run, current, count);
-  const detail = document.querySelector<HTMLElement>("#replay-event-detail");
+  updateReplayPlaybackReadout(run, current, count, root, idPrefix);
+  const detail = root.querySelector<HTMLElement>(`#${idPrefix}replay-event-detail`);
   if (detail) detail.innerHTML = eventDetailMarkup(run, current);
 }
 
-function renderReplay(run: RunResult): string {
+function renderReplay(run: RunResult, idPrefix = "", title = "Recorrido de la réplica"): string {
+  const id = (value: string): string => `${idPrefix}${value}`;
   const traceEnd = Math.max(0, run.trace.drain_end_s);
   const first = currentEvent(run, 0);
   const count = first ? run.trace.events.filter((event) => event.time_s <= 0).length : 0;
@@ -402,14 +410,14 @@ function renderReplay(run: RunResult): string {
     `<option value="order:${escapeHtml(order.order_id)}">${escapeHtml(order.order_id)} · ${formatNumber(order.person_ids.length, 0)} ${order.person_ids.length === 1 ? "persona" : "personas"}</option>`,
   ).join("");
   return `
-    <section class="work-surface results-surface replay-surface" aria-labelledby="replay-title">
-      <div class="surface-heading"><div><h2 id="replay-title">Recorrido de la réplica</h2>
+    <section class="work-surface results-surface replay-surface" aria-labelledby="${id("replay-title")}">
+      <div class="surface-heading"><div><h2 id="${id("replay-title")}">${escapeHtml(title)}</h2>
         <p>Esta escena ilustra los eventos guardados por el motor. El reloj llega hasta la última entrega, aunque ocurra después del cierre.</p></div></div>
       <div class="replay-controls" role="group" aria-label="Controles de reproducción">
         <div class="replay-transport">
-          <button id="replay-play" class="primary-button" type="button" data-replay-play aria-pressed="false">Reproducir</button>
-          <button id="replay-restart" class="secondary-button" type="button" data-replay-restart>Volver al inicio</button>
-          <div class="replay-speed field"><label for="replay-speed">Velocidad</label><select id="replay-speed" data-replay-speed>
+          <button id="${id("replay-play")}" class="primary-button" type="button" data-replay-play aria-pressed="false">Reproducir</button>
+          <button id="${id("replay-restart")}" class="secondary-button" type="button" data-replay-restart>Volver al inicio</button>
+          <div class="replay-speed field"><label for="${id("replay-speed")}">Velocidad</label><select id="${id("replay-speed")}" data-replay-speed>
             <option value="1">1×</option><option value="5">5×</option><option value="20" selected>20×</option><option value="60">60×</option>
           </select></div>
         </div>
@@ -420,9 +428,9 @@ function renderReplay(run: RunResult): string {
           <button class="secondary-button" type="button" data-replay-camera-reset>Restablecer cámara</button>
         </div>
       </div>
-      <div id="replay-stage" class="replay-stage" data-state="loading">
-        <canvas id="replay-canvas" tabindex="-1" aria-label="Vista ilustrativa de la tienda. Usa los controles de teclado para reproducción, selección y cámara."></canvas>
-        <div id="replay-render-status" class="replay-render-status" role="status" aria-live="polite">Preparando la escena local…</div>
+      <div id="${id("replay-stage")}" class="replay-stage" data-state="loading">
+        <canvas id="${id("replay-canvas")}" tabindex="-1" aria-label="Vista ilustrativa de la tienda. Usa los controles de teclado para reproducción, selección y cámara."></canvas>
+        <div id="${id("replay-render-status")}" class="replay-render-status" role="status" aria-live="polite">Preparando la escena local…</div>
         <button class="secondary-button replay-retry" type="button" data-replay-retry hidden>Intentar abrir la vista 3D otra vez</button>
       </div>
       <div class="replay-scene-footer">
@@ -432,36 +440,47 @@ function renderReplay(run: RunResult): string {
           <span><i class="legend-dot waiting" aria-hidden="true"></i>Espera pagada</span>
           <span><i class="legend-dot preparation" aria-hidden="true"></i>Preparación y entrega</span>
         </div>
-        <span id="replay-scene-summary" class="status-chip">La escena representa el historial seleccionado.</span>
+        <span id="${id("replay-scene-summary")}" class="status-chip">La escena representa el historial seleccionado.</span>
         <p class="replay-illustration-note">Distribución ilustrativa; no representa medidas ni capacidad física del local.</p>
       </div>
       <div class="replay-controls replay-timeline-controls">
         <div class="replay-timeline-action">
-          <label class="visually-hidden" for="replay-slider">Reloj de simulación</label>
-          <input id="replay-slider" type="range" min="0" max="${traceEnd}" step="any" value="0" aria-describedby="replay-readout">
+          <label class="visually-hidden" for="${id("replay-slider")}">Reloj de simulación</label>
+          <input id="${id("replay-slider")}" type="range" min="0" max="${traceEnd}" step="any" value="0" aria-describedby="${id("replay-readout")}">
           <div class="timeline-markers"><span>Inicio</span><span>Cierran admisiones · ${escapeHtml(formatClockFromOpening(run.trace.config.opening_time, run.trace.window_end_s))}</span><span>Fin</span></div>
         </div>
         <span class="status-chip replay-window-chip">Ventana ${escapeHtml(formatSeconds(run.trace.window_end_s))}</span>
       </div>
-      <div id="replay-readout" class="timeline-readout" role="status" aria-live="polite">${escapeHtml(readout)}</div>
-      <div id="replay-event-detail" class="replay-event-detail">${eventDetailMarkup(run, 0)}</div>
-      <div class="replay-inspector" role="group" aria-labelledby="replay-inspector-title">
-        <div class="replay-inspector-heading"><div><h3 id="replay-inspector-title">Personas y órdenes</h3>
+      <div id="${id("replay-readout")}" class="timeline-readout" role="status" aria-live="polite">${escapeHtml(readout)}</div>
+      <div id="${id("replay-event-detail")}" class="replay-event-detail">${eventDetailMarkup(run, 0)}</div>
+      <div class="replay-inspector" role="group" aria-labelledby="${id("replay-inspector-title")}">
+        <div class="replay-inspector-heading"><div><h3 id="${id("replay-inspector-title")}">Personas y órdenes</h3>
           <p>Selecciona una entidad para ver su vínculo y los tiempos disponibles.</p></div>
-          <div class="replay-entity-field field"><label for="replay-entity">Inspeccionar</label>
-            <select id="replay-entity" data-replay-entity>
+          <div class="replay-entity-field field"><label for="${id("replay-entity")}">Inspeccionar</label>
+            <select id="${id("replay-entity")}" data-replay-entity>
               <option value="">Elige una persona o una orden</option>
               ${personOptions ? `<optgroup label="Personas">${personOptions}</optgroup>` : ""}
               ${orderOptions ? `<optgroup label="Órdenes">${orderOptions}</optgroup>` : ""}
             </select>
           </div>
         </div>
-        <div id="replay-inspector-detail" class="replay-inspector-detail" aria-live="polite">
+        <div id="${id("replay-inspector-detail")}" class="replay-inspector-detail" aria-live="polite">
           <p class="help-text">Las personas completadas o retiradas siguen disponibles aquí.</p>
         </div>
       </div>
       <p class="provenance-line">Cierre de admisiones: ${escapeHtml(formatClockFromOpening(run.trace.config.opening_time, run.trace.window_end_s))} · fin de la réplica: ${escapeHtml(formatClockFromOpening(run.trace.config.opening_time, run.trace.drain_end_s))}.</p>
     </section>`;
+}
+
+function renderComparisonReplay(runs: ComparisonReplayRuns): string {
+  return `<section class="comparison-replay" aria-labelledby="comparison-replay-title">
+    <div class="surface-heading"><div><h2 id="comparison-replay-title">Ejecuciones 3D comparadas</h2>
+      <p>Las dos alternativas usan la misma semilla e índice de réplica y avanzan sincronizadas.</p></div></div>
+    <div class="comparison-replay-grid">
+      <div class="comparison-replay-pane"><h3>${escapeHtml(runs.reference.scenario.display_name)}</h3>${renderReplay(runs.reference, "comparison-reference-", "Ejecución de referencia")}</div>
+      <div class="comparison-replay-pane"><h3>${escapeHtml(runs.candidate.scenario.display_name)}</h3>${renderReplay(runs.candidate, "comparison-candidate-", "Ejecución alternativa")}</div>
+    </div>
+  </section>`;
 }
 
 function renderRunOrders(run: RunResult): string {
@@ -578,7 +597,7 @@ function renderExperiment(experiment: ExperimentResult, selection: ReplaySelecti
   const selectedMetric = candidateMetrics[0] ?? "";
   const options = candidateMetrics.map((metric) => `<option value="${escapeHtml(metric)}">${escapeHtml(metricLabel(metric))}</option>`).join("");
   const candidateIds = experiment.scenarios.map((scenario) => scenario.scenario_id);
-  const selectedScenario = selection?.scenarioId && candidateIds.includes(selection.scenarioId)
+  const selectedScenario = selection?.scenarioId && candidateIds.includes(selection.scenarioId) && selection.scenarioId !== candidateIds[0]
     ? selection.scenarioId
     : candidateIds[1] ?? candidateIds[0] ?? "";
   const completedIndices = experiment.replication_results
@@ -633,6 +652,7 @@ export function renderResultsView(options: {
   completed: CompletedResult | null;
   selectedRun: RunResult | null;
   selection: ReplaySelection | null;
+  comparisonRuns?: ComparisonReplayRuns | null;
   observations: ImportReport | null;
   pending: string | null;
   pendingMessage: string | null;
@@ -703,7 +723,8 @@ export function renderResultsView(options: {
         ${renderExperiment(experiment, options.selection)}
         ${selectedRun ? `<div class="results-meta"><div class="result-meta"><span class="status-chip">${escapeHtml(selectionTitle)}</span><span>Solicitud reproducible con la semilla e índice del experimento.</span></div></div>` : ""}
       ` : ""}
-      ${baseRun ? `${renderReplay(baseRun)}<div class="results-grid ${experiment ? "has-selection" : ""}"><div class="results-column">
+      ${experiment && options.comparisonRuns ? renderComparisonReplay(options.comparisonRuns) : ""}
+      ${baseRun ? `${experiment && options.comparisonRuns ? "" : renderReplay(baseRun)}<div class="results-grid ${experiment ? "has-selection" : ""}"><div class="results-column">
         ${renderAssumptions(baseRun)}
         ${renderRunMetrics(baseRun)}
         ${renderQueueModels(baseRun)}

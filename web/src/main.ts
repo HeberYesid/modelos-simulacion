@@ -1,7 +1,7 @@
 import "./styles.css";
 import { installColorSchemeToggle } from "./theme";
 import type { ExperimentResult, RunResult, Scenario, ScenarioDraft } from "./api/types";
-import type { CompletedResult, ReplaySelection } from "./components/results";
+import type { CompletedResult, ComparisonReplayRuns, ReplaySelection } from "./components/results";
 import { renderResultsView, renderExperimentChartForSelection, updateReplayTimeline } from "./components/results";
 import { renderObservationsView, type ObservationSourceMode } from "./components/observations";
 import { renderObservedSection, mountObservedSection, type ObservedSectionHandle } from "./components/observed-replay";
@@ -100,6 +100,7 @@ interface AppState {
   completedBytes: ArrayBuffer | null;
   selectedRun: RunResult | null;
   selection: ReplaySelection | null;
+  comparisonRuns: ComparisonReplayRuns | null;
   analysisObjective: AnalysisObjective;
   csvFiles: Array<{ name: string; url: string }>;
   csvLabel: string | null;
@@ -137,6 +138,7 @@ const state: AppState = {
   completedBytes: null,
   selectedRun: null,
   selection: null,
+  comparisonRuns: null,
   analysisObjective: "time",
   csvFiles: [],
   csvLabel: null,
@@ -152,6 +154,7 @@ let liveScenarioKey: string | null = null;
 let livePreview: { key: string; result: RunResult } | null = null;
 let liveFailure: { key: string; message: string } | null = null;
 let activeReplayHost: ReplayHostHandle | null = null;
+let activeReplayHosts: ReplayHostHandle[] = [];
 let activeObservedSection: ObservedSectionHandle | null = null;
 let replayMemoryRun: RunResult | null = null;
 let replayMemoryTimeS = 0;
@@ -276,6 +279,8 @@ function renderCurrentView(focusRoot = false): void {
   const replayRun = state.view === "results"
     ? state.completed?.kind === "run" ? state.completed.value : state.selectedRun
     : null;
+  for (const host of activeReplayHosts) host.dispose();
+  activeReplayHosts = [];
   activeReplayHost?.dispose();
   activeReplayHost = null;
   activeObservedSection?.dispose();
@@ -327,6 +332,7 @@ function renderCurrentView(focusRoot = false): void {
       completed: state.completed,
       selectedRun: state.selectedRun,
       selection: state.selection,
+      comparisonRuns: state.comparisonRuns,
       observations: state.observations,
       pending: state.pending,
       pendingMessage: state.pendingMessage,
@@ -339,7 +345,37 @@ function renderCurrentView(focusRoot = false): void {
     });
   }
   if (state.activeExecution) root.insertAdjacentHTML("afterbegin", executionCancellationMarkup(state.activeExecution));
-  if (replayRun && root.querySelector("#replay-stage")) {
+  if (state.view === "results" && state.completed?.kind === "experiment" && state.comparisonRuns) {
+    const runs = state.comparisonRuns;
+    let syncingComparisonTime = false;
+    const hosts = [
+      { run: runs.reference, prefix: "comparison-reference-" },
+      { run: runs.candidate, prefix: "comparison-candidate-" },
+    ].map(({ run, prefix }) => {
+      const stage = root.querySelector<HTMLElement>(`#${prefix}replay-stage`);
+      if (!stage) return null;
+      const replayRoot = stage.closest<HTMLElement>(".comparison-replay-pane") ?? root;
+      try {
+        return mountReplayHost(run, {
+          root: replayRoot,
+          idPrefix: prefix,
+          initialTimeS: replayMemoryTimeS,
+          onTimeChange(timeS) {
+            replayMemoryTimeS = timeS;
+            if (syncingComparisonTime) return;
+            syncingComparisonTime = true;
+            for (const other of activeReplayHosts) other.seekTo(timeS);
+            syncingComparisonTime = false;
+          },
+        }, replayProjectorFor(run));
+      } catch {
+        stage.dataset.state = "unavailable";
+        return null;
+      }
+    });
+    activeReplayHosts = hosts.filter((host): host is ReplayHostHandle => host !== null);
+    activeReplayHost = activeReplayHosts[1] ?? activeReplayHosts[0] ?? null;
+  } else if (replayRun && root.querySelector("#replay-stage")) {
     try {
       activeReplayHost = mountReplayHost(replayRun, {
         initialTimeS: replayMemoryTimeS,
@@ -347,6 +383,7 @@ function renderCurrentView(focusRoot = false): void {
         onTimeChange(timeS) { replayMemoryTimeS = timeS; },
         onSelectionChange(selection) { replayMemorySelection = selection; },
       }, replayProjectorFor(replayRun));
+      activeReplayHosts = [activeReplayHost];
     } catch (error) {
       const stage = root.querySelector<HTMLElement>("#replay-stage");
       if (stage) {
@@ -861,6 +898,7 @@ function showRunResult(result: RunResult): void {
   state.completedBytes = null;
   state.selectedRun = result;
   state.selection = { scenarioId: result.scenario.scenario_id, replicationIndex: result.replication_index };
+  state.comparisonRuns = null;
   clearCsvFiles();
   state.resultError = null;
 }
@@ -999,6 +1037,7 @@ async function runBatch(): Promise<void> {
     state.completedBytes = null;
     state.selectedRun = null;
     state.selection = null;
+    state.comparisonRuns = null;
     for (let index = 0; index < result.scenarios.length; index += 1) {
       const current = state.scenarios[index];
       if (current && scenarioWireJson(current) === JSON.stringify(submittedScenarios[index])) {
@@ -1120,14 +1159,19 @@ async function selectExperimentReplication(): Promise<void> {
   if (!scenarioId || !Number.isSafeInteger(replicationIndex) || replicationIndex < 0) return;
   const experiment = state.completed.value;
   const scenario = experiment.scenarios.find((item) => item.scenario_id === scenarioId);
+  const referenceScenario = experiment.scenarios[0];
   const record = experiment.replication_results.find((item) => item.scenario_id === scenarioId && item.replication_index === replicationIndex);
-  if (!scenario || !record || record.status !== "complete") {
+  const referenceRecord = referenceScenario
+    ? experiment.replication_results.find((item) => item.scenario_id === referenceScenario.scenario_id && item.replication_index === replicationIndex)
+    : null;
+  if (!scenario || !referenceScenario || !record || record.status !== "complete" || !referenceRecord || referenceRecord.status !== "complete") {
     state.resultError = "Esta réplica no terminó correctamente; elige un escenario e índice que tengan un registro completo.";
     renderCurrentView();
     return;
   }
   const identity = { scenarioId, replicationIndex };
   const request: RunRequest = { scenario, root_seed: experiment.root_seed, replication_index: replicationIndex };
+  const referenceRequest: RunRequest = { scenario: referenceScenario, root_seed: experiment.root_seed, replication_index: replicationIndex };
   const execution: ActiveExecution = {
     id: crypto.randomUUID(),
     kind: "run",
@@ -1138,15 +1182,23 @@ async function selectExperimentReplication(): Promise<void> {
   state.activeExecution = execution;
   setPending("selection", "El motor está reconstruyendo la réplica exacta elegida desde la semilla y el índice guardados.");
   try {
-    const result = await executeRun(request, execution.id);
+    const [result, referenceResult] = await Promise.all([
+      executeRun(request, execution.id),
+      executeRun(referenceRequest, execution.id),
+    ]);
     replayProjectorFor(result);
+    replayProjectorFor(referenceResult);
     if (result.scenario.scenario_id !== identity.scenarioId
+      || referenceResult.scenario.scenario_id !== referenceScenario.scenario_id
       || result.root_seed !== experiment.root_seed
-      || result.replication_index !== identity.replicationIndex) {
+      || referenceResult.root_seed !== experiment.root_seed
+      || result.replication_index !== identity.replicationIndex
+      || referenceResult.replication_index !== identity.replicationIndex) {
       throw new Error(`El ${serviceName()} respondió con otra identidad de réplica. El resultado anterior se mantiene.`);
     }
     state.selectedRun = result;
     state.selection = identity;
+    state.comparisonRuns = { reference: referenceResult, candidate: result };
     state.resultError = null;
     clearCsvFiles();
   } catch (error) {
@@ -1207,6 +1259,13 @@ function handleInput(event: Event): void {
   setDirty(isDirty());
 }
 
+function replayHostForTarget(target: Element): ReplayHostHandle | null {
+  const pane = target.closest<HTMLElement>(".comparison-replay-pane");
+  if (!pane) return activeReplayHost;
+  const index = [...document.querySelectorAll<HTMLElement>(".comparison-replay-pane")].indexOf(pane);
+  return activeReplayHosts[index] ?? activeReplayHost;
+}
+
 function handleChange(event: Event): void {
   const target = event.target;
   if (!(target instanceof HTMLInputElement || target instanceof HTMLSelectElement || target instanceof HTMLTextAreaElement)) return;
@@ -1220,11 +1279,12 @@ function handleChange(event: Event): void {
     return;
   }
   if (target instanceof HTMLSelectElement && target.matches("[data-replay-entity]")) {
-    activeReplayHost?.selectEntity(target.value);
+    replayHostForTarget(target)?.selectEntity(target.value);
     return;
   }
   if (target instanceof HTMLSelectElement && target.matches("[data-replay-speed]")) {
-    activeReplayHost?.setSpeed(Number(target.value));
+    if (activeReplayHosts.length > 1) activeReplayHosts.forEach((host) => host.setSpeed(Number(target.value)));
+    else replayHostForTarget(target)?.setSpeed(Number(target.value));
     return;
   }
   if (target instanceof HTMLTextAreaElement && target.matches('[data-initial-field$=".person_ids"]')) {
@@ -1517,16 +1577,18 @@ function handleClick(event: MouseEvent): void {
   } else if (button.matches("[data-select-replication]")) {
     void selectExperimentReplication();
   } else if (button.matches("[data-replay-play]")) {
-    activeReplayHost?.togglePlayback();
+    if (activeReplayHosts.length > 1) activeReplayHosts.forEach((host) => host.togglePlayback());
+    else replayHostForTarget(button)?.togglePlayback();
   } else if (button.matches("[data-replay-restart]")) {
-    activeReplayHost?.restartPlayback();
+    if (activeReplayHosts.length > 1) activeReplayHosts.forEach((host) => host.restartPlayback());
+    else replayHostForTarget(button)?.restartPlayback();
   } else if (button.matches("[data-replay-camera-reset]")) {
-    activeReplayHost?.resetCamera();
+    replayHostForTarget(button)?.resetCamera();
   } else if (button.matches("[data-replay-view-toggle]")) {
-    activeReplayHost?.toggleShopView();
+    replayHostForTarget(button)?.toggleShopView();
   } else if (button.matches("[data-replay-zoom]")) {
     const direction = button.dataset.replayZoom;
-    if (direction === "in" || direction === "out") activeReplayHost?.zoom(direction);
+    if (direction === "in" || direction === "out") replayHostForTarget(button)?.zoom(direction);
   } else if (button.matches("[data-reload-demo]")) {
     void loadDemoScenario();
   }
@@ -1571,8 +1633,9 @@ function handleComparisonMetricChange(event: Event): void {
 
 function handleReplayInput(event: Event): void {
   const target = event.target;
-  if (!(target instanceof HTMLInputElement) || target.id !== "replay-slider") return;
-  if (activeReplayHost) activeReplayHost.seekTo(Number(target.value));
+  if (!(target instanceof HTMLInputElement) || !target.matches("[id$='replay-slider']")) return;
+  const host = replayHostForTarget(target);
+  if (host) host.seekTo(Number(target.value));
   else if (state.selectedRun) updateReplayTimeline(state.selectedRun, Number(target.value));
 }
 

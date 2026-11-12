@@ -627,6 +627,12 @@ a { color: var(--raspberry-ink); }
 .scenario-flag { display: inline-flex; align-items: center; min-height: 1.8rem; padding: 0.2rem 0.5rem; border: 1px solid var(--rule); border-radius: 999px; color: var(--muted); font-size: 0.74rem; }
 
 .replay-surface { display: grid; gap: 0.9rem; }
+.comparison-replay { display: grid; gap: 0.9rem; }
+.comparison-replay-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1rem; }
+.comparison-replay-pane { min-width: 0; }
+.comparison-replay-pane > h3 { margin: 0 0 0.55rem; font-size: 1rem; }
+.comparison-replay-pane .replay-surface { height: 100%; }
+.comparison-replay-pane .replay-stage { height: clamp(20rem, 30vw, 30rem); min-height: 20rem; }
 .replay-surface .surface-heading { margin-bottom: 0; }
 .replay-controls { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 0.65rem 1rem; }
 .replay-transport, .replay-camera-controls { display: flex; flex-wrap: wrap; align-items: center; gap: 0.5rem; }
@@ -742,6 +748,7 @@ a { color: var(--raspberry-ink); }
   .batch-selectors button { grid-column: 1 / -1; width: 100%; }
   .event-detail { grid-template-columns: 1fr 1fr; }
   .replay-stage { height: 24rem; min-height: 24rem; }
+  .comparison-replay-grid { grid-template-columns: 1fr; }
   .replay-inspector-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .replay-speed { margin-left: 0; }
   .app-footer { flex-direction: column; }

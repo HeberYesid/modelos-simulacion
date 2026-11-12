@@ -19,6 +19,8 @@ import { basketUnitCount, MAX_VISIBLE_PRODUCT_MODELS } from "./products";
 import { createShopScene, type ShopScene, type ShopView } from "./scene";
 
 export interface ReplayHostOptions {
+  root?: ParentNode;
+  idPrefix?: string;
   initialTimeS?: number;
   initialSelection?: string;
   onTimeChange?: (timeS: number) => void;
@@ -223,19 +225,22 @@ export function mountReplayHost(
   options: ReplayHostOptions = {},
   validatedProjector?: ReplayProjector,
 ): ReplayHostHandle {
-  const stage = document.querySelector<HTMLElement>("#replay-stage");
-  const readout = document.querySelector<HTMLElement>("#replay-readout");
-  const slider = document.querySelector<HTMLInputElement>("#replay-slider");
-  const playButton = document.querySelector<HTMLButtonElement>("[data-replay-play]");
-  const restartButton = document.querySelector<HTMLButtonElement>("[data-replay-restart]");
-  const speedSelect = document.querySelector<HTMLSelectElement>("[data-replay-speed]");
-  const entitySelect = document.querySelector<HTMLSelectElement>("[data-replay-entity]");
-  const inspector = document.querySelector<HTMLElement>("#replay-inspector-detail");
-  const summary = document.querySelector<HTMLElement>("#replay-scene-summary");
-  const renderStatus = document.querySelector<HTMLElement>("#replay-render-status");
-  const retryButton = document.querySelector<HTMLButtonElement>("[data-replay-retry]");
-  const viewButton = document.querySelector<HTMLButtonElement>("[data-replay-view-toggle]");
-  const cameraButtons = document.querySelectorAll<HTMLButtonElement>("[data-replay-zoom], [data-replay-camera-reset], [data-replay-view-toggle]");
+  const root = options.root ?? document;
+  const prefix = options.idPrefix ?? "";
+  const query = <T extends Element>(selector: string): T | null => root.querySelector<T>(selector);
+  const stage = query<HTMLElement>(`#${prefix}replay-stage`);
+  const readout = query<HTMLElement>(`#${prefix}replay-readout`);
+  const slider = query<HTMLInputElement>(`#${prefix}replay-slider`);
+  const playButton = query<HTMLButtonElement>("[data-replay-play]");
+  const restartButton = query<HTMLButtonElement>("[data-replay-restart]");
+  const speedSelect = query<HTMLSelectElement>("[data-replay-speed]");
+  const entitySelect = query<HTMLSelectElement>("[data-replay-entity]");
+  const inspector = query<HTMLElement>(`#${prefix}replay-inspector-detail`);
+  const summary = query<HTMLElement>(`#${prefix}replay-scene-summary`);
+  const renderStatus = query<HTMLElement>(`#${prefix}replay-render-status`);
+  const retryButton = query<HTMLButtonElement>("[data-replay-retry]");
+  const viewButton = query<HTMLButtonElement>("[data-replay-view-toggle]");
+  const cameraButtons = root.querySelectorAll<HTMLButtonElement>("[data-replay-zoom], [data-replay-camera-reset], [data-replay-view-toggle]");
   if (!stage || !slider || !playButton || !restartButton || !speedSelect || !entitySelect || !inspector || !summary || !renderStatus || !retryButton) {
     throw new Error("Falta el contenedor de reproducción o alguno de sus controles.");
   }
@@ -250,7 +255,7 @@ export function mountReplayHost(
   let selectedEntity = options.initialSelection ?? "";
   let scene: ShopScene | null = null;
   let shopView: ShopView = "interior";
-  let canvas = stage.querySelector<HTMLCanvasElement>("#replay-canvas");
+  let canvas = stage.querySelector<HTMLCanvasElement>(`#${prefix}replay-canvas`);
   let fallbackAnimationFrame: number | null = null;
   let loopTarget: "renderer" | "fallback" | null = null;
   let lastFrameMs: number | null = null;
@@ -281,7 +286,7 @@ export function mountReplayHost(
     if (!force && eventIndex === lastReadoutEventCount && frameTimeMs - lastReadoutAtMs < 200) return;
     lastReadoutAtMs = frameTimeMs;
     lastReadoutEventCount = eventIndex;
-    updateReplayPlaybackReadout(run, clock.time_s, eventIndex);
+    updateReplayPlaybackReadout(run, clock.time_s, eventIndex, root, prefix);
     if (readout) readout.dataset.time = String(clock.time_s);
     if (slider && Number(slider.value) !== clock.time_s) slider.value = String(clock.time_s);
   };
@@ -422,7 +427,7 @@ export function mountReplayHost(
       scene?.setSimulationTime(clock.time_s);
       syncSummary(projected, affected, previousState);
       updateReplayLatestEvent(trace.events[eventIndex - 1] ?? null,
-        trace.contract_version === 2 ? latestEventGroup() : undefined);
+        trace.contract_version === 2 ? latestEventGroup() : undefined, root, prefix);
       updateInspector();
     }
     scene?.setSimulationTime(clock.time_s);
@@ -463,7 +468,7 @@ export function mountReplayHost(
     scene?.setState(projected, null, animate);
     scene?.setSimulationTime(clock.time_s);
     syncSummary(projected, null, previous);
-    updateReplayTimeline(run, clock.time_s);
+    updateReplayTimeline(run, clock.time_s, root, prefix);
     updateInspector();
     syncReadout();
     syncPlaybackControls();
@@ -494,7 +499,7 @@ export function mountReplayHost(
     scene?.dispose();
     scene = null;
     const replacement = document.createElement("canvas");
-    replacement.id = "replay-canvas";
+    replacement.id = `${prefix}replay-canvas`;
     replacement.tabIndex = -1;
     replacement.setAttribute("aria-label", "Vista ilustrativa de la tienda. Usa los controles externos de reproducción, selección y cámara.");
     if (canvas?.isConnected) canvas.replaceWith(replacement);
@@ -545,7 +550,7 @@ export function mountReplayHost(
   syncPlaybackControls();
   syncReadout(true);
   updateReplayLatestEvent(trace.events[eventIndex - 1] ?? null,
-    trace.contract_version === 2 ? latestEventGroup() : undefined);
+    trace.contract_version === 2 ? latestEventGroup() : undefined, root, prefix);
   updateInspector();
   syncSummary(projected, null, null);
   setRenderStatus("loading", "Preparando la escena local…");
